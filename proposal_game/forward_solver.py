@@ -41,34 +41,29 @@ def get_move_probabilities(state, my_belief, k_beliefs):
     return move_probabilities
 
 
-@memoized
-def single_belief_update(state, new_state, my_belief, k_beliefs):
+def single_belief_update(state, moves, my_belief, k_beliefs):
     move_probabilities = get_move_probabilities(state, my_belief, k_beliefs)
-    
-    # IMPORTANT!!!!! need to also update based on my move
-    # I.e. I only consider scenarios in which I moved in a certain way
 
     bad_probabilities = np.array([0.0]*NUM_PLAYERS) # this would be changed to support more belief states than just num_players
     for bad_guy, (bad_guy_prob, moves_if_bad) in enumerate(move_probabilities):
-        for move_list in itertools.product(*moves_if_bad):
-            if state.move(move_list) != new_state:
-                continue # ignore moves that wouldn't have produced this state
-            move_prob = product(moves_if_bad[player][m] for player, m in enumerate(move_list))
-            bad_probabilities[bad_guy] += bad_guy_prob * move_prob
+        move_prob = product(moves_if_bad[player][m] if m in moves_if_bad[player] else 0.0 for player, m in enumerate(moves))
+        bad_probabilities[bad_guy] = bad_guy_prob * move_prob
 
-    new_belief = bad_probabilities / np.sum(bad_probabilities)
+    s = np.sum(bad_probabilities)
+    if s == 0.0:
+        return my_belief
+    new_belief = bad_probabilities / s
     return tuple(new_belief)
 
 
-@memoized
-def k_belief_update(state, new_state, k_beliefs):
+def k_belief_update(state, moves, k_beliefs):
     if len(k_beliefs) == 0:
         return k_beliefs
 
-    lower_k_beliefs = k_belief_update(state, new_state, k_beliefs[1:])
+    lower_k_beliefs = k_belief_update(state, moves, k_beliefs[1:])
     new_k_belief = tuple([
         tuple([
-            single_belief_update(state, new_state, k_beliefs[0][player][is_bad], k_beliefs[1:]) # This would be changed to support N types.
+            single_belief_update(state, moves, k_beliefs[0][player][is_bad], k_beliefs[1:]) # This would be changed to support N types.
             for is_bad in range(2)
         ])
         for player in range(NUM_PLAYERS)
@@ -106,8 +101,8 @@ def get_value_and_move(state, me, is_bad, my_belief, k_beliefs):
             new_state = state.move(move_list)
             immediate_payoff = state.payoff(move_list, bad_guy, is_bad)
 
-            new_k_beliefs = k_belief_update(state, new_state, k_beliefs)
-            my_new_belief = single_belief_update(state, new_state, my_belief, k_beliefs)
+            new_k_beliefs = k_belief_update(state, move_list, k_beliefs)
+            my_new_belief = single_belief_update(state, move_list, my_belief, k_beliefs)
 
             future_payoff, _ = get_value_and_move(new_state, me, is_bad, my_new_belief, new_k_beliefs)
 
@@ -117,7 +112,7 @@ def get_value_and_move(state, me, is_bad, my_belief, k_beliefs):
     values = np.exp(np.array(values))
     probabilities = values / np.sum(values)
 
-    moveset = { move: probability for move, probability in zip(moves, probabilities) }
+    moveset = { move: probability for move, probability in zip(moves, probabilities) if probability != 0.0 }
     overall_value = sum(moveset[move]*value_if_move[move] for move in moves)
 
     # if is_bad and not 203 >= overall_value >= -23:

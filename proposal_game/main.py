@@ -111,15 +111,15 @@ def play_game(k, bad):
 
         print "Updating beliefs"
         for player in range(NUM_PLAYERS):
-            player_beliefs[player][0] = single_belief_update(state, new_state, player_beliefs[player][0], player_beliefs[player][1])
-            player_beliefs[player][1] = k_belief_update(state, new_state, player_beliefs[player][1])
+            player_beliefs[player][0] = single_belief_update(state, tuple(moves), player_beliefs[player][0], player_beliefs[player][1])
+            player_beliefs[player][1] = k_belief_update(state, tuple(moves), player_beliefs[player][1])
 
         state = new_state
 
 
 
 def play_main():
-    k = 4
+    k = 2
     bad = 1
     if k >= 1:
         print "===== Solving game at k={}, player {} is bad".format(k, bad)
