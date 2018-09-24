@@ -45,6 +45,9 @@ def get_move_probabilities(state, my_belief, k_beliefs):
 def single_belief_update(state, new_state, my_belief, k_beliefs):
     move_probabilities = get_move_probabilities(state, my_belief, k_beliefs)
     
+    # IMPORTANT!!!!! need to also update based on my move
+    # I.e. I only consider scenarios in which I moved in a certain way
+
     bad_probabilities = np.array([0.0]*NUM_PLAYERS) # this would be changed to support more belief states than just num_players
     for bad_guy, (bad_guy_prob, moves_if_bad) in enumerate(move_probabilities):
         for move_list in itertools.product(*moves_if_bad):
@@ -81,10 +84,22 @@ def get_value_and_move(state, me, is_bad, my_belief, k_beliefs):
     if my_belief is None:
         return 0.0, get_zero_move_set(state, me, is_bad)
 
+    assert my_belief[me] == (1.0 if is_bad else 0.0), "Invalid value: state={}, me={}, is_bad={}, my_belief={}, k_beliefs={}".format(state, me, is_bad, my_belief, k_beliefs)
+    if is_bad:
+        assert all(my_belief[i] == 0.0 for i in range(NUM_PLAYERS) if i != me)
+
+    # print "Solving: state={}, me={}, is_bad={}, my_belief={}, k_beliefs={}".format(state, me, is_bad, my_belief, k_beliefs)
+
     move_probabilities = get_move_probabilities(state, my_belief, k_beliefs)
 
     value_if_move = defaultdict(lambda: 0.0)
     for bad_guy, (bad_guy_prob, moves_if_bad) in enumerate(move_probabilities):
+        if is_bad and bad_guy != me:
+            assert bad_guy_prob == 0.0
+            continue
+        if not is_bad and bad_guy == me: # necessary, not an optimization. Must avoid allowing moves that are impossible
+            assert bad_guy_prob == 0.0
+            continue
         for move_list in itertools.product(*moves_if_bad):
             move = move_list[me]
             move_prob = product(moves_if_bad[player][m] if player != me else 1.0 for player, m in enumerate(move_list))
@@ -95,6 +110,7 @@ def get_value_and_move(state, me, is_bad, my_belief, k_beliefs):
             my_new_belief = single_belief_update(state, new_state, my_belief, k_beliefs)
 
             future_payoff, _ = get_value_and_move(new_state, me, is_bad, my_new_belief, new_k_beliefs)
+
             value_if_move[move] += bad_guy_prob * move_prob * (immediate_payoff + BETA*future_payoff)
 
     moves, values = zip(*value_if_move.items())
@@ -103,6 +119,15 @@ def get_value_and_move(state, me, is_bad, my_belief, k_beliefs):
 
     moveset = { move: probability for move, probability in zip(moves, probabilities) }
     overall_value = sum(moveset[move]*value_if_move[move] for move in moves)
+
+    # if is_bad and not 203 >= overall_value >= -23:
+    #     assert 203 >= overall_value >= -23, "Invalid value: state={}, me={}, is_bad={}, my_belief={}, k_beliefs={}, value={}".format(state, me, is_bad, my_belief, k_beliefs, overall_value)
+
+
+    # if not is_bad and not 23 > overall_value > -203:
+    #     assert 23 >= overall_value >= -203, "Invalid value: state={}, me={}, is_bad={}, my_belief={}, k_beliefs={}, value={}".format(state, me, is_bad, my_belief, k_beliefs, overall_value)
+
+
     return overall_value, moveset
 
 
