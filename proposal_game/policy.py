@@ -13,10 +13,7 @@ def get_zero_move_set(state, player, is_bad):
     for potential_move in moves:
         if state.is_proposing(player):
             _, proposal = potential_move
-            if player in proposal:
-                scores.append(10)
-            else:
-                scores.append(0)
+            scores.append(0)
         elif state.is_final():
             _, pick = potential_move
             if pick is None:
@@ -24,7 +21,7 @@ def get_zero_move_set(state, player, is_bad):
             else:
                 scores.append(0)
         else:
-            if state.is_on_mission(player) and (is_bad ^ potential_move[0] == MISSION_SUCCEED):
+            if state.is_on_mission(player) and (is_bad ^ (potential_move[0] == MISSION_SUCCEED)):
                 scores.append(10)
             else:
                 scores.append(0)

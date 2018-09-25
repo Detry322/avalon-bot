@@ -1,5 +1,5 @@
 import numpy as np
-np.random.seed(10)
+np.random.seed(11)
 
 from game import PhysicalGameState, NUM_PLAYERS, display_move
 import moves
@@ -89,15 +89,26 @@ def play_game(k, bad):
             explain(state, player, belief, k_belief)
 
         moves = [
-            get_move(get_value_and_move(
+            get_value_and_move(
                 state,
                 player,
                 player == bad,
                 player_beliefs[player][0],
                 player_beliefs[player][1]
-            )[1])
+            )[1]
             for player in range(NUM_PLAYERS)
         ]
+
+        print "===== move probs"
+
+        for player, moveset in enumerate(moves):
+            explained_moveset = { display_move(m): prob for m, prob in moveset.items() }
+            print "Player {} ({}): {}".format(player, 'BAD' if player == bad else '   ', explained_moveset)
+
+        print "===== actual moves"
+
+        moves = [get_move(moveset) for moveset in moves]
+
         for player, move in enumerate(moves):
             print "Player {} ({}): {}".format(player, 'BAD' if player == bad else '   ', display_move(move))
         payoff = state.payoff(moves, bad, False)
@@ -119,7 +130,7 @@ def play_game(k, bad):
 
 
 def play_main():
-    k = 2
+    k = 3
     bad = 1
     if k >= 1:
         print "===== Solving game at k={}, player {} is bad".format(k, bad)

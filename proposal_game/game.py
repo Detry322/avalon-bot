@@ -3,8 +3,8 @@ import copy
 
 from moves import *
 
-NUM_ROUNDS = 3
-NUM_PLAYERS = 3
+NUM_ROUNDS = 4
+NUM_PLAYERS = 4
 MISSION_SIZE = 2
 
 PROPOSE = 0
@@ -47,7 +47,10 @@ class PhysicalGameState(object):
             return [(PICK_BAD, person) for person in itertools.chain([None], range(NUM_PLAYERS))]
         if self.proposal is not None:
             if player in self.proposal:
-                return [(MISSION_SUCCEED,), (MISSION_FAIL,)]
+                if is_bad:
+                    return [(MISSION_SUCCEED,), (MISSION_FAIL,)]
+                else:
+                    return [(MISSION_SUCCEED,)]
             else:
                 return [(OBSERVE,)]
         if self.round % NUM_PLAYERS == player:

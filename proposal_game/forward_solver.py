@@ -9,7 +9,8 @@ from functools import wraps
 
 import numpy as np
 
-BETA = 1.0
+BETA = 3.0
+GAMMA = 1.0
 
 def memoized(f):
     backing_cache = {}
@@ -41,21 +42,26 @@ def get_move_probabilities(state, my_belief, k_beliefs):
     return move_probabilities
 
 
+@memoized
 def single_belief_update(state, moves, my_belief, k_beliefs):
     move_probabilities = get_move_probabilities(state, my_belief, k_beliefs)
 
     bad_probabilities = np.array([0.0]*NUM_PLAYERS) # this would be changed to support more belief states than just num_players
+    s = 0.0
     for bad_guy, (bad_guy_prob, moves_if_bad) in enumerate(move_probabilities):
+        if bad_guy_prob == 0.0:
+            continue
         move_prob = product(moves_if_bad[player][m] if m in moves_if_bad[player] else 0.0 for player, m in enumerate(moves))
         bad_probabilities[bad_guy] = bad_guy_prob * move_prob
+        s += bad_guy_prob * move_prob
 
-    s = np.sum(bad_probabilities)
     if s == 0.0:
         return my_belief
     new_belief = bad_probabilities / s
     return tuple(new_belief)
 
 
+@memoized
 def k_belief_update(state, moves, k_beliefs):
     if len(k_beliefs) == 0:
         return k_beliefs
@@ -98,18 +104,22 @@ def get_value_and_move(state, me, is_bad, my_belief, k_beliefs):
         for move_list in itertools.product(*moves_if_bad):
             move = move_list[me]
             move_prob = product(moves_if_bad[player][m] if player != me else 1.0 for player, m in enumerate(move_list))
+            if move_prob <= 0.0001: # Optimization
+                value_if_move[move] += 0.0
+                continue
+
             new_state = state.move(move_list)
             immediate_payoff = state.payoff(move_list, bad_guy, is_bad)
 
-            new_k_beliefs = k_belief_update(state, move_list, k_beliefs)
             my_new_belief = single_belief_update(state, move_list, my_belief, k_beliefs)
+            new_k_beliefs = k_belief_update(state, move_list, k_beliefs)
 
             future_payoff, _ = get_value_and_move(new_state, me, is_bad, my_new_belief, new_k_beliefs)
 
-            value_if_move[move] += bad_guy_prob * move_prob * (immediate_payoff + BETA*future_payoff)
+            value_if_move[move] += bad_guy_prob * move_prob * (immediate_payoff + GAMMA*future_payoff)
 
     moves, values = zip(*value_if_move.items())
-    values = np.exp(np.array(values))
+    values = np.exp(BETA*np.array(values))
     probabilities = values / np.sum(values)
 
     moveset = { move: probability for move, probability in zip(moves, probabilities) if probability != 0.0 }
