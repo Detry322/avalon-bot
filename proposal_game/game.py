@@ -3,8 +3,8 @@ import copy
 
 from moves import *
 
-NUM_ROUNDS = 4
-NUM_PLAYERS = 4
+NUM_ROUNDS = 3
+NUM_PLAYERS = 3
 MISSION_SIZE = 2
 
 PROPOSE = 0

@@ -5,6 +5,12 @@ from game import PhysicalGameState, NUM_PLAYERS, display_move
 import moves
 from forward_solver import get_value_and_move, initial_belief, initial_k_belief, single_belief_update, k_belief_update
 
+VERBOSE = False
+
+def print_v(message):
+    if VERBOSE:
+        print message
+
 
 def solve_forward(player, bad, k):
     assert k >= 1
@@ -49,41 +55,41 @@ def explain_move(moveset):
 
 
 def explain(state, perspective, perspective_belief, perspective_k_beliefs):
-    print "====== Player {} thinks:".format(perspective)
+    print_v("====== Player {} thinks:".format(perspective))
 
     for player in range(NUM_PLAYERS):
         belief = perspective_belief[player]
-        print " === " + explain_belief(player, belief)
+        print_v(" === " + explain_belief(player, belief))
         if player == perspective:
             continue
         if belief != 0.0:
             b = perspective_k_beliefs[0][player][1] if len(perspective_k_beliefs) != 0 else None
             k_belief = perspective_k_beliefs[1:]
             _, move_if_bad = get_value_and_move(state, player, True, b, k_belief)
-            print "If player {} is bad, then he ".format(player) + explain_move(move_if_bad)
+            print_v("If player {} is bad, then he ".format(player) + explain_move(move_if_bad))
         if belief != 1.0:
             b = perspective_k_beliefs[0][player][0] if len(perspective_k_beliefs) != 0 else None
             k_belief = perspective_k_beliefs[1:]
             _, move_if_good = get_value_and_move(state, player, False, b, k_belief)
-            print "If player {} is good, then he ".format(player) + explain_move(move_if_good)
+            print_v("If player {} is good, then he ".format(player) + explain_move(move_if_good))
 
 
 
-def play_game(k, bad):
+def play_game(ks, bad):
     state = PhysicalGameState()
 
     total_payoff = 0.0
 
     player_beliefs = [
         [initial_belief(player, player == bad) if k >= 1 else None, initial_k_belief(k - 1)]
-        for player in range(NUM_PLAYERS)
+        for player, k in enumerate(ks)
     ]
 
     while not state.finished():
-        print "=========== {}".format(state)
+        print_v("=========== {}".format(state))
 
         for player, (belief, _) in enumerate(player_beliefs):
-            print "Player {} ({}) BELIEF: {}".format(player, 'BAD' if player == bad else '   ', belief)
+            print_v("Player {} ({}) (k={}) BELIEF: {}".format(player, 'BAD' if player == bad else '   ', ks[player], belief))
 
         for player, (belief, k_belief) in enumerate(player_beliefs):
             explain(state, player, belief, k_belief)
@@ -99,45 +105,50 @@ def play_game(k, bad):
             for player in range(NUM_PLAYERS)
         ]
 
-        print "===== move probs"
+        print_v("===== move probs")
 
         for player, moveset in enumerate(moves):
             explained_moveset = { display_move(m): prob for m, prob in moveset.items() }
-            print "Player {} ({}): {}".format(player, 'BAD' if player == bad else '   ', explained_moveset)
+            print_v("Player {} ({}): {}".format(player, 'BAD' if player == bad else '   ', explained_moveset))
 
-        print "===== actual moves"
+        print_v("===== actual moves")
 
         moves = [get_move(moveset) for moveset in moves]
 
         for player, move in enumerate(moves):
-            print "Player {} ({}): {}".format(player, 'BAD' if player == bad else '   ', display_move(move))
+            print_v("Player {} ({}): {}".format(player, 'BAD' if player == bad else '   ', display_move(move)))
         payoff = state.payoff(moves, bad, False)
-        print "Immediate payoff: {}".format(payoff)
+        print_v("Immediate payoff: {}".format(payoff))
         total_payoff += payoff
-        print "Cumulative payoff: {}".format(total_payoff)
+        print_v("Cumulative payoff: {}".format(total_payoff))
         new_state = state.move(moves)
         if k == 0:
             state = new_state
             continue
 
-        print "Updating beliefs"
+        print_v("Updating beliefs")
         for player in range(NUM_PLAYERS):
             player_beliefs[player][0] = single_belief_update(state, tuple(moves), player_beliefs[player][0], player_beliefs[player][1])
             player_beliefs[player][1] = k_belief_update(state, tuple(moves), player_beliefs[player][1])
 
         state = new_state
 
+    return total_payoff
+
 
 
 def play_main():
-    k = 3
+    ks = [5, 4, 4]
     bad = 1
-    if k >= 1:
-        print "===== Solving game at k={}, player {} is bad".format(k, bad)
-        for player in range(NUM_PLAYERS):
-            print "=== Solving player {}".format(player)
-            solve_forward(player, bad, k)
-    play_game(k, bad)
+    num_games = 1000
+    for player, k in enumerate(ks):
+        print_v("=== Solving player {}, k={}".format(player, k))
+        solve_forward(player, bad, k)
+
+    total_payoff = 0.0
+    for _ in range(num_games):
+        total_payoff += play_game(ks, bad)
+    print ("Average payoff: {}".format(total_payoff/num_games))
 
 
 def solve_main():
