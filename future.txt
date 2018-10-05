@@ -1,3 +1,17 @@
+======== 10/4
+
+== Proposal Game
+- Create statistics for the proposal_game
+- Grab a intuitive scenario from the proposal_game, present to dparkes
+    - Create intuitive scenario for non common knowledge case (non common observation)
+
+== Avalon
+- Answer more person-based vs. team-based questions like:
+    - Do strong players try to "hide" more? (pass missions more often?)
+- Come up with ideas for models that captures intuition/thinking
+
+
+======== 9/26
 === Analyzing the real data
 - Compute an ELO measure
     - As an individual difference measure

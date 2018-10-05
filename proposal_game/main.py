@@ -138,8 +138,8 @@ def play_game(ks, bad):
 
 
 def play_main():
-    ks = [5, 4, 4]
-    bad = 1
+    ks = [7, 7, 8]
+    bad = 2
     num_games = 1000
     for player, k in enumerate(ks):
         print_v("=== Solving player {}, k={}".format(player, k))
