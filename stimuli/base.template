@@ -1,0 +1,223 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <title>Stimuli</title>
+
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            margin-top: 100px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 3em;
+            margin-bottom: 0
+        }
+
+        .player {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            color: white;
+            font-size: 2.4em;
+        }
+/*
+        #1a1334    #26294a    #01545a
+#017351    #03c383    #aad962
+#fbbf45    #ef6a32    #ed0345
+#a12a5e    #710162    #110141*/
+
+        .player-1 {
+            background-color: #ef6a32;
+        }
+
+        .player-2 {
+            background-color: #fbbf45;
+        }
+
+        .player-3 {
+            background-color: #017351;
+        }
+
+        .player-4 {
+            background-color: #01446a;
+        }
+
+        .player-5 {
+            background-color: #710162;
+        }
+
+        .result i {
+            font-size: 4em;
+        }
+
+        .result-success {
+            color: #4BB543;
+        }
+
+        .result-fail {
+            color: #BD3D3A;
+        }
+
+        table.r-1 tr.round-2 td.content * {
+            display: none;
+        }
+
+        table.r-1 tr.round-3 td.content * {
+            display: none;
+        }
+
+        table.r-1 tr.round-4 td.content * {
+            display: none;
+        }
+
+        table.r-1 tr.round-5 td.content * {
+            display: none;
+        }
+
+        table.r-2 tr.round-3 td.content * {
+            display: none;
+        }
+
+        table.r-2 tr.round-4 td.content * {
+            display: none;
+        }
+
+        table.r-2 tr.round-5 td.content * {
+            display: none;
+        }
+
+        table.r-3 tr.round-4 td.content * {
+            display: none;
+        }
+
+        table.r-3 tr.round-5 td.content * {
+            display: none;
+        }
+
+        table.r-4 tr.round-5 td.content * {
+            display: none;
+        }
+
+        table.r-1 tr.round-1.s-0 td.not-stage-0 * {
+            display: none;
+        }
+
+        table.r-1 tr.round-1.s-1 td.not-stage-1 * {
+            display: none;
+        }
+
+        table.r-2 tr.round-2.s-0 td.not-stage-0 * {
+            display: none;
+        }
+
+        table.r-2 tr.round-2.s-1 td.not-stage-1 * {
+            display: none;
+        }
+
+        table.r-3 tr.round-3.s-0 td.not-stage-0 * {
+            display: none;
+        }
+
+        table.r-3 tr.round-3.s-1 td.not-stage-1 * {
+            display: none;
+        }
+
+        table.r-4 tr.round-4.s-0 td.not-stage-0 * {
+            display: none;
+        }
+
+        table.r-4 tr.round-4.s-1 td.not-stage-1 * {
+            display: none;
+        }
+
+        table.r-5 tr.round-5.s-0 td.not-stage-0 * {
+            display: none;
+        }
+
+        table.r-5 tr.round-5.s-1 td.not-stage-1 * {
+            display: none;
+        }
+
+        td.number, th.number, td.leader, th.leader, td.result, th.result {
+            width: 140px;
+        }
+
+        td.proposal, th.proposal {
+            width: 280px;
+        }
+
+        td {
+            height: 90px;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Stimuli</h1>
+    <div class="row">
+        <div>
+            <p>{{ remarks }}</p>
+        </div>
+    </div>
+
+    {% for r in rounds %}
+
+    {% for s in range(3) %}
+
+    <div class="row">
+        <table class="table table-striped table-bordered r-{{ r.number }}">
+            <thead class="thead thead-light">
+                <tr>
+                    <th class="number">Round</th>
+                    <th class="leader">Leader</th>
+                    <th class="proposal">Proposal</th>
+                    <th class="result">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for round in rounds %}
+                    <tr class="round-{{ round.number }} s-{{ s }}">
+                        <td class="content number">
+                            <h2>
+                                {{ round.number }}
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-{{ round.number }}">{{ round.number }}</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            {% for player in round.proposal %}
+                                <div class="player player-{{ player }}">{{ player }}</div>
+                            {% endfor %}
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-{{ round.result }}">
+                                {% if round.result == 'fail' %}
+                                    <i class="fas fa-times"></i>
+                                {% else %}
+                                    <i class="fas fa-check"></i>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% endfor %}
+
+    {% endfor %}
+</div>
+</body>
