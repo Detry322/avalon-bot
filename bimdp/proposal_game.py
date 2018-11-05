@@ -4,10 +4,13 @@ from collections import namedtuple
 from game import Game
 
 N = 3
+GOOD_REWARD = 1
+EVIL_REWARD = -1
 
 Move = namedtuple('Move', ['type', 'extra'])
 HiddenState = namedtuple('HiddenState', ['evil'])
 PhysicalState = namedtuple('PhysicalState', ['round', 'proposal'])
+Observation = namedtuple('Observation', ['success', 'proposal'])
 
 def all_physical_states():
     states = []
@@ -19,6 +22,7 @@ def all_physical_states():
 
     states.append(PhysicalState(round=N, proposal=None))
     states.append(PhysicalState(round=N+1, proposal=None))
+    return states
 
 
 class ProposalGame(Game):
@@ -41,7 +45,7 @@ class ProposalGame(Game):
                 Move(type='Propose', extra=frozenset(set(range(cls.NUM_PLAYERS)) - set([odd_one_out])))
                 for odd_one_out in range(cls.NUM_PLAYERS)
             ]
-        
+
         if state.proposal is not None and player in state.proposal:
             if hidden_state.evil == player:
                 return [Move(type='Pass', extra=None), Move(type='Fail', extra=None)]
@@ -62,18 +66,41 @@ class ProposalGame(Game):
 
     @classmethod
     def rewards(cls, state, hidden_state, moves):
-        raise NotImplemented
+        rewards = [0 for _ in range(cls.NUM_PLAYERS)]
+        success = 1 if not any([move.type == 'Fail' for move in moves]) else -1
+        if state.proposal is not None and any([move.type is not None for move in moves]):
+            for player in range(cls.NUM_PLAYERS):
+                if hidden_state.evil == player:
+                    rewards[player] = EVIL_REWARD * success
+                else:
+                    rewards[player] = GOOD_REWARD * success
+        return rewards
 
 
     @classmethod
     def observation(cls, state, hidden_state, moves):
-        raise NotImplemented
+        if state.proposal is not None and not any([move.type is not None for move in moves]):
+            return Observation(success=None, proposal=state.proposal)
+        elif state.proposal and any([move.type is not None for move in moves]):
+            success = not any([move.type == 'Fail' in moves])
+            return Observation(success=success, proposal=state.proposal)
+        return Observation(success=None, proposal=None)
 
 
     @classmethod
     def transition(cls, state, hidden_state, moves):
-        raise NotImplemented
-
+        if state.round == N:
+            return PhysicalState(round=N+1, proposal=None)
+        elif state.round == N+1:
+            return None
+        else:
+            if state.proposal is None:
+                # search through moves to find the proposal
+                proposer = state.round
+                proposal = moves[proposer].extra
+                return PhysicalState(round=state.round, proposal=proposal)
+            else:
+                return PhysicalState(round=state.round+1, proposal=None)
 
     @classmethod
     def state_is_final(cls, state):
