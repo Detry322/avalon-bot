@@ -1,0 +1,1036 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <title>Stimuli</title>
+
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            margin-top: 100px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 3em;
+            margin-bottom: 0
+        }
+
+        .player {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 0;
+            border-radius: 30px;
+            color: white;
+            font-size: 2.4em;
+        }
+/*
+        #1a1334    #26294a    #01545a
+#017351    #03c383    #aad962
+#fbbf45    #ef6a32    #ed0345
+#a12a5e    #710162    #110141*/
+
+        .player-1 {
+            background-color: #ef6a32;
+        }
+
+        .player-2 {
+            background-color: #fbbf45;
+        }
+
+        .player-3 {
+            background-color: #017351;
+        }
+
+        .player-4 {
+            background-color: #01446a;
+        }
+
+        .player-5 {
+            background-color: #710162;
+        }
+
+        .result i {
+            font-size: 4em;
+        }
+
+        .result-success {
+            color: #4BB543;
+        }
+
+        .result-fail {
+            color: #BD3D3A;
+        }
+
+        table.r-1 tr.round-2 td.content * {
+            display: none;
+        }
+
+        table.r-1 tr.round-3 td.content * {
+            display: none;
+        }
+
+        table.r-1 tr.round-4 td.content * {
+            display: none;
+        }
+
+        table.r-1 tr.round-5 td.content * {
+            display: none;
+        }
+
+        table.r-2 tr.round-3 td.content * {
+            display: none;
+        }
+
+        table.r-2 tr.round-4 td.content * {
+            display: none;
+        }
+
+        table.r-2 tr.round-5 td.content * {
+            display: none;
+        }
+
+        table.r-3 tr.round-4 td.content * {
+            display: none;
+        }
+
+        table.r-3 tr.round-5 td.content * {
+            display: none;
+        }
+
+        table.r-4 tr.round-5 td.content * {
+            display: none;
+        }
+
+        table.r-1 tr.round-1.s-0 td.not-stage-0 * {
+            display: none;
+        }
+
+        table.r-1 tr.round-1.s-1 td.not-stage-1 * {
+            display: none;
+        }
+
+        table.r-2 tr.round-2.s-0 td.not-stage-0 * {
+            display: none;
+        }
+
+        table.r-2 tr.round-2.s-1 td.not-stage-1 * {
+            display: none;
+        }
+
+        table.r-3 tr.round-3.s-0 td.not-stage-0 * {
+            display: none;
+        }
+
+        table.r-3 tr.round-3.s-1 td.not-stage-1 * {
+            display: none;
+        }
+
+        table.r-4 tr.round-4.s-0 td.not-stage-0 * {
+            display: none;
+        }
+
+        table.r-4 tr.round-4.s-1 td.not-stage-1 * {
+            display: none;
+        }
+
+        table.r-5 tr.round-5.s-0 td.not-stage-0 * {
+            display: none;
+        }
+
+        table.r-5 tr.round-5.s-1 td.not-stage-1 * {
+            display: none;
+        }
+
+        td.number, th.number, td.leader, th.leader, td.result, th.result {
+            width: 140px;
+        }
+
+        td.proposal, th.proposal {
+            width: 280px;
+        }
+
+        td {
+            height: 90px;
+        }
+
+        @media print {
+            .row {
+                page-break-after: always;
+            }
+
+            body {
+              -webkit-print-color-adjust: exact !important;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+<!--     <h1>Stimuli</h1>
+    <div class="row">
+        <div>
+            <p></p>
+        </div>
+    </div> -->
+
+    
+
+    
+
+    <div class="row">
+        <table class="table table-striped table-bordered r-1">
+            <thead class="thead thead-light">
+                <tr>
+                    <th class="number">Round</th>
+                    <th class="leader">Leader</th>
+                    <th class="proposal">Proposal</th>
+                    <th class="result">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr class="round-1 s-0">
+                        <td class="content number">
+                            <h2>
+                                1
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-1">1</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-2">2</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-fail">
+                                
+                                    <i class="fas fa-times"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-2 s-0">
+                        <td class="content number">
+                            <h2>
+                                2
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-2">2</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-3 s-0">
+                        <td class="content number">
+                            <h2>
+                                3
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-3">3</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-2">2</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    
+
+    <div class="row">
+        <table class="table table-striped table-bordered r-1">
+            <thead class="thead thead-light">
+                <tr>
+                    <th class="number">Round</th>
+                    <th class="leader">Leader</th>
+                    <th class="proposal">Proposal</th>
+                    <th class="result">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr class="round-1 s-1">
+                        <td class="content number">
+                            <h2>
+                                1
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-1">1</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-2">2</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-fail">
+                                
+                                    <i class="fas fa-times"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-2 s-1">
+                        <td class="content number">
+                            <h2>
+                                2
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-2">2</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-3 s-1">
+                        <td class="content number">
+                            <h2>
+                                3
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-3">3</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-2">2</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    
+
+    <div class="row">
+        <table class="table table-striped table-bordered r-1">
+            <thead class="thead thead-light">
+                <tr>
+                    <th class="number">Round</th>
+                    <th class="leader">Leader</th>
+                    <th class="proposal">Proposal</th>
+                    <th class="result">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr class="round-1 s-2">
+                        <td class="content number">
+                            <h2>
+                                1
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-1">1</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-2">2</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-fail">
+                                
+                                    <i class="fas fa-times"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-2 s-2">
+                        <td class="content number">
+                            <h2>
+                                2
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-2">2</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-3 s-2">
+                        <td class="content number">
+                            <h2>
+                                3
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-3">3</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-2">2</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    
+
+    
+
+    
+
+    <div class="row">
+        <table class="table table-striped table-bordered r-2">
+            <thead class="thead thead-light">
+                <tr>
+                    <th class="number">Round</th>
+                    <th class="leader">Leader</th>
+                    <th class="proposal">Proposal</th>
+                    <th class="result">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr class="round-1 s-0">
+                        <td class="content number">
+                            <h2>
+                                1
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-1">1</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-2">2</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-fail">
+                                
+                                    <i class="fas fa-times"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-2 s-0">
+                        <td class="content number">
+                            <h2>
+                                2
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-2">2</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-3 s-0">
+                        <td class="content number">
+                            <h2>
+                                3
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-3">3</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-2">2</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    
+
+    <div class="row">
+        <table class="table table-striped table-bordered r-2">
+            <thead class="thead thead-light">
+                <tr>
+                    <th class="number">Round</th>
+                    <th class="leader">Leader</th>
+                    <th class="proposal">Proposal</th>
+                    <th class="result">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr class="round-1 s-1">
+                        <td class="content number">
+                            <h2>
+                                1
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-1">1</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-2">2</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-fail">
+                                
+                                    <i class="fas fa-times"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-2 s-1">
+                        <td class="content number">
+                            <h2>
+                                2
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-2">2</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-3 s-1">
+                        <td class="content number">
+                            <h2>
+                                3
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-3">3</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-2">2</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    
+
+    <div class="row">
+        <table class="table table-striped table-bordered r-2">
+            <thead class="thead thead-light">
+                <tr>
+                    <th class="number">Round</th>
+                    <th class="leader">Leader</th>
+                    <th class="proposal">Proposal</th>
+                    <th class="result">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr class="round-1 s-2">
+                        <td class="content number">
+                            <h2>
+                                1
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-1">1</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-2">2</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-fail">
+                                
+                                    <i class="fas fa-times"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-2 s-2">
+                        <td class="content number">
+                            <h2>
+                                2
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-2">2</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-3 s-2">
+                        <td class="content number">
+                            <h2>
+                                3
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-3">3</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-2">2</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    
+
+    
+
+    
+
+    <div class="row">
+        <table class="table table-striped table-bordered r-3">
+            <thead class="thead thead-light">
+                <tr>
+                    <th class="number">Round</th>
+                    <th class="leader">Leader</th>
+                    <th class="proposal">Proposal</th>
+                    <th class="result">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr class="round-1 s-0">
+                        <td class="content number">
+                            <h2>
+                                1
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-1">1</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-2">2</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-fail">
+                                
+                                    <i class="fas fa-times"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-2 s-0">
+                        <td class="content number">
+                            <h2>
+                                2
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-2">2</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-3 s-0">
+                        <td class="content number">
+                            <h2>
+                                3
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-3">3</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-2">2</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    
+
+    <div class="row">
+        <table class="table table-striped table-bordered r-3">
+            <thead class="thead thead-light">
+                <tr>
+                    <th class="number">Round</th>
+                    <th class="leader">Leader</th>
+                    <th class="proposal">Proposal</th>
+                    <th class="result">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr class="round-1 s-1">
+                        <td class="content number">
+                            <h2>
+                                1
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-1">1</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-2">2</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-fail">
+                                
+                                    <i class="fas fa-times"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-2 s-1">
+                        <td class="content number">
+                            <h2>
+                                2
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-2">2</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-3 s-1">
+                        <td class="content number">
+                            <h2>
+                                3
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-3">3</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-2">2</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    
+
+    <div class="row">
+        <table class="table table-striped table-bordered r-3">
+            <thead class="thead thead-light">
+                <tr>
+                    <th class="number">Round</th>
+                    <th class="leader">Leader</th>
+                    <th class="proposal">Proposal</th>
+                    <th class="result">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr class="round-1 s-2">
+                        <td class="content number">
+                            <h2>
+                                1
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-1">1</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-2">2</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-fail">
+                                
+                                    <i class="fas fa-times"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-2 s-2">
+                        <td class="content number">
+                            <h2>
+                                2
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-2">2</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-3">3</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+                    <tr class="round-3 s-2">
+                        <td class="content number">
+                            <h2>
+                                3
+                            </h2>
+                        </td>
+                        <td class="content leader">
+                            <div class="player player-3">3</div>
+                        </td>
+                        <td class="content proposal not-stage-0">
+                            
+                                <div class="player player-1">1</div>
+                            
+                                <div class="player player-2">2</div>
+                            
+                        </td>
+                        <td class="content result not-stage-0 not-stage-1" style="vertical-align: middle;">
+                            <div class="result result-success">
+                                
+                                    <i class="fas fa-check"></i>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    
+
+    
+</div>
+</body>
