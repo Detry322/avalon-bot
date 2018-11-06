@@ -105,3 +105,18 @@ class ProposalGame(Game):
     @classmethod
     def state_is_final(cls, state):
         return state.round == (N + 1)
+
+    @classmethod
+    def infer_possible_actions(cls, state, hidden_state, obs):
+        actions = [Move(type='None') for _ in range(cls.NUM_PLAYERS)]
+        if obs.success:
+            proposer = state.round
+            p1, p2 = (proposer + 1) % 3, (proposer + 2) % 3
+            actions[p1], actions[p2] = Move(type='Pass')
+        else:
+            traitor = hidden_state.evil
+            proposer = state.round
+            passer = (3 - traitor - proposer)
+            actions[traitor] = Move(type='Fail')
+            actions[passer] = Move(type='Pass')
+        return actions
