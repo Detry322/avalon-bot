@@ -41,33 +41,52 @@ for bad in players:
 
 sorted_games = sorted(games)
 
+games_json = {}
+for game_id, game in enumerate(sorted_games):
+    games_json[str(game_id)] = {
+        "id": str(game_id),
+        "rounds": [
+            {
+                "proposal": r.proposal,
+                "result": r.result,
+            }
+            for r in game
+        ]
+    }
+
+import json
+with open('games.json', 'w') as f:
+    f.write(json.dumps(games_json, sort_keys=True, indent=2))
+
+
+
 import errno    
 import os
-def mkdir_p(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:  # Python >2.5
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
+# def mkdir_p(path):
+#     try:
+#         os.makedirs(path)
+#     except OSError as exc:  # Python >2.5
+#         if exc.errno == errno.EEXIST and os.path.isdir(path):
+#             pass
+#         else:
+#             raise
 
-print "generating html"
-for game_id, game in enumerate(sorted_games):
-    mkdir_p('games/{}'.format(game_id))
-    with open('games/{}/{}.html'.format(game_id, game_id), 'w') as f:
-        f.write(template.render(remarks='', rounds=game))
+# print "generating html"
+# for game_id, game in enumerate(sorted_games):
+#     mkdir_p('games/{}'.format(game_id))
+#     with open('games/{}/{}.html'.format(game_id, game_id), 'w') as f:
+#         f.write(template.render(remarks='', rounds=game))
 
 
-print 'generating pdfs'
+# print 'generating pdfs'
 
-import pdfkit
-def generate_pdf(game_id):
-    print "generating {}".format(game_id)
-    pdfkit.from_file('games/{}/{}.html'.format(game_id,game_id), 'games/{}/{}.pdf'.format(game_id,game_id), options={'page-width': 200, 'page-height': 120})
+# import pdfkit
+# def generate_pdf(game_id):
+#     print "generating {}".format(game_id)
+#     pdfkit.from_file('games/{}/{}.html'.format(game_id,game_id), 'games/{}/{}.pdf'.format(game_id,game_id), options={'page-width': 200, 'page-height': 120})
 
-pool = ThreadPool()
-pool.map(generate_pdf, range(len(sorted_games)))
+# pool = ThreadPool()
+# pool.map(generate_pdf, range(len(sorted_games)))
 # Basic.html
 
 # rounds = [
