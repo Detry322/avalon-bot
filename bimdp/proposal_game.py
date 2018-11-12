@@ -82,7 +82,7 @@ class ProposalGame(Game):
         if state.proposal is not None and not any([move.type is not None for move in moves]):
             return Observation(success=None, proposal=state.proposal)
         elif state.proposal and any([move.type is not None for move in moves]):
-            success = not any([move.type == 'Fail' in moves])
+            success = not any([move.type == 'Fail' for move in moves])
             return Observation(success=success, proposal=state.proposal)
         return Observation(success=None, proposal=None)
 
