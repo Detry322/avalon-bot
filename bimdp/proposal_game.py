@@ -38,8 +38,9 @@ class ProposalGame(Game):
         return np.array([1.0/(cls.NUM_PLAYERS - 1) if p != player else 0.0 for p in range(cls.NUM_PLAYERS)])
 
 
+
     @classmethod
-    def __possible_moves_for_player(cls, state, hidden_state, player):
+    def possible_moves(cls, player, state, hidden_state):
         if state.proposal is None and state.round == player:
             return [
                 Move(type='Propose', extra=frozenset(set(range(cls.NUM_PLAYERS)) - set([odd_one_out])))
@@ -56,12 +57,6 @@ class ProposalGame(Game):
             return [Move(type='Pick', extra=p) for p in range(cls.NUM_PLAYERS)]
 
         return [Move(type=None, extra=None)]
-
-
-
-    @classmethod
-    def possible_moves(cls, state, hidden_state):
-        return [cls.__possible_moves_for_player(state, hidden_state, player) for player in range(cls.NUM_PLAYERS)]
 
 
     @classmethod

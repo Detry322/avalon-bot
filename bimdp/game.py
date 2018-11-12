@@ -11,7 +11,7 @@ class Game(object):
 
 
     @classmethod
-    def possible_moves(cls, state, hidden_state):
+    def possible_moves(cls, player, state, hidden_state):
         raise NotImplemented
 
 
