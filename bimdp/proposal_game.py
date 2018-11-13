@@ -10,7 +10,7 @@ EVIL_REWARD = -1
 Move = namedtuple('Move', ['type', 'extra'])
 HiddenState = namedtuple('HiddenState', ['evil'])
 PhysicalState = namedtuple('PhysicalState', ['round', 'proposal'])
-Observation = namedtuple('Observation', ['success', 'proposal'])
+Observation = namedtuple('Observation', ['success', 'proposal', 'bad_picks'])
 
 def all_physical_states():
     states = []
@@ -54,7 +54,9 @@ class ProposalGame(Game):
                 return [Move(type='Pass', extra=None)]
 
         if state.round == cls.NUM_PLAYERS and hidden_state.evil != player:
-            return [Move(type='Pick', extra=p) for p in range(cls.NUM_PLAYERS)]
+            moves = [Move(type='Pick', extra=p) for p in range(cls.NUM_PLAYERS)]
+            moves.append(Move(type='Pick', extra=None))
+            return moves
 
         return [Move(type=None, extra=None)]
 
@@ -74,12 +76,14 @@ class ProposalGame(Game):
 
     @classmethod
     def observation(cls, state, hidden_state, moves):
-        if state.proposal is not None and not any([move.type is not None for move in moves]):
-            return Observation(success=None, proposal=state.proposal)
-        elif state.proposal and any([move.type is not None for move in moves]):
+        if state.proposal is None and state.round < N:
+            return Observation(success=None, proposal=moves[state.round].extra, bad_picks=None)
+        elif state.proposal is None and state.round == N:
+            return Observation(success=None, proposal=None, bad_picks=tuple(move.extra for move in moves))
+        elif state.proposal is not None:
             success = not any([move.type == 'Fail' for move in moves])
-            return Observation(success=success, proposal=state.proposal)
-        return Observation(success=None, proposal=None)
+            return Observation(success=success, proposal=state.proposal, bad_picks=None)
+        raise Exception("Execution should never reach here - you didn't check state_is_final correctly")
 
 
     @classmethod
@@ -101,17 +105,25 @@ class ProposalGame(Game):
     def state_is_final(cls, state):
         return state.round == (N + 1)
 
+
     @classmethod
     def infer_possible_actions(cls, state, hidden_state, obs):
-        actions = [Move(type='None') for _ in range(cls.NUM_PLAYERS)]
-        if obs.success:
-            proposer = state.round
-            p1, p2 = (proposer + 1) % 3, (proposer + 2) % 3
-            actions[p1], actions[p2] = Move(type='Pass')
+        actions = [Move(type=None, extra=None) for _ in range(cls.NUM_PLAYERS)]
+        if state.proposal is None:
+            if state.round == N:
+                for player, bad_pick in enumerate(obs.bad_picks):
+                    if player == hidden_state.evil:
+                        actions[player] = Move(type='Pick', extra=bad_pick)
+            else:
+                actions[state.round] = Move(type='Propose', extra=obs.proposal)
         else:
-            traitor = hidden_state.evil
-            proposer = state.round
-            passer = (3 - traitor - proposer)
-            actions[traitor] = Move(type='Fail')
-            actions[passer] = Move(type='Pass')
+            if obs.success:
+                proposer = state.round
+                p1, p2 = (proposer + 1) % 3, (proposer + 2) % 3
+                actions[p1], actions[p2] = Move(type='Pass', extra=None), Move(type='Pass', extra=None)
+            else:
+                traitor = hidden_state.evil
+                passer = list(set(state.proposal) - set([traitor]))[0]
+                actions[traitor] = Move(type='Fail', extra=None)
+                actions[passer] = Move(type='Pass', extra=None)
         return actions
