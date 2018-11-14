@@ -1,9 +1,11 @@
 import numpy as np
 from collections import namedtuple
+import itertools as it
 
 from game import Game
 
 N = 3
+PROP_SIZE = 2
 GOOD_REWARD = 1
 EVIL_REWARD = -1
 
@@ -43,8 +45,8 @@ class ProposalGame(Game):
     def possible_moves(cls, player, state, hidden_state):
         if state.proposal is None and state.round == player:
             return [
-                Move(type='Propose', extra=frozenset(set(range(cls.NUM_PLAYERS)) - set([odd_one_out])))
-                for odd_one_out in range(cls.NUM_PLAYERS)
+                Move(type='Propose', extra=frozenset(group))
+                for group in it.combinations(range(cls.NUM_PLAYERS), r=PROP_SIZE)
             ]
 
         if state.proposal is not None and player in state.proposal:
@@ -64,8 +66,8 @@ class ProposalGame(Game):
     @classmethod
     def rewards(cls, state, hidden_state, moves):
         rewards = [0 for _ in range(cls.NUM_PLAYERS)]
-        success = 1 if not any([move.type == 'Fail' for move in moves]) else -1
-        if state.proposal is not None and any([move.type is not None for move in moves]):
+        if state.proposal is not None:
+            success = 1 if not any([move.type == 'Fail' for move in moves]) else -1
             for player in range(cls.NUM_PLAYERS):
                 if hidden_state.evil == player:
                     rewards[player] = EVIL_REWARD * success
@@ -118,12 +120,10 @@ class ProposalGame(Game):
                 actions[state.round] = Move(type='Propose', extra=obs.proposal)
         else:
             if obs.success:
-                proposer = state.round
-                p1, p2 = (proposer + 1) % 3, (proposer + 2) % 3
-                actions[p1], actions[p2] = Move(type='Pass', extra=None), Move(type='Pass', extra=None)
+                for player in state.proposal:
+                    actions[player] = Move(type='Pass', extra=None)
             else:
                 traitor = hidden_state.evil
-                passer = list(set(state.proposal) - set([traitor]))[0]
-                actions[traitor] = Move(type='Fail', extra=None)
-                actions[passer] = Move(type='Pass', extra=None)
+                for player in state.proposal:
+                    actions[player] = Move(type='Fail', extra=None) if traitor == player else Move(type='Pass', extra=None)
         return actions
