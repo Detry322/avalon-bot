@@ -29,19 +29,21 @@ def probability_of_action_set(action_set, probabilities):
 
 def all_actions(player, action, opponent_possible_actions):
     everyone_actions = [
-        opp_actions if p != player else { action: 1.0 }
+        opp_actions if p != player else { action: (1.0, None) }
         for p, opp_actions in enumerate(opponent_possible_actions)
     ]    
     for moves in it.product(*everyone_actions):
         prob = 1.0
         for player, move in enumerate(moves):
-            prob *= everyone_actions[player][move]
+            p, _ = everyone_actions[player][move]
+            prob *= p
         yield (moves, prob)
 
 
 class Solver:
     def __init__(self, game):
         self.game = game
+        self.memoized_player_solve = {}
 
 
     def _get_opponent_moves(self, state, h, belief_tensor):
@@ -74,6 +76,15 @@ class Solver:
 
 
     def solve_for_player(self, player, player_belief, state, belief_tensor):
+        key = (player, player_belief.tostring(), state, belief_tensor.tostring())
+        if key not in self.memoized_player_solve:
+            result = self.__solve_for_player(player, player_belief, state, belief_tensor)
+            self.memoized_player_solve[key] = result
+        
+        return self.memoized_player_solve[key]
+
+
+    def __solve_for_player(self, player, player_belief, state, belief_tensor):
         '''
         Given a player, a state, and a k-belief tensor, this function computes the
         set of rewards associated with optimal play for the player at level k.
@@ -95,9 +106,6 @@ class Solver:
         k, H, N, Hprime = belief_tensor.shape
         assert H == Hprime, "u dun goof"
 
-        if k == 0:
-            return None
-
         rewards = []
         for h, h_prob in enumerate(self.game.HIDDEN_STATES):
             # Do something if h_prob is 0
@@ -116,8 +124,8 @@ class Solver:
                     if not self.game.state_is_final(new_state):
                         future_actions = self.solve_for_player(player, new_belief, new_state, new_belief_tensor)
 
-                        for action, (p_action, rewards) in future_actions.items():
-                            my_future_reward += rewards[h] * p_action
+                        for action, (p_action, rs) in future_actions.items():
+                            my_future_reward += rs[h] * p_action
 
                     my_current_reward_for_taking_action = p*(r + my_future_reward)
 
@@ -167,6 +175,7 @@ class Solver:
             move: (prob, np.array([
                 payoff_for_hidden.get(move, float('-inf')) for payoff_for_hidden in payoff_matrix
             ]))
+            for move, prob in zip(actions, probs)
         }
 
 
@@ -193,13 +202,16 @@ class Solver:
             observation = self.game.observation(state, hidden_state, moves)
             rewards = self.game.rewards(state, hidden_state, moves)
             player_reward = rewards[player]
-            new_belief_tensor = self.get_beliefs(state, belief_tensor, next_state, observation)
+            new_belief, new_belief_tensor = self.get_beliefs(player, player_belief, belief_tensor, state, next_state, observation, player_action)
 
-            yield (next_state, new_belief_tensor, player_reward, prob)
+            yield (new_belief, next_state, new_belief_tensor, player_reward, prob)
 
 
-    def get_beliefs(self, belief, belief_tensor, state, next_state, observation):
-        pass
+    def get_beliefs(self, player, player_belief, belief_tensor, state, next_state, observation, player_action):
+        new_belief = self.single_update(player, player_belief, player_action, belief_tensor, state, next_state, observation)
+        new_belief_tensor = self.update_tensor(belief_tensor, state, next_state, observation)
+        return new_belief, new_belief_tensor
+
 
     def update_tensor(self, belief_tensor, state, next_state, observation):
         '''
@@ -211,37 +223,46 @@ class Solver:
 
         lower_belief_tensor = belief_tensor[:-1]
         new_lower_belief_tensor = self.update_tensor(lower_belief_tensor, state, next_state, observation)
-        new_beliefs = np.zeros((len(self.game.HIDDEN_STATES), self.game.NUM_PLAYERS, len(self.game.HIDDEN_STATES)))
+        new_beliefs = np.zeros((1, len(self.game.HIDDEN_STATES), self.game.NUM_PLAYERS, len(self.game.HIDDEN_STATES)))
+        new_belief_tensor = np.concatenate([new_lower_belief_tensor, new_beliefs])
 
         for h, hidden_state in enumerate(self.game.HIDDEN_STATES):
             moves = self.game.infer_possible_actions(state, hidden_state, observation)
-            opponent_actions = self._get_opponent_moves(state, h, belief_tensor)
-            new_beliefs[h] = np.array([
-                self.single_update(belief_tensor[-1][h][opp], moves, opponent_actions)
-                for opp in range(self.game.NUM_PLAYERS)
-            ])
-        return np.concatenate([new_lower_belief_tensor, new_beliefs.reshape((1,) + new_beliefs.shape)])
+
+            for player in range(self.game.NUM_PLAYERS):
+                player_belief = belief_tensor[-1, h, player]
+                player_move = moves[player]
+                new_beliefs[-1, h, player] = self.single_update(player, player_belief, player_move, lower_belief_tensor, state, next_state, observation)
+        return new_belief_tensor
 
 
-    def single_update(self, my_belief, moves, opponent_actions):
+    def single_update(self, player, my_belief, my_move, belief_tensor, state, next_state, observation):
         '''
         Compute an update for a single player's belief conditioned on a single hidden state given
         previous belief tensor and a set of actions governing a transition.
         
         Inputs: 
+            player           : the player who is updating
             my_belief.       : the original belief
-            moves            : a (N,) list of moves that occurred to generate a transition, reconstructed from observation
-            opponent_actions : a (N,) list of maps from actions to probabilities for opponent moves
-
+            my_move          : the move this player took
+            belief_tensor    : the matrix that determines the opponents beliefs
+            state            : the current state
+            next_state       : the next state the occured
+            observation      : the observation that occured
         '''
-        # TODO: this needs to take a my_move of some sort and a player position.
         new_belief = np.zeros(len(self.game.HIDDEN_STATES))
         for h, prob in enumerate(my_belief):
             if prob == 0:
                 continue
-            new_belief[h] = prob
-            for player, move in enumerate(moves):
-                new_belief[h] *= opponent_actions[player][move] if move in opponent_actions[player] else 0
+            hidden_state = self.game.HIDDEN_STATES[h]
+            opponent_actions = self._get_opponent_moves(state, h, belief_tensor)
+            for moves, moves_prob in all_actions(player, my_move, opponent_actions):
+                if next_state != self.game.transition(state, hidden_state, moves):
+                    continue
+                if observation != self.game.observation(state, hidden_state, moves):
+                    continue
+
+                new_belief[h] += prob * moves_prob
 
         s = np.sum(new_belief)
         if s == 0:
