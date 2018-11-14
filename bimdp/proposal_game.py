@@ -65,15 +65,15 @@ class ProposalGame(Game):
 
     @classmethod
     def rewards(cls, state, hidden_state, moves):
-        rewards = [0] * cls.NUM_PLAYERS
+        good_reward = 0
         if state.proposal is not None:
-            success = 1 if not any([move.type == 'Fail' for move in moves]) else -1
-            for player in range(cls.NUM_PLAYERS):
-                if hidden_state.evil == player:
-                    rewards[player] = EVIL_REWARD * success
-                else:
-                    rewards[player] = GOOD_REWARD * success
-        return rewards
+            good_reward = 1 if not any([move.type == 'Fail' for move in moves]) else -1
+        elif state.round == N:
+            correct = sum(1 if move.type == 'Pick' and move.extra == hidden_state.evil else 0 for move in moves)
+            incorrect = sum(1 if move.type == 'Pick' and move.extra != hidden_state.evil and move.extra is not None else 0 for move in moves)
+            good_reward = 10*correct - 100*incorrect
+
+        return [(EVIL_REWARD if player == hidden_state.evil else GOOD_REWARD) * good_reward for player in range(cls.NUM_PLAYERS)]
 
 
     @classmethod
