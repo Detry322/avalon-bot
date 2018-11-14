@@ -107,7 +107,7 @@ class Solver:
         assert H == Hprime, "u dun goof"
 
         rewards = []
-        for h, h_prob in enumerate(self.game.HIDDEN_STATES):
+        for h, h_prob in enumerate(player_belief):
             # Do something if h_prob is 0
 
             hidden_state = self.game.HIDDEN_STATES[h]
@@ -127,7 +127,7 @@ class Solver:
                         for action, (p_action, rs) in future_actions.items():
                             my_future_reward += rs[h] * p_action
 
-                    my_current_reward_for_taking_action = p*(r + my_future_reward)
+                    my_current_reward_for_taking_action += p*(r + my_future_reward)
 
                 my_action_reward_pairs[my_action] = my_current_reward_for_taking_action
             rewards.append(my_action_reward_pairs)

@@ -65,7 +65,7 @@ class ProposalGame(Game):
 
     @classmethod
     def rewards(cls, state, hidden_state, moves):
-        rewards = [0 for _ in range(cls.NUM_PLAYERS)]
+        rewards = [0] * cls.NUM_PLAYERS
         if state.proposal is not None:
             success = 1 if not any([move.type == 'Fail' for move in moves]) else -1
             for player in range(cls.NUM_PLAYERS):
