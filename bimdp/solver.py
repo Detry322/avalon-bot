@@ -39,6 +39,7 @@ def all_actions(player, action, opponent_possible_actions):
             prob *= p
         yield (moves, prob)
 
+NotPossible = ("not possible",)
 
 class Solver:
     def __init__(self, game):
@@ -108,7 +109,9 @@ class Solver:
 
         rewards = []
         for h, h_prob in enumerate(player_belief):
-            # Do something if h_prob is 0
+            if h_prob == 0:
+                rewards.append(NotPossible)
+                continue
 
             hidden_state = self.game.HIDDEN_STATES[h]
 
@@ -117,8 +120,10 @@ class Solver:
             my_action_reward_pairs = {}
             for my_action in self.game.possible_moves(player, state, hidden_state):
 
-                my_current_reward_for_taking_action = 0.0
-                for new_belief, new_state, new_belief_tensor, r, p in self.simulate_state(player, player_belief, state, h, belief_tensor, opponent_moves, my_action):
+                my_current_reward_for_taking_action = None
+
+                for new_belief, new_state, new_belief_tensor, r, p in self.simulate_state(player, player_belief, state, h, belief_tensor, opponent_moves, my_action):               
+                    assert p != 0, "Transitioning to nonexistent state"
                     my_future_reward = 0.0
 
                     if not self.game.state_is_final(new_state):
@@ -127,9 +132,15 @@ class Solver:
                         for action, (p_action, rs) in future_actions.items():
                             my_future_reward += rs[h] * p_action
 
-                    my_current_reward_for_taking_action += p*(r + my_future_reward)
+                    if my_current_reward_for_taking_action is None:
+                        my_current_reward_for_taking_action = p * (r + my_future_reward)
+                    else:
+                        my_current_reward_for_taking_action += p * (r + my_future_reward)
 
-                my_action_reward_pairs[my_action] = my_current_reward_for_taking_action
+                if my_current_reward_for_taking_action is not None:
+                    my_action_reward_pairs[my_action] = my_current_reward_for_taking_action
+
+            assert len(my_action_reward_pairs) != 0, "Empty reward action pairs"
             rewards.append(my_action_reward_pairs)
         return self._get_move(player_belief, rewards)
 
@@ -158,14 +169,14 @@ class Solver:
         if acceptable_moves is None or len(acceptable_moves) == 0:
             return {}
 
-        payoffs = defaultdict(lambda: 0.0)
+        actual_payoffs = defaultdict(lambda: 0.0)
         for prob, move_payoffs in zip(belief, payoff_matrix):
             if prob == 0:
                 continue
             for move in acceptable_moves:
-                payoffs[move] += prob*move_payoffs[move]
+                actual_payoffs[move] += prob*move_payoffs[move]
 
-        actions, payoffs = zip(*move_payoffs.items())
+        actions, payoffs = zip(*actual_payoffs.items())
         # Do some softmax stuff
         payoffs = np.array(payoffs)
         payoffs -= np.max(payoffs)
@@ -173,7 +184,8 @@ class Solver:
         probs /= np.sum(probs)
         return {
             move: (prob, np.array([
-                payoff_for_hidden.get(move, float('-inf')) for payoff_for_hidden in payoff_matrix
+                float('nan') if payoff_for_hidden is NotPossible else payoff_for_hidden[move]
+                for payoff_for_hidden in payoff_matrix
             ]))
             for move, prob in zip(actions, probs)
         }
@@ -195,16 +207,22 @@ class Solver:
             next_states     : a list of tuples (belief', state', belief_tensor', r, p) corresponding to new MDP state and
                               output
         '''
+        assert abs(np.sum(player_belief) - 1) < 0.000001, "PLAYER's belief doesn't sum to 1"
         hidden_state = self.game.HIDDEN_STATES[h]
- 
+        yielded = False
         for moves, prob in all_actions(player, player_action, opponent_actions):
             next_state = self.game.transition(state, hidden_state, moves)
             observation = self.game.observation(state, hidden_state, moves)
             rewards = self.game.rewards(state, hidden_state, moves)
             player_reward = rewards[player]
             new_belief, new_belief_tensor = self.get_beliefs(player, player_belief, belief_tensor, state, next_state, observation, player_action)
+            
+            assert abs(np.sum(new_belief) - 1) < 0.000001, "New belief doesn't sum to 1"
 
+            yielded = True
             yield (new_belief, next_state, new_belief_tensor, player_reward, prob)
+
+        assert yielded, "Simulate state didn't yield anything"
 
 
     def get_beliefs(self, player, player_belief, belief_tensor, state, next_state, observation, player_action):
@@ -232,7 +250,9 @@ class Solver:
             for player in range(self.game.NUM_PLAYERS):
                 player_belief = belief_tensor[-1, h, player]
                 player_move = moves[player]
-                new_beliefs[-1, h, player] = self.single_update(player, player_belief, player_move, lower_belief_tensor, state, next_state, observation)
+                new_belief_tensor[-1, h, player, :] = self.single_update(player, player_belief, player_move, lower_belief_tensor, state, next_state, observation)
+
+        assert not np.all(new_belief_tensor == 0), "new belief tensor isn't valid"
         return new_belief_tensor
 
 
