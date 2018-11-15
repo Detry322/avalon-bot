@@ -13,6 +13,29 @@ Move = namedtuple('Move', ['type', 'extra'])
 HiddenState = namedtuple('HiddenState', ['evil'])
 PhysicalState = namedtuple('PhysicalState', ['round', 'proposal'])
 Observation = namedtuple('Observation', ['success', 'proposal', 'bad_picks'])
+Round = namedtuple('Round', ['number', 'proposal', 'result'])
+
+
+def create_playthrough(rounds):
+    playthrough = []
+    for i, r in enumerate(rounds):
+        proposal = frozenset([p - 1 for p in r.proposal])
+        playthrough.append(
+            (
+                PhysicalState(round=i, proposal=None),
+                PhysicalState(round=i, proposal=proposal),
+                Observation(success=None, proposal=proposal, bad_picks=None)
+            )
+        )
+        playthrough.append(
+            (
+                PhysicalState(round=i, proposal=proposal),
+                PhysicalState(round=i+1, proposal=None),
+                Observation(success=(r.result != 'fail'), proposal=proposal, bad_picks=None)
+            )
+        )
+    return playthrough
+
 
 def all_physical_states():
     states = []
