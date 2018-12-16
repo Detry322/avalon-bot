@@ -51,6 +51,7 @@ class Agent(object):
 		self.game = game
 		self.level = level		
 		self.belief = my_starting_distribution
+		self.index = 0 # or something idk
 		self.my_particles = self._initial_particles(game, level)
 		self.my_particles = self.prune_particles(game)
 
@@ -59,7 +60,12 @@ class Agent(object):
 			return None
 
 		if level == 1:
-			return [Particle(Hypothesis(hidden_state, [], np.log(self.belief[h])), EmptyTOM) for h, hidden_state in enumerate(game.HIDDEN_STATES)]
+			return [
+				Particle(
+					Hypothesis(hidden_state, [], np.log(self.belief[h])), EmptyTOM
+				) 
+				for h, hidden_state in enumerate(game.HIDDEN_STATES)
+			]
 
 		if level > 1:
 			return [
@@ -83,7 +89,7 @@ class Agent(object):
 		'''
 		player_belief = np.zeros((len(game.HIDDEN_STATES),))
 		for particle in player_particles:
-			player_belief[particle.h] = log_add(player_belief[particle.Hypothesis.h], particle.score)
+			player_belief[particle.Hypothesis.h] = log_add(player_belief[particle.Hypothesis.h], particle.score)
 		player_belief = log_normalize_and_convert(player_belief)
 		return player_belief
 
@@ -99,7 +105,7 @@ class Agent(object):
         return {move : 1. / len(moves) for move in moves}
 
 
-	def get_move_probs_from_belief(self, game, player, state, belief, hypothesis, level):
+	def move_probs_given_h(self, game, player, state, hidden_state, level):
 		'''
 		Given a single player's belief vector, and hypothesis, get the move
 		probabilities for that player if they were playing at level
@@ -108,12 +114,22 @@ class Agent(object):
 		'''
 		if level == 0:
 			# what a level 0 player would do
-			actions = self.base_strategy(player, state, hypothesis.h)
+			actions = self.base_strategy(player, state, hidden_state)
+		if level > 0:
+			# do random tree search
+			move_probs = self.random_tree_search(game, player, state, hidden_state)
+
+
+	def random_tree_search(self, _game, player, _state, hidden_state):
+		game = copy.deepcopy(_game)
+		state = copy.deepcopy(_state)
+		for it in range(self.MCTS_NITER):
+			while state.round < N:
+				actions = {i : random.choice(game.possible_moves(i, state, hidden_state)) for i in range(game.NUM_PLAYERS)}
 
 
 
-
-	def score_actions(self, game, prev_state, actions, particle):
+	def score_actions(self, game, prev_state, actions, hidden_state, TOM, level):
 		'''
 		Scores a new set of actions in a round given a previous state and a particle.
 		Algorithm proceeds in 3 steps:
@@ -128,32 +144,72 @@ class Agent(object):
 		'''
 		score = 0
 		for player, action in enumerate(actions):
-			belief = self.get_beliefs_given_particles(game, particle.TOM[player])
+			if level == 1:
+				# TOM is empty, your opponent has no belief
+				belief = None
+			else:
+				belief = self.get_beliefs_given_particles(game, TOM[player])
 			probs = self.get_move_probs_from_belief(
-				game, player, prev_state, belief, particle.Hypothesis, self.level-1
+				game, player, prev_state, belief, hidden_state, level-1
 			)
-			score += np.log(probs[action]) if action in probs else float('-inf')
-		return score + particle.score
+			score = log_add(score, np.log(probs[action])) if action in probs else float('-inf')
+		return log_add(score, particle.score)
 
 
-	def generate_new_particles(self, game, prev_state, actions):
+	def update_TOM(self, game, TOM, prev_state, actions, level):
+		if level == 0:
+			assert False, "Should never have a TOM for level 0 player"
+
+		if level == 1:
+			return EmptyTOM
+
+		if level > 1:
+			for player in range(game.NUM_PLAYERS):
+				new_particles = self.generate_and_prune_new_particles(game, prev_state, actions, level-1, TOM.thoughts)
+				return TOM(new_particles)
+
+
+	def generate_and_prune_new_particles(self, game, prev_state, actions, level, particles):
 		my_new_particles = []
-		for particle in self.my_particles:
-			new_score = score_actions(self, game, prev_state, actions, particle)
-			#TODO: fast-path this to prune here, instead of separate function.
+		for particle in particles:
+			new_actions = particle.Hypothesis.explanation + actions
+			new_TOM = self.updateTOM(game, particle.TOM, prev_state, actions, level)
+			new_score = score_actions(self, game, prev_state, actions, new_hypothesis.h, new_TOM, level)
+			if new_score < self.THRESHOLD:
+				continue
+			new_hypothesis = Hypothesis(particle.Hypothesis.h, new_actions, new_score)
+			new_particle = Particle(new_hypothesis, new_TOM)
+			my_new_particles.append(new_particle)
 
-
-
-	def prune_particles(self, game):
-		my_new_particles = []
-		for particle in self.my_particles:
-			if particle.score > self.THRESHOLD:
-				my_new_particles.append(particle)
 		if len(my_new_particles) == 0:
 			#self.regenerate_all_particles()
 			assert False, "let's make em from scratch"
-		self.my_particles = my_new_particles
+		return my_new_particles
 
 
-	def get_move(self, game):
-		pass
+	def get_move(self, game, state):
+		my_belief = self.get_belief_given_particles(game, self.my_particles)
+		conditioned_move_probs = [
+			self.move_probs_given_h(game, self.index, state, hidden_state, self.level)	
+			for hidden_state in game.HIDDEN_STATES
+		]
+		acceptable_moves = None
+        for h in range(len(game.HIDDEN_STATES)):
+	        if prob == 0:
+    	        continue
+        	if acceptable_moves is None:
+            	acceptable_moves = set(conditioned_move_probs[h].keys())
+            	
+            else:
+            	acceptable_moves &= set(conditioned_move_probs[h].keys())
+
+        if acceptable_moves is None or len(acceptable_moves) == 0:
+	        return {}
+
+	    weighted_move_probs = {move : 1 for move in acceptable_moves}
+	    for move in weighted_move_probs:
+	    	for h, move_probs in enumerate(conditioned_move_probs):
+	    		if move in move_probs:
+	    			# weight by move prob and likelihood of hidden state
+	    			weighted_move_probs[move] *= my_belief[h] * move_probs[move]
+	    return weighted_move_probs
