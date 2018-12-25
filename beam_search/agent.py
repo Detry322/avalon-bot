@@ -50,16 +50,20 @@ def log_normalize_and_convert(arr):
 # ------------ AGENT ------------
 
 class Agent(object):
-	def __init__(self, game, level, my_starting_distribution):
+	def __init__(self, game, level, my_starting_distribution, is_bad):
 		self.game = game
 		self.level = level		
 		self.belief = my_starting_distribution
+		# probably redundant but probably also useful
+		self.is_bad = is_bad
 		self.index = 0 # or something idk
-		self.my_particles = self._initial_particles(game, level)
-		self.my_particles = self.prune_particles(game)
+		self.my_particles = generate_and_prune_new_particles(self, game, None, None, None, None)
 		self.MCTS_NITER = 1000
 
-	def _initial_particles(self, game, level):
+	def _initial_particles(self, game, level, hidden_states=None):
+		# hidden states is all valid hidden states
+		if hidden_states is None:
+			hidden_states = {i:game.HIDDEN_STATES[i] for i in range(len(game.HIDDEN_STATES))}
 		if level == 0:
 			return None
 
@@ -68,7 +72,7 @@ class Agent(object):
 				Particle(
 					Hypothesis(hidden_state, [], np.log(self.belief[h])), EmptyTOM
 				) 
-				for h, hidden_state in enumerate(game.HIDDEN_STATES)
+				for h, hidden_state in hidden_states.items()
 			]
 
 		if level > 1:
@@ -80,7 +84,7 @@ class Agent(object):
 						for player in range(game.NUM_PLAYERS)
 					])
 				)
-				for h, hidden_state in enumerate(game.HIDDEN_STATES)
+				for h, hidden_state in hidden_states.items()
 			]
 
 
@@ -118,10 +122,11 @@ class Agent(object):
 		'''
 		if level == 0:
 			# what a level 0 player would do
-			actions = self.base_strategy(game, player, state, hidden_state)
+			move_probs = self.base_strategy(game, player, state, hidden_state)
 		if level > 0:
 			# do random tree search
 			move_probs = self.random_tree_search(game, player, state, hidden_state)
+		return move_probs
 
 
 	def random_tree_search(self, game, player, state, hidden_state):
@@ -129,26 +134,44 @@ class Agent(object):
 		Given an input game and player state, conduct a random tree search
 		to find the optimal move probabilities for that player.
 
+		This random tree search is unbelievably naive at the moment. For each round,
+		we just pick a random action and then do a heavy playout, updating our rewards at each
+		timestep. The only intelligent move is at the end, we select the final action based
+		on our updated beliefs.
+
 		Return a dict of {action : proba} 
 			'''
 		rewards = {act : 0 for act in game.possible_moves(player, state, hidden_state)}
 		for _ in range(self.MCTS_NITER):
 			is_first_move = True
 			while !game.state_is_final(state):
-				moves = [
-					random.choice(game.possible_moves(player, state, hidden_state)) 
-					for player in game.NUM_PLAYERS
-				]
-				if is_first_move:
-					first_move = moves[player]
-					is_first_move = False
+				if state.round != game.NUM_PLAYERS:
+					moves = [
+						random.choice(game.possible_moves(p, state, hidden_state)) 
+						for p in game.NUM_PLAYERS
+					]
+					if is_first_move:
+						first_move = moves[player]
+						is_first_move = False
+				else:
+					moves = []
+					for p in range(game.NUM_PLAYERS):
+						if p == hidden_state.evil:
+							moves.append(Move(type=None, extra=None))							
+						elif p == player:
+							belief = self.get_belief_given_particles(game, particles)
+							moves.append(Move(type='Pick', extra=np.argmax(belief)))
+						else:
+							belief = self.get_belief_given_particles(game, particles[0].TOM[p])
+							moves.append(Move(type='Pick', extra=np.argmax(belief)))
 				round_rewards = game.rewards(state, hidden_state, moves)
-				state = game.transition(state, hidden_state, moves)
 				rewards[first_move] += round_rewards[player]
+				new_state = game.transition(state, hidden_state, moves)
+				new_particles = self.generate_and_prune_new_particles(game, state, moves, level, particles)
+				state, particles = new_state, new_particles
 		rewards = {a : max(0, r) for a, r in rewards.items()}
 		reward_sum = sum(rewards.values())
 		return {a : r / reward_sum for a, r in rewards.items()}
-
 
 	def score_actions(self, game, prev_state, actions, hidden_state, TOM, level):
 		'''
@@ -191,6 +214,12 @@ class Agent(object):
 
 
 	def generate_and_prune_new_particles(self, game, prev_state, actions, level, particles):
+		if prev_state is None:
+			if self.is_bad:
+				# TODO: fix this to only take one particle if you know you're a baddie
+				hidden_state = HIDDEN_STATE(evil=self.index)
+				return self._initial_particles(game, level, hidden_states={self.index: hidden_state})
+			return self._initial_particles(game, level)
 		my_new_particles = []
 		for particle in particles:
 			new_actions = particle.Hypothesis.explanation + actions
