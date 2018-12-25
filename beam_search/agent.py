@@ -1,4 +1,6 @@
 from collections import namedtuple, defaultdict
+
+import searcher
 import numpy as np
 '''
 Terminology:
@@ -44,6 +46,7 @@ def log_add(x, y):
 def log_normalize_and_convert(arr):
 	return np.exp(arr - max(arr)) / np.sum(np.exp(arr - max(arr)))
 
+
 # ------------ AGENT ------------
 
 class Agent(object):
@@ -54,6 +57,7 @@ class Agent(object):
 		self.index = 0 # or something idk
 		self.my_particles = self._initial_particles(game, level)
 		self.my_particles = self.prune_particles(game)
+		self.MCTS_NITER = 1000
 
 	def _initial_particles(self, game, level):
 		if level == 0:
@@ -94,14 +98,14 @@ class Agent(object):
 		return player_belief
 
 
-	def base_strategy(self, player, state, hidden_state):
+	def base_strategy(self, game, player, state, hidden_state):
 		''' level 0 strat ''' 
         if state.proposal is not None and player in state.proposal:
             if hidden_state.evil == player:
                 return {Move(type='Pass', extra=None) : EPSILON, Move(type='Fail', extra=None) : 1. - EPSILON }
             else:
                 return {Move(type='Pass', extra=None) : 1.}
-        moves = cls.possible_moves(player, state, hidden_state)
+        moves = game.possible_moves(player, state, hidden_state)
         return {move : 1. / len(moves) for move in moves}
 
 
@@ -114,19 +118,36 @@ class Agent(object):
 		'''
 		if level == 0:
 			# what a level 0 player would do
-			actions = self.base_strategy(player, state, hidden_state)
+			actions = self.base_strategy(game, player, state, hidden_state)
 		if level > 0:
 			# do random tree search
 			move_probs = self.random_tree_search(game, player, state, hidden_state)
 
 
-	def random_tree_search(self, _game, player, _state, hidden_state):
-		game = copy.deepcopy(_game)
-		state = copy.deepcopy(_state)
-		for it in range(self.MCTS_NITER):
-			while state.round < N:
-				actions = {i : random.choice(game.possible_moves(i, state, hidden_state)) for i in range(game.NUM_PLAYERS)}
+	def random_tree_search(self, game, player, state, hidden_state):
+		'''
+		Given an input game and player state, conduct a random tree search
+		to find the optimal move probabilities for that player.
 
+		Return a dict of {action : proba} 
+			'''
+		rewards = {act : 0 for act in game.possible_moves(player, state, hidden_state)}
+		for _ in range(self.MCTS_NITER):
+			is_first_move = True
+			while !game.state_is_final(state):
+				moves = [
+					random.choice(game.possible_moves(player, state, hidden_state)) 
+					for player in game.NUM_PLAYERS
+				]
+				if is_first_move:
+					first_move = moves[player]
+					is_first_move = False
+				round_rewards = game.rewards(state, hidden_state, moves)
+				state = game.transition(state, hidden_state, moves)
+				rewards[first_move] += round_rewards[player]
+		rewards = {a : max(0, r) for a, r in rewards.items()}
+		reward_sum = sum(rewards.values())
+		return {a : r / reward_sum for a, r in rewards.items()}
 
 
 	def score_actions(self, game, prev_state, actions, hidden_state, TOM, level):
