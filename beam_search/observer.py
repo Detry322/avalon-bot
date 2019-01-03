@@ -42,4 +42,4 @@ def prettyprint(particle):
     for rnd, moves in enumerate(particle.Hypothesis.explanation):
         print "\t \t \t Round {0}: {1}".format(rnd, moves)
     print "\t \t Score: {}".format(particle.Hypothesis.score)
-    print "\t \t Theory-of-mind: {}".format(particle.TOM)
+    #print "\t \t Theory-of-mind: {}".format(particle.TOM)

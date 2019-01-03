@@ -20,7 +20,7 @@ def observe():
         Round(3, [2, 3], 'success'),
     ]
     playthrough = create_playthrough(rounds)
-    k = 1
+    k = 2
     # hacky initial distribution
     solver = Agent(game, k, [1./3, 1./3, 1./3], False)
     observe_playthrough(solver, playthrough, k)
