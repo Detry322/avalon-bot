@@ -59,8 +59,8 @@ class Agent(object):
         self.is_bad = is_bad
         self.index = 0 # or something idk
         self.my_particles = self.generate_and_prune_new_particles(game, None, None, self.level, None)
-        self.MCTS_NITER = 1000
-        self.THRESHOLD = -3000
+        self.MCTS_NITER = 10000
+        self.THRESHOLD = -15
 
     def _initial_particles(self, game, level, hidden_states=None):
         # hidden states is all valid hidden states
@@ -192,9 +192,10 @@ class Agent(object):
                 new_state = game.transition(state, hidden_state, moves)
                 new_particles = self.generate_and_prune_new_particles(game, state, [moves], level, particles)
                 state, particles = new_state, new_particles
-        rewards = {a : r for a, r in rewards.items()}
-        reward_min = min(rewards.values())
-        reward_sum = sum(rewards.values()) + len(rewards) * reward_min
+        # TODO: this doesn't work
+        # rewards = {a : r for a, r in rewards.items()}
+        # reward_min = min(rewards.values())
+        # reward_sum = sum(rewards.values()) + len(rewards) * reward_min
         return {a : (r + reward_min) / reward_sum for a, r in rewards.items()}
 
     def score_actions(self, game, prev_state, actions, hidden_state, thm, level):
@@ -258,7 +259,7 @@ class Agent(object):
                 new_particle = Particle(new_hypothesis, new_TOM)
                 my_new_particles.append(new_particle)
         if len(my_new_particles) == 0:
-            assert False, "bitch"
+            assert False, "we need to regenerate particles"
         return my_new_particles
 
     def get_move_probs_from_belief(self, game, player, prev_state, belief, hidden_state, level):
