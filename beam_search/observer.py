@@ -21,14 +21,19 @@ def observe_playthrough(solver, playthrough, k=2):
         print " Belief: {}".format(belief)
         print " Next : {}".format(next_state)
         print " Obs  : {}".format(observation)
-        action_sets = solver.game.infer_action_sets(state, observation)
-        new_particles = solver.generate_and_prune_new_particles(solver.game, state, action_sets, k, particles)
+        new_particles = solver.generate_and_prune_new_particles(solver.game, state, observation, k, particles)
         print " New Particles:"
-        new_particles = sorted(new_particles, key=lambda x : x.Hypothesis.score, reverse=True)
-        for particle in new_particles[:5]:
+        for particle in new_particles:
             prettyprint(particle)
         belief = solver.get_belief_given_particles(solver.game, new_particles)
         print " New Belief: {}".format(belief)
+        if k >=2 :
+            for player in range(solver.game.NUM_PLAYERS):
+                player_belief = solver.get_belief_given_particles(solver.game, new_particles[0].TOM.thoughts[player])
+                print " \t TOM player {0} belief: {1}".format(player, player_belief)
+                print " \t--------TOM PARTICLES---------"
+                for particle in new_particles[0].TOM.thoughts[player]:
+                    prettyprint(particle)
         particles = new_particles
 
 
@@ -42,4 +47,4 @@ def prettyprint(particle):
     for rnd, moves in enumerate(particle.Hypothesis.explanation):
         print "\t \t \t Round {0}: {1}".format(rnd, moves)
     print "\t \t Score: {}".format(particle.Hypothesis.score)
-    #print "\t \t Theory-of-mind: {}".format(particle.TOM)
+    # print "\t \t Theory-of-mind: {}".format(particle.TOM)

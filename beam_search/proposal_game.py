@@ -151,24 +151,33 @@ class ProposalGame(Game):
         return actions
 
     @classmethod
-    def infer_action_sets(cls, state, obs):
-        action_sets = []
-        for h, hidden_state in enumerate(cls.HIDDEN_STATES):
-            actions = [Move(type=None, extra=None) for _ in range(cls.NUM_PLAYERS)]
-            if state.proposal is None:
-                if state.round == N:
-                    for player, bad_pick in enumerate(obs.bad_picks):
-                        if player == hidden_state.evil:
-                            actions[player] = Move(type='Pick', extra=bad_pick)
-                else:
-                    actions[state.round] = Move(type='Propose', extra=obs.proposal)
+    def infer_action_sets(cls, state, obs, hidden_state):
+        action_sets = [[] for _ in range(cls.NUM_PLAYERS)]
+        if state.proposal is None:
+            if state.round == N:
+                for player, bad_pick in enumerate(obs.bad_picks):
+                    if player != hidden_state.evil:
+                        for pick in range(cls.NUM_PLAYERS):
+                            action_sets[player].append(Move(type='Pick', extra=pick))
+                    else:
+                        action_sets[player].append(Move(type='Pick', extra=bad_pick))
             else:
-                if obs.success:
-                    for player in state.proposal:
-                        actions[player] = Move(type='Pass', extra=None)
+                action_sets[state.round].append(Move(type='Propose', extra=obs.proposal))
+                for player in range(cls.NUM_PLAYERS):
+                    action_sets[player].append(Move(type=None, extra=None))
+        else:
+            if obs.success:
+                for player in state.proposal:
+                    action_sets[player].append(Move(type='Pass', extra=None))
+            else:
+                traitor = hidden_state.evil
+                if traitor not in state.proposal:
+                    return [[]]
                 else:
-                    traitor = hidden_state.evil
                     for player in state.proposal:
-                        actions[player] = Move(type='Fail', extra=None) if traitor == player else Move(type='Pass', extra=None)
-            action_sets.append(actions)
-        return action_sets
+                        action_sets[player].append(Move(type='Fail', extra=None) if traitor == player else Move(type='Pass', extra=None))
+            for player in range(cls.NUM_PLAYERS):
+                if player not in state.proposal:
+                    action_sets[player].append(Move(type=None, extra=None))
+        return list(it.product(*action_sets))
+
