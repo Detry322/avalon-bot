@@ -259,6 +259,7 @@ class Agent(object):
                 new_particle = Particle(new_hypothesis, new_TOM)
                 my_new_particles.append(new_particle)
         if len(my_new_particles) == 0:
+            # TODO: code to regenerate particle
             assert False, "we need to regenerate particles"
         return my_new_particles
 
