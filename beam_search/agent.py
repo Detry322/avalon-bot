@@ -59,7 +59,7 @@ class Agent(object):
         self.is_bad = is_bad
         self.index = 0 # or something idk
         self.my_particles = self.generate_and_prune_new_particles(game, None, None, self.level, None)
-        self.MCTS_NITER = 1000
+        self.MCTS_NITER = 10
         self.THRESHOLD = -3000
 
     def _initial_particles(self, game, level, hidden_states=None):
@@ -131,7 +131,7 @@ class Agent(object):
         return move_probs
 
 
-    def random_tree_search(self, game, player, state, hidden_state, particles, level):
+    def random_tree_search(self, game, player, state_, hidden_state, particles, level):
         '''
         Given an input game and player state, conduct a random tree search
         to find the optimal move probabilities for that player.
@@ -143,9 +143,11 @@ class Agent(object):
 
         Return a dict of {action : proba} 
         '''
-        rewards = {act : 0.0 for act in game.possible_moves(player, state, hidden_state)} 
+        rewards = {act : 0.0 for act in game.possible_moves(player, state_, hidden_state)} 
         for _ in range(self.MCTS_NITER):
+            state = state_
             is_first_move = True
+            first_move = None
             best_particle_with_hidden_state = None
             for particle in particles:
                 if particle.Hypothesis.h == hidden_state:
@@ -200,7 +202,8 @@ class Agent(object):
                             elif level == 1:
                                 # your opponent is level 0
                                 moves.append(Move(type='Pick', extra=random.choice(range(game.NUM_PLAYERS))))
-
+                if is_first_move or first_move is None:
+                    first_move = moves[player]
                 round_rewards = game.rewards(state, hidden_state, moves)
                 rewards[first_move] += round_rewards[player]
                 new_state = game.transition(state, hidden_state, moves)

@@ -15,9 +15,9 @@ def play():
 def observe():
     game = ProposalGame
     rounds = [
-        Round(1, [1, 2], 'fail'),
-        Round(2, [2, 3], 'success'),
-        Round(3, [2, 3], 'success'),
+        Round(1, [2, 3], 'success'),
+        Round(2, [2, 3], 'fail'),
+        Round(3, [2, 3], 'fail'),
     ]
     playthrough = create_playthrough(rounds)
     k = 2
