@@ -59,7 +59,7 @@ class Agent(object):
         self.is_bad = is_bad
         self.index = 0 # or something idk
         self.my_particles = self.generate_and_prune_new_particles(game, None, None, self.level, None)
-        self.MCTS_NITER = 10
+        self.MCTS_NITER = 100
         self.THRESHOLD = -3000
 
     def _initial_particles(self, game, level, hidden_states=None):
@@ -143,7 +143,10 @@ class Agent(object):
 
         Return a dict of {action : proba} 
         '''
-        rewards = {act : 0.0 for act in game.possible_moves(player, state_, hidden_state)} 
+        rewards = {act : 0.0 for act in game.possible_moves(player, state_, hidden_state)}
+        if len(rewards) == 1:
+            return rewards
+
         for _ in range(self.MCTS_NITER):
             state = state_
             is_first_move = True
@@ -369,3 +372,4 @@ class Agent(object):
                     # weight by move prob and likelihood of hidden state
                     weighted_move_probs[move] *= my_belief[h] * move_probs[move]
         return weighted_move_probs
+
