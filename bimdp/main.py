@@ -21,7 +21,7 @@ def observe():
         Round(3, [2, 3], 'success'),
     ]
     playthrough = create_playthrough(rounds)
-    k = 2
+    k = 4
     solver = Solver(game)
     observe_playthrough(solver, playthrough, k)
 

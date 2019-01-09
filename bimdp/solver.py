@@ -85,6 +85,19 @@ class Solver:
         return self.memoized_player_solve[key]
 
 
+    def _get_acceptable_moves(self, player, state, belief):
+        acceptable_moves = None
+        for h, prob in enumerate(belief):
+            if prob == 0:
+                continue
+            new_acceptable = set(self.game.possible_moves(player, state, self.game.HIDDEN_STATES[h]))
+            if acceptable_moves is None:
+                acceptable_moves = new_acceptable
+            else:
+                acceptable_moves &= new_acceptable
+        return acceptable_moves
+
+
     def __solve_for_player(self, player, player_belief, state, belief_tensor):
         '''
         Given a player, a state, and a k-belief tensor, this function computes the
@@ -106,6 +119,13 @@ class Solver:
         '''
         k, H, N, Hprime = belief_tensor.shape
         assert H == Hprime, "u dun goof"
+
+        acceptable_moves = self._get_acceptable_moves(player, state, player_belief)
+        if len(acceptable_moves) < 2:
+            return {
+                move: (1.0, np.array([0.0 for _ in range(len(self.game.HIDDEN_STATES))]))
+                for move in acceptable_moves
+            } 
 
         rewards = []
         for h, h_prob in enumerate(player_belief):
