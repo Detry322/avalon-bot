@@ -4,8 +4,7 @@ import itertools
 import numpy as np
 from collections import defaultdict
 
-def random_choice(values, p=None):
-    return values[np.random.choice(range(len(values)), p=p)]
+from mcts_common import random_choice, determinization_iterator, simulate
 
 class Node:
     def __init__(self, parent, incoming_edge):
@@ -81,18 +80,6 @@ class Node:
             return move
 
 
-def determinization_iterator(possible_hidden_states, num_iterations):
-    i = 0
-    hidden = list(possible_hidden_states)
-    while i < num_iterations:
-        random.shuffle(hidden)
-        for h in hidden:
-            if i >= num_iterations:
-                return
-            yield i, h
-            i += 1
-
-
 def select_leaf(node, game_state, hidden_state):
     if game_state.is_terminal():
         return node, game_state, hidden_state
@@ -116,16 +103,6 @@ def expand_if_needed(node, game_state, hidden_state):
     node.children[action] = new_node
     new_game_state, new_hidden_state, _ = game_state.transition(action, hidden_state)
     return new_node, new_game_state, new_hidden_state
-
-
-def simulate(game_state, hidden_state):
-    while not game_state.is_terminal():
-        moves = tuple([
-            random_choice(game_state.legal_actions(player, hidden_state))
-            for player in game_state.moving_players()
-        ])
-        game_state, hidden_state, _ = game_state.transition(moves, hidden_state)
-    return game_state.terminal_value(hidden_state)
 
 
 def backpropagate(initial_game_state, initial_hidden_state, node, rewards):
