@@ -120,12 +120,13 @@ class Solver:
         k, H, N, Hprime = belief_tensor.shape
         assert H == Hprime, "u dun goof"
 
-        acceptable_moves = self._get_acceptable_moves(player, state, player_belief)
-        if len(acceptable_moves) < 2:
-            return {
-                move: (1.0, np.array([0.0 for _ in range(len(self.game.HIDDEN_STATES))]))
-                for move in acceptable_moves
-            } 
+        # This is a good idea, but doesn't work yet since we need the payoffs for each player.
+        # acceptable_moves = self._get_acceptable_moves(player, state, player_belief)
+        # if len(acceptable_moves) < 2:
+        #     return {
+        #         move: (1.0, np.array([0.0 for _ in range(len(self.game.HIDDEN_STATES))]))
+        #         for move in acceptable_moves
+        #     } 
 
         rewards = []
         for h, h_prob in enumerate(player_belief):
