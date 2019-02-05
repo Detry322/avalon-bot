@@ -1,7 +1,7 @@
 import random
 
 from battlefield.bots.bot import Bot
-from battlefield.avalon_types import EVIL_ROLES, GOOD_ROLES
+from battlefield.avalon_types import EVIL_ROLES, GOOD_ROLES, MissionAction, VoteAction
 
 # Plays randomly, except always fails missions if bad.
 class SimpleBot(Bot):
@@ -21,5 +21,9 @@ class SimpleBot(Bot):
     def get_action(self, state, legal_actions):
         if state.status == 'run':
             return MissionAction(fail=self.is_evil)
+        if state.status == 'vote':
+            return VoteAction(up=True)
 
         return random.choice(legal_actions)
+
+

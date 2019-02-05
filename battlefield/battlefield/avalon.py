@@ -1,7 +1,7 @@
 import itertools
 
 from game import GameState
-from battlefield.avalon_types import *
+from battlefield.avalon_types import AVALON_PROPOSE_SIZES, AVALON_PLAYER_COUNT, EVIL_ROLES, GOOD_ROLES, ProposeAction, VoteAction, MissionAction, PickMerlinAction
 
 class AvalonState(GameState):
     def __init__(self, proposer, propose_count, succeeds, fails, status, proposal, game_end):
@@ -12,9 +12,9 @@ class AvalonState(GameState):
         assert 0 <= succeeds + fails <= 5, "Round invalid"
         assert status in set(['propose', 'vote', 'run', 'merlin', 'end']), "invalid status"
         assert status != 'end' or game_end is not None, "game end not consistent"
-        assert status != 'merlin' or succeeds != 3, "merlin guess not consistent"
+        assert status != 'merlin' or succeeds == 3, "merlin guess not consistent"
         assert status != 'run' or proposal is not None, "bad proposal for running"
-        assert status != 'run' or len(proposal) == self.MISSION_SIZES[self.succeeds + self.fails][0]
+        assert status != 'run' or len(proposal) == self.MISSION_SIZES[succeeds + fails][0]
         assert status != 'propose' or proposal is None, "proposal should be None before proposal"
         self.proposer = proposer
         self.propose_count = propose_count
@@ -37,20 +37,20 @@ class AvalonState(GameState):
         """
         Returns true if the game has ended
         """
-        return self.game_end is not None
+        return self.status == 'end'
 
 
     def terminal_value(self, hidden_state):
         """
         Returns the payoff for each player
         """
-        assert game_end[0] in set(['evil', 'good']), "Bad game end"
+        assert self.game_end[0] in set(['evil', 'good']), "Bad game end"
         # This ensures zero-sum
 
         num_good, num_evil = self.NUM_GOOD, self.NUM_EVIL
 
-        good_amount = 1.0 if game_end[0] == 'good' else -1.0
-        evil_amount = -float(num_good)/num_evil if game_end[0] == 'good' else float(num_good)/num_evil
+        good_amount = 1.0 if self.game_end[0] == 'good' else -1.0
+        evil_amount = -float(num_good)/num_evil if self.game_end[0] == 'good' else float(num_good)/num_evil
 
         return [
             good_amount if player_role in GOOD_ROLES else evil_amount
@@ -126,7 +126,7 @@ class AvalonState(GameState):
             fails=self.fails,
             status='propose',
             proposal=None,
-            game_end=('evil', 'Too many proposals and no resolution')
+            game_end=None
         )
 
 
@@ -236,7 +236,7 @@ class AvalonState(GameState):
         hidden_state': the new hidden state
         observation: the communal observation made by all of the players
         """
-        assert len(move) == len(self.moving_players()), "More players moved than allowed"
+        assert len(moves) == len(self.moving_players()), "More players moved than allowed"
         if self.status == 'merlin':
             chosen_player = moves[hidden_state.index('assassin')].merlin
             assassin_picked_correctly = chosen_player == hidden_state.index('merlin')
