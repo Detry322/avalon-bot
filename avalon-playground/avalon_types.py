@@ -76,8 +76,8 @@ def starting_hidden_states(player, real_hidden_state, possible_hidden_states):
 
 
 if __name__ == "__main__":
-    hidden_states = possible_hidden_states(['assassin', 'mordred', 'merlin'], 5)
-    real_hidden_state = ('mordred', 'assassin', 'servant', 'merlin', 'servant')
+    hidden_states = possible_hidden_states(['assassin', 'mordred', 'merlin', 'oberon'], 7)
+    real_hidden_state = hidden_states[len(hidden_states)/2]
     print "REAL ROLES"
     print real_hidden_state
 
