@@ -1,7 +1,7 @@
 import itertools
 
 from game import GameState
-from avalon_types import *
+from battlefield.avalon_types import *
 
 class AvalonState(GameState):
     def __init__(self, proposer, propose_count, succeeds, fails, status, proposal, game_end):

@@ -70,7 +70,7 @@ def starting_hidden_states(player, real_hidden_state, possible_hidden_states):
 
     return [
         hidden_state
-        for hidden_state in hidden_states
+        for hidden_state in possible_hidden_states
         if all(hidden_state[p] in possible_roles for p, possible_roles in knowledge)
     ]
 
