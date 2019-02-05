@@ -1,7 +1,7 @@
 import random
 
 from battlefield.bots.bot import Bot
-from battlefield.avalon_types import filter_hidden_states, EVIL_ROLES, GOOD_ROLES, VoteAction, ProposeAction
+from battlefield.avalon_types import filter_hidden_states, EVIL_ROLES, GOOD_ROLES, VoteAction, ProposeAction, MissionAction
 
 
 class ObserveBot(Bot):
@@ -34,5 +34,8 @@ class ObserveBot(Bot):
             good_players = [ p for p, role in enumerate(role_guess) if role in GOOD_ROLES ]
             random.shuffle(good_players)
             return ProposeAction(proposal=tuple(sorted(good_players[:propose_size])))
+
+        if state.status == 'run' and self.is_evil:
+            return MissionAction(fail=True)
 
         return random.choice(legal_actions)

@@ -21,7 +21,7 @@ def run_game(state, hidden_state, bots):
     return state.terminal_value(hidden_state), state.game_end
 
 
-def run_tournament(config, num_games=1000):
+def run_tournament(config, num_games=1000, granularity=100):
     tournament_statistics = {
         'bots': [
             { 'bot': bot['bot'].__name__, 'role': bot['role'], 'wins': 0, 'total': 0, 'win_percent': 0, 'payoff': 0.0 }
@@ -39,7 +39,7 @@ def run_tournament(config, num_games=1000):
     ]
 
     for i in range(num_games):
-        if i % 100 == 0:
+        if i % granularity == 0:
             print "Running game {}".format(i)
         bots = [
             bot['bot'](start_state, player, bot['role'], beliefs[player])
