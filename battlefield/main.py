@@ -8,11 +8,11 @@ TOURNAMENT_CONFIG = [
         'role': 'merlin'
     },
     {
-        'bot': MOISMCTSBot,
+        'bot': ObserveBot,
         'role': 'servant'
     },
     {
-        'bot': ISMCTSBot,
+        'bot': ObserveBot,
         'role': 'assassin'
     },
     {
@@ -27,7 +27,7 @@ TOURNAMENT_CONFIG = [
 
 def main():
     check_config(TOURNAMENT_CONFIG)
-    tournament_results = run_tournament(TOURNAMENT_CONFIG, num_games=40, granularity=1)
+    tournament_results = run_tournament(TOURNAMENT_CONFIG, num_games=1000, granularity=100)
     print_statistics(tournament_results)
 
 

@@ -25,6 +25,10 @@ class AvalonState(GameState):
         self.game_end = game_end
 
 
+    def as_key(self):
+        return (proposer, propose_count, succeeds, fails, status, proposal, game_end)
+
+
     @classmethod
     def start_state(cls):
         """

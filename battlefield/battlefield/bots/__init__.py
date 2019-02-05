@@ -3,3 +3,4 @@ from battlefield.bots.random_bot import *
 from battlefield.bots.simple_bot import *
 from battlefield.bots.observe_bot import *
 from battlefield.bots.ismcts_bot import *
+from battlefield.bots.human_bot import *
