@@ -1,26 +1,26 @@
 from battlefield.avalon import create_avalon_game
-from battlefield.bots import RandomBot, RandomBotUV, SimpleBot, ObserveBot, ISMCTSBot, MOISMCTSBot
+from battlefield.bots import RandomBot, RandomBotUV, SimpleBot, ObserveBot, ISMCTSBot, MOISMCTSBot, HumanBot
 from battlefield.tournament import run_tournament, print_statistics, check_config
 
 TOURNAMENT_CONFIG = [
     {
-        'bot': ObserveBot,
+        'bot': HumanBot,
         'role': 'merlin'
     },
     {
-        'bot': ObserveBot,
+        'bot': HumanBot,
         'role': 'servant'
     },
     {
-        'bot': ObserveBot,
+        'bot': RandomBot,
         'role': 'assassin'
     },
     {
-        'bot': ObserveBot,
+        'bot': HumanBot,
         'role': 'servant'
     },
     {
-        'bot': ObserveBot,
+        'bot': RandomBot,
         'role': 'minion'
     }
 ]

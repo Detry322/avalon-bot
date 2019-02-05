@@ -26,7 +26,7 @@ class AvalonState(GameState):
 
 
     def as_key(self):
-        return (proposer, propose_count, succeeds, fails, status, proposal, game_end)
+        return (self.proposer, self.propose_count, self.succeeds, self.fails, self.status, self.proposal, self.game_end)
 
 
     @classmethod
