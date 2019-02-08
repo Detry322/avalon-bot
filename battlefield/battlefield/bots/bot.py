@@ -10,3 +10,7 @@ class Bot:
 
     def get_action(self, state, legal_actions):
         raise NotImplemented
+
+
+    def get_move_probabilities(self, state, legal_actions):
+        raise NotImplemented

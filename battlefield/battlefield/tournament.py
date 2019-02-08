@@ -76,7 +76,7 @@ def check_config(config):
         assert role in GOOD_ROLES or role in EVIL_ROLES
 
 
-def print_statistics(tournament_statistics):
+def print_tournament_statistics(tournament_statistics):
     print "       Role |            Bot |      Evil |      Winrate |        Payoff "
     print "------------------------------------------------------------------------"
     for bot in tournament_statistics['bots']:

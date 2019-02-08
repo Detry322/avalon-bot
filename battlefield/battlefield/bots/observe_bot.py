@@ -1,8 +1,10 @@
 import random
+import numpy as np
 
 from battlefield.bots.bot import Bot
 from battlefield.avalon_types import filter_hidden_states, EVIL_ROLES, GOOD_ROLES, VoteAction, ProposeAction, MissionAction
 
+from collections import defaultdict
 
 class ObserveBot(Bot):
     def __init__(self, game, player, role, hidden_states):
@@ -18,8 +20,8 @@ class ObserveBot(Bot):
             self.hidden_states = filter_hidden_states(self.hidden_states, old_state.proposal, observation)
 
 
-    def get_action(self, state, legal_actions):
-        role_guess = random.choice(self.hidden_states)
+    def get_action(self, state, legal_actions, role_guess=None):
+        role_guess = role_guess or random.choice(self.hidden_states)
         if state.status == 'vote':
             if state.propose_count == 4:
                 return VoteAction(up=True)
@@ -39,3 +41,16 @@ class ObserveBot(Bot):
             return MissionAction(fail=True)
 
         return random.choice(legal_actions)
+
+
+    def get_move_probabilities(self, state, legal_actions):
+        move_counts = defaultdict(lambda: 0)
+        for role_guess in self.hidden_states:
+            move_counts[self.get_action(state, legal_actions, role_guess=role_guess)] += 1
+
+        result = np.zeros(len(legal_actions))
+
+        for move, count in move_counts.items():
+            result[legal_actions.index(move)] = count
+
+        return result / np.sum(result)

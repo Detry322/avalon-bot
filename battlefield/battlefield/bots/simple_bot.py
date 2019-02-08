@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 from battlefield.bots.bot import Bot
 from battlefield.avalon_types import EVIL_ROLES, GOOD_ROLES, MissionAction, VoteAction
@@ -25,5 +26,17 @@ class SimpleBot(Bot):
             return VoteAction(up=True)
 
         return random.choice(legal_actions)
+
+
+    def get_move_probabilities(self, state, legal_actions):
+        result = np.zeros(len(legal_actions))
+        if state.status == 'run':
+            result[legal_actions.index(MissionAction(fail=self.is_evil))] = 1
+        elif state.status == 'vote':
+            result[legal_actions.index(VoteAction(up=True))] = 1
+        else:
+            result[:] = 1
+
+        return result / len(legal_actions)
 
 

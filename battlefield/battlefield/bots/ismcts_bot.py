@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 from battlefield.bots.bot import Bot
 from battlefield.avalon_types import filter_hidden_states, EVIL_ROLES, GOOD_ROLES, VoteAction, ProposeAction, MissionAction
@@ -27,6 +28,10 @@ class ISMCTSBot(Bot):
         return action
 
 
+    def get_move_probabilities(self, state, legal_actions):
+        raise NotImplemented
+
+
 
 class MOISMCTSBot(Bot):
     def __init__(self, game, player, role, hidden_states):
@@ -47,3 +52,7 @@ class MOISMCTSBot(Bot):
 
         actions, _ = search_mtmoismcts(self.player, state, self.hidden_states, 100)
         return actions[self.role in EVIL_ROLES]
+
+
+    def get_move_probabilities(self, state, legal_actions):
+        raise NotImplemented

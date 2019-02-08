@@ -3,6 +3,7 @@ import os
 import json
 import gzip
 import cPickle as pickle
+import numpy as np
 
 from battlefield.bots.bot import Bot
 from battlefield.avalon_types import filter_hidden_states, EVIL_ROLES, GOOD_ROLES, VoteAction, ProposeAction, MissionAction
@@ -58,3 +59,7 @@ class HumanBot(Bot):
             return random.choice(legal_actions)
 
         return max(self.current_node['move_counts'], key=self.current_node['move_counts'].get)
+
+
+    def get_move_probabilities(self, state, legal_actions):
+        raise NotImplemented

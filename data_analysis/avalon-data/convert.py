@@ -18,6 +18,7 @@ class Game(object):
 
     def add_player(self, player):
         self.players.append(player)
+        self.players.sort(key=lambda x: x['seat'])
 
     def canonicalize_role(self):
         for p in self.players:
@@ -123,11 +124,13 @@ def replay_game(game, log):
             for i, x in enumerate(vote["team"]):
                 if game.id_map[int(entry[1])] == x:
                     round["mission"][i] = data["choice"]
+                    if data['choice'] == 'Fail':
+                        assert game.players[x]['spy'], "Non spy failed a mission"
                     break
             if len([x for x in round["mission"] if x is None]) == 0:
                 vote_n = 1
                 round_n += 1
-                if len([x for x in round["mission"] if x == "Fail"]) == 0:
+                if len([x for x in round["mission"] if x == "Fail"]) == 0: # There's a bug here
                     wins += 1
                 if wins == 3 and "assassin" in game.role_data and "merlin" in game.role_data:
                     state = "find_merlin"
@@ -173,12 +176,20 @@ def add_vote_data(gameset, filename):
         fields = l.split("\t")
         if int(fields[0]) != current_id:
             if current_id is not None:
-                replay_game(gameset[current_id], current_log)
+                try:
+                    replay_game(gameset[current_id], current_log)
+                except AssertionError:
+                    print "{} has a bad fail".format(current_id)
+                    del gameset[current_id]
             current_id = int(fields[0])
             current_log = []
         current_log.append(fields[1:])
     if current_id is not None:
-        replay_game(gameset[current_id], current_log)
+        try:
+            replay_game(gameset[current_id], current_log)
+        except AssertionError:
+            print "{} has a bad fail".format(current_id)
+            del gameset[current_id]
     f.close()
 
 
