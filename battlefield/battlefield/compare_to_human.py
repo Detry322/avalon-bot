@@ -6,7 +6,7 @@ from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_sta
 from battlefield.avalon import create_avalon_game
 
 DATAFILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bots', 'data', 'relabeled.json'))
-TREMBLING_HAND_PROB = 0.0001
+TREMBLING_HAND_PROB = 0.2
 
 ROLES = ['servant', 'merlin', 'percival', 'minion', 'assassin', 'mordred', 'morgana', 'oberon']
 
@@ -35,12 +35,11 @@ def handle_transition(state, hidden_state, moves, bots):
 def get_ll(state, hidden_state, player, bot, move):
     legal_actions = state.legal_actions(player, hidden_state)
     move_probs = bot.get_move_probabilities(state, legal_actions)
+    move_probs += np.ones(len(move_probs)) * TREMBLING_HAND_PROB
+    move_probs = move_probs / np.sum(move_probs)
+
     assert move in legal_actions, "Something is amiss"
-    prob = move_probs[legal_actions.index(move)]
-    if prob < TREMBLING_HAND_PROB:
-        return np.log(TREMBLING_HAND_PROB)
-    else:
-        return np.log(prob)
+    return np.log(move_probs[legal_actions.index(move)])
 
 
 def handle_round(state, hidden_state, bots, round_, stats):
@@ -168,3 +167,16 @@ def print_human_statistics(bot_class, stats):
         print "       Vote LL: {: >10.04f}".format(stats[role]['vote'])
         print "    Mission LL: {: >10.04f}".format(stats[role]['mission'])
         print "Pick Merlin LL: {: >10.04f}".format(stats[role]['merlin'])
+
+def print_human_statistics_csv(bot_class, stats):
+    result = [ bot_class.__name__ ]
+    for role in ['all'] + ROLES:
+        for category in ['total', 'propose', 'vote', 'mission', 'merlin']:
+            result.append(stats[role][category])
+
+    print ','.join(str(x) for x in result)
+
+
+def print_header_row():
+    res = ['bot_class'] + [ "{}_{}_ll".format(role, category) for role in ['all'] + ROLES for category in ['total', 'propose', 'vote', 'mission', 'merlin']]
+    print ",".join(res)

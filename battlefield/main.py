@@ -1,7 +1,7 @@
 from battlefield.avalon import create_avalon_game
 from battlefield.bots import RandomBot, RandomBotUV, SimpleBot, ObserveBot, ISMCTSBot, MOISMCTSBot, HumanBot
 from battlefield.tournament import run_tournament, print_tournament_statistics, check_config
-from battlefield.compare_to_human import compute_human_statistics, print_human_statistics
+from battlefield.compare_to_human import compute_human_statistics, print_human_statistics, print_header_row, print_human_statistics_csv
 
 TOURNAMENT_CONFIG = [
     {
@@ -33,9 +33,11 @@ def tournament():
 
 
 def human_compare():
-    bot_class = ObserveBot
-    stats = compute_human_statistics(bot_class, verbose=False)
-    print_human_statistics(bot_class, stats)
+    bots = [ RandomBot, RandomBotUV, SimpleBot, ObserveBot ]
+    print_header_row()
+    for bot in bots:
+        stats = compute_human_statistics(bot, verbose=False)
+        print_human_statistics_csv(bot, stats)
 
 
 if __name__ == "__main__":
