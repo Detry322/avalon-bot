@@ -4,30 +4,30 @@ from battlefield.tournament import run_tournament, print_statistics, check_confi
 
 TOURNAMENT_CONFIG = [
     {
-        'bot': HumanBot,
+        'bot': RandomBotUV,
         'role': 'merlin'
     },
     {
-        'bot': HumanBot,
+        'bot': RandomBotUV,
         'role': 'servant'
     },
     {
-        'bot': RandomBot,
+        'bot': MOISMCTSBot,
         'role': 'assassin'
     },
     {
-        'bot': HumanBot,
+        'bot': RandomBotUV,
         'role': 'servant'
     },
     {
-        'bot': RandomBot,
+        'bot': MOISMCTSBot,
         'role': 'minion'
     }
 ]
 
 def main():
     check_config(TOURNAMENT_CONFIG)
-    tournament_results = run_tournament(TOURNAMENT_CONFIG, num_games=1000, granularity=100)
+    tournament_results = run_tournament(TOURNAMENT_CONFIG, num_games=40, granularity=1)
     print_statistics(tournament_results)
 
 
