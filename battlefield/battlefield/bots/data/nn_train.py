@@ -6,7 +6,8 @@ import sys
 import numpy as np
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Sequential, save_model, Model
-from keras.layers import Dense, LSTM, Masking, GRU, CuDNNGRU, CuDNNLSTM, Input
+from keras.layers import Dense, LSTM, Masking, GRU, CuDNNGRU, CuDNNLSTM, Input, Dropout
+from keras.callbacks import ModelCheckpoint
 from sklearn.utils import shuffle
 
 PARENT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir))
@@ -52,9 +53,10 @@ def create_propose_model():
 def create_kl_propose_model():
     model = Sequential([
         Masking(input_shape=(None, 79)),
-        Dense(128, activation='relu'),
-        LSTM(128, return_sequences=True),
-        LSTM(128),
+        Dense(256, activation='relu'), # input_shape=(None, 79)),
+        Dropout(0.4),
+        LSTM(256, return_sequences=False),
+        Dropout(0.4),
         Dense(5, activation='softmax'),
     ])
 
@@ -74,8 +76,7 @@ def train():
     # actual_y = { 'propose_{}'.format(i): y[i] for i in range(5) }
     model = create_kl_propose_model()
     model.summary()
-    model.fit(x=X, y=y, batch_size=128, epochs=100, validation_split=0.1)
-    model.save('propose_model.h5')
+    model.fit(x=X, y=y, batch_size=1024, epochs=100, validation_split=0.1, callbacks=[ModelCheckpoint('propose_model-{epoch:02d}-{val_loss:.4f}.h5', save_best_only=True)])
 
 
 if __name__ == "__main__":
