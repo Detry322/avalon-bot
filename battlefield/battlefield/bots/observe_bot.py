@@ -17,6 +17,8 @@ class ObserveBot(Bot):
 
     def handle_transition(self, old_state, new_state, observation, move=None):
         if old_state.status == 'run':
+            if move is not None and self.role in EVIL_ROLES and not move.fail:
+                observation += 1
             self.hidden_states = filter_hidden_states(self.hidden_states, old_state.proposal, observation)
 
 
