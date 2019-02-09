@@ -1,6 +1,5 @@
 import random
 import numpy as np
-import keras
 import os
 
 from battlefield.bots.bot import Bot
@@ -10,14 +9,23 @@ from battlefield.avalon_types import VoteAction, ProposeAction, MissionAction, f
 PROPOSE_MODELFILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data', 'propose_model.h5'))
 VOTE_MODELFILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data', 'vote_model.h5'))
 
-PROPOSE_MODEL = keras.models.load_model(PROPOSE_MODELFILE)
-VOTE_MODEL = keras.models.load_model(VOTE_MODELFILE)
+PROPOSE_MODEL = None
+VOTE_MODEL = None
 
 ROLES = ['servant', 'merlin', 'percival', 'minion', 'assassin', 'mordred', 'morgana', 'oberon']
 
 ROLE_TO_ONEHOT = {
     role: np.eye(len(ROLES))[i] for i, role in enumerate(ROLES)
 }
+
+def load_models():
+    import keras
+    global PROPOSE_MODEL
+    global VOTE_MODEL
+    if PROPOSE_MODEL is not None:
+        PROPOSE_MODEL = keras.models.load_model(PROPOSE_MODELFILE)
+        VOTE_MODEL = keras.models.load_model(VOTE_MODELFILE)
+
 
 def create_perception(hidden_states):
     perceptions = [ np.zeros(len(ROLES)) for _ in ROLES ]
@@ -38,6 +46,7 @@ def onehot(player, num_players=5):
 # Plays via two neural nets
 class NNBot(Bot):
     def __init__(self, game, player, role, hidden_states):
+        load_models()
         self.game = game
         self.player = player
         self.role = role

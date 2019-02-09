@@ -1,12 +1,12 @@
 import numpy as np
 import json
 import os
+import pandas as pd
 
 from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_states, starting_hidden_states, ProposeAction, VoteAction, MissionAction, PickMerlinAction
 from battlefield.avalon import create_avalon_game
 
 DATAFILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bots', 'data', 'relabeled.json'))
-TREMBLING_HAND_PROB = 0.2
 
 ROLES = ['servant', 'merlin', 'percival', 'minion', 'assassin', 'mordred', 'morgana', 'oberon']
 
@@ -32,17 +32,17 @@ def handle_transition(state, hidden_state, moves, bots):
     return new_state
 
 
-def get_ll(state, hidden_state, player, bot, move):
+def get_ll(state, hidden_state, player, bot, move, trembling_hand_prob):
     legal_actions = state.legal_actions(player, hidden_state)
     move_probs = bot.get_move_probabilities(state, legal_actions)
-    move_probs += np.ones(len(move_probs)) * TREMBLING_HAND_PROB
-    move_probs = move_probs / np.sum(move_probs)
+    trembling_hand = np.ones(len(move_probs)) / len(move_probs)
+    move_probs = (1.0 - trembling_hand_prob) * move_probs + trembling_hand_prob*trembling_hand
 
     assert move in legal_actions, "Something is amiss"
     return np.log(move_probs[legal_actions.index(move)])
 
 
-def handle_round(state, hidden_state, bots, round_, stats):
+def handle_round(game, state, hidden_state, bots, round_, stats, trembling_hand_prob):
     last_proposal = None
     for proposal_num in ['1', '2', '3', '4', '5']:
         proposal = last_proposal = round_[proposal_num]
@@ -50,21 +50,33 @@ def handle_round(state, hidden_state, bots, round_, stats):
         assert state.propose_count == int(proposal_num) - 1
         moves = [ProposeAction(proposal=tuple(sorted(proposal['team'])))]
         for player, move in zip(state.moving_players(), moves):
-            ll = get_ll(state, hidden_state, player, bots[player], move)
-            stats['all']['total'] += ll
-            stats['all']['propose'] += ll
-            stats[hidden_state[player]]['total'] += ll
-            stats[hidden_state[player]]['propose'] += ll
+            ll = get_ll(state, hidden_state, player, bots[player], move, trembling_hand_prob)
+            stats.append({
+                'seat': player,
+                'role': hidden_state[player],
+                'player': game['players'][player]['player_id'],
+                'type': 'propose',
+                'move': set(move.proposal),
+                'bot': bots[player].__class__.__name__,
+                'trembling_hand_prob': trembling_hand_prob,
+                'nll': -ll
+            })
         state = handle_transition(state, hidden_state, moves, bots)
 
         assert state.status == 'vote'
         moves = [VoteAction(up=(vote == 'Approve')) for vote in proposal['votes']]
         for player, move in zip(state.moving_players(), moves):
-            ll = get_ll(state, hidden_state, player, bots[player], move)
-            stats['all']['total'] += ll
-            stats['all']['vote'] += ll
-            stats[hidden_state[player]]['total'] += ll
-            stats[hidden_state[player]]['vote'] += ll
+            ll = get_ll(state, hidden_state, player, bots[player], move, trembling_hand_prob)
+            stats.append({
+                'seat': player,
+                'role': hidden_state[player],
+                'player': game['players'][player]['player_id'],
+                'type': 'vote',
+                'move': 'up' if move.up else 'down',
+                'bot': bots[player].__class__.__name__,
+                'trembling_hand_prob': trembling_hand_prob,
+                'nll': -ll
+            })
         state = handle_transition(state, hidden_state, moves, bots)
 
         if state.status == 'run':
@@ -73,11 +85,17 @@ def handle_round(state, hidden_state, bots, round_, stats):
     secret_votes = sorted(zip(last_proposal['team'], round_['mission']))
     moves = [MissionAction(fail=(vote == "Fail")) for player, vote in secret_votes]
     for player, move in zip(state.moving_players(), moves):
-        ll = get_ll(state, hidden_state, player, bots[player], move)
-        stats['all']['total'] += ll
-        stats['all']['mission'] += ll
-        stats[hidden_state[player]]['total'] += ll
-        stats[hidden_state[player]]['mission'] += ll
+        ll = get_ll(state, hidden_state, player, bots[player], move, trembling_hand_prob)
+        stats.append({
+            'seat': player,
+            'role': hidden_state[player],
+            'player': game['players'][player]['player_id'],
+            'type': 'mission',
+            'move': 'fail' if move.fail else 'succeed',
+            'bot': bots[player].__class__.__name__,
+            'trembling_hand_prob': trembling_hand_prob,
+            'nll': -ll
+        })
     state = handle_transition(state, hidden_state, moves, bots)
 
     if state.status == 'merlin':
@@ -89,18 +107,25 @@ def handle_round(state, hidden_state, bots, round_, stats):
             for _ in hidden_state
         ]
         for player, move in zip(state.moving_players(), moves):
-            ll = get_ll(state, hidden_state, player, bots[player], move)
-            stats['all']['total'] += ll
-            stats['all']['merlin'] += ll
-            stats[hidden_state[player]]['total'] += ll
-            stats[hidden_state[player]]['merlin'] += ll
+            ll = get_ll(state, hidden_state, player, bots[player], move, trembling_hand_prob)
+            if hidden_state[player] == 'assassin':
+                stats.append({
+                    'seat': player,
+                    'role': hidden_state[player],
+                    'player': game['players'][player]['player_id'],
+                    'type': 'merlin',
+                    'move': move.merlin,
+                    'bot': bots[player].__class__.__name__,
+                    'trembling_hand_prob': trembling_hand_prob,
+                    'nll': -ll
+                })
         state = handle_transition(state, hidden_state, moves, bots)
     return state
 
 
 
 
-def process_game(game, bot_class, stats, verbose=True, num_players=None, max_num_players=7):
+def process_game(game, bot_class, stats, trembling_hand_prob, verbose=True, num_players=None, max_num_players=7):
     try:
         hidden_state = reconstruct_hidden_state(game)
         if num_players is not None:
@@ -122,19 +147,18 @@ def process_game(game, bot_class, stats, verbose=True, num_players=None, max_num
             for player, role in enumerate(hidden_state)
         ]
         for round_ in game['log']:
-            state = handle_round(state, hidden_state, bots, round_, stats)
+            state = handle_round(game, state, hidden_state, bots, round_, stats, trembling_hand_prob)
     except AssertionError:
         if verbose:
             print game['id'], 'is bad'
 
 
 def create_stats():
-    stats = {
-        role: { 'total': 0.0, 'propose': 0.0, 'vote': 0.0, 'mission': 0.0, 'merlin': 0.0 }
-        for role in ROLES
-    }
-    stats['all'] = { 'total': 0.0, 'propose': 0.0, 'vote': 0.0, 'mission': 0.0, 'merlin': 0.0 }
-    return stats
+    return []
+
+
+def collect_stats(stats):
+    return pd.DataFrame(stats, columns=['bot', 'trembling_hand_prob', 'type', 'move', 'role', 'seat', 'player', 'nll'])
 
 
 def load_human_data(cache=True):
@@ -148,35 +172,25 @@ def load_human_data(cache=True):
     return result
 
 
-def compute_human_statistics(bot_class, cache=True, verbose=True, num_players=None, max_num_players=7):
+def compute_human_statistics(bot_class, trembling_hand_prob=0.1, cache=True, verbose=True, num_players=None, max_num_players=7):
+    print "Analyzing {} with trembling_hand_prob={}".format(bot_class.__name__, trembling_hand_prob)
     stats = create_stats()
     if verbose:
         print "Loading human data"
     data = load_human_data(cache=cache)
     for game in data:
-        process_game(game, bot_class, stats, verbose=verbose, num_players=num_players, max_num_players=max_num_players)
-    return stats
+        process_game(game, bot_class, stats, trembling_hand_prob, verbose=verbose, num_players=num_players, max_num_players=max_num_players)
+    return collect_stats(stats)
 
 
-def print_human_statistics(bot_class, stats):
-    print "========== Bot statistics for {}".format(bot_class.__name__)
-    for role in ['all'] + ROLES:
-        print "===== Summary for {}".format(role)
-        print "All actions LL: {: >10.04f}".format(stats[role]['total'])
-        print "    Propose LL: {: >10.04f}".format(stats[role]['propose'])
-        print "       Vote LL: {: >10.04f}".format(stats[role]['vote'])
-        print "    Mission LL: {: >10.04f}".format(stats[role]['mission'])
-        print "Pick Merlin LL: {: >10.04f}".format(stats[role]['merlin'])
+def print_human_statistics(stats):
+    bots = stats.bot.unique()
+    for bot in bots:
+        print "========== Bot statistics for {}".format(bot)
+        data = stats[stats.bot == bot]
+        print "All actions NLL: {: >16.04f}".format(data.nll.sum())
+        print "    Propose NLL: {: >16.04f}".format(data[data.type == 'propose'].nll.sum())
+        print "       Vote NLL: {: >16.04f}".format(data[data.type == 'vote'].nll.sum())
+        print "    Mission NLL: {: >16.04f}".format(data[data.type == 'mission'].nll.sum())
+        print "Pick Merlin NLL: {: >16.04f}".format(data[data.type == 'merlin'].nll.sum())
 
-def print_human_statistics_csv(bot_class, stats):
-    result = [ bot_class.__name__ ]
-    for role in ['all'] + ROLES:
-        for category in ['total', 'propose', 'vote', 'mission', 'merlin']:
-            result.append(stats[role][category])
-
-    print ','.join(str(x) for x in result)
-
-
-def print_header_row():
-    res = ['bot_class'] + [ "{}_{}_ll".format(role, category) for role in ['all'] + ROLES for category in ['total', 'propose', 'vote', 'mission', 'merlin']]
-    print ",".join(res)
