@@ -1,6 +1,7 @@
 import numpy as np
 import json
 import os
+import sys
 import pandas as pd
 
 from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_states, starting_hidden_states, ProposeAction, VoteAction, MissionAction, PickMerlinAction
@@ -165,6 +166,8 @@ def load_human_data():
     global human_data
     if human_data is not None:
         return human_data
+    print "Loading human data"
+    sys.stdout.flush()
     with open(DATAFILE, 'r') as f:
         human_data = json.load(f)
     return human_data
@@ -173,8 +176,7 @@ def load_human_data():
 def compute_human_statistics(bot_class, trembling_hand_prob=0.1, verbose=True, num_players=None, max_num_players=7):
     print "Analyzing {} with trembling_hand_prob={}".format(bot_class.__name__, trembling_hand_prob)
     stats = create_stats()
-    if verbose:
-        print "Loading human data"
+    sys.stdout.flush()
     data = load_human_data()
     for game in data:
         process_game(game, bot_class, stats, trembling_hand_prob, verbose=verbose, num_players=num_players, max_num_players=max_num_players)

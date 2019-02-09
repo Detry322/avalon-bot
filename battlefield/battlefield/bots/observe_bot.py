@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import itertools
 
 from battlefield.bots.bot import Bot
 from battlefield.avalon_types import filter_hidden_states, EVIL_ROLES, GOOD_ROLES, VoteAction, ProposeAction, MissionAction
@@ -22,7 +23,7 @@ class ObserveBot(Bot):
             self.hidden_states = filter_hidden_states(self.hidden_states, old_state.proposal, observation)
 
 
-    def get_action(self, state, legal_actions, role_guess=None):
+    def get_action(self, state, legal_actions, role_guess=None, return_all=False):
         role_guess = role_guess or random.choice(self.hidden_states)
         if state.status == 'vote':
             if state.propose_count == 4:
@@ -36,19 +37,27 @@ class ObserveBot(Bot):
         if state.status == 'propose' and not self.is_evil:
             propose_size = len(legal_actions[0].proposal)
             good_players = [ p for p, role in enumerate(role_guess) if role in GOOD_ROLES ]
+            if return_all:
+                return [ProposeAction(proposal=combo) for combo in itertools.combinations(good_players, propose_size)]
             random.shuffle(good_players)
             return ProposeAction(proposal=tuple(sorted(good_players[:propose_size])))
 
         if state.status == 'run' and self.is_evil:
             return MissionAction(fail=True)
 
+        if return_all:
+            return legal_actions
         return random.choice(legal_actions)
 
 
     def get_move_probabilities(self, state, legal_actions):
         move_counts = defaultdict(lambda: 0)
         for role_guess in self.hidden_states:
-            move_counts[self.get_action(state, legal_actions, role_guess=role_guess)] += 1
+            actions = self.get_action(state, legal_actions, role_guess=role_guess, return_all=True)
+            if not isinstance(actions, list):
+                actions = [actions]
+            for action in actions:
+                move_counts[action] += 1
 
         result = np.zeros(len(legal_actions))
 

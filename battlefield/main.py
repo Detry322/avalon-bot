@@ -4,6 +4,7 @@ from battlefield.tournament import run_tournament, print_tournament_statistics, 
 from battlefield.compare_to_human import compute_human_statistics, print_human_statistics
 import multiprocessing
 import pandas as pd
+import sys
 
 TOURNAMENT_CONFIG = [
     {
@@ -38,15 +39,18 @@ def parallel_human_compare():
     pool = multiprocessing.Pool()
     try:
         results = []
-        for bot in [NNBot, NNBotWithObservePropose, RandomBot, RandomBotUV, SimpleBot, ObserveBot]:
-            for tremble in [0.0001, 0.001, 0.01, 0.05, 0.1, 0.15, 0.2]:
+        for bot in [ObserveBot]:
+            for tremble in [0.0001, 0.001, 0.01, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9]:
                 results.append(pool.apply_async(compute_human_statistics, (bot, tremble, False, 5)))
-        
+
         print "Waiting for results"
+        sys.stdout.flush()
         results = [ result.get() for result in results ]
         print "Concatenating results"
+        sys.stdout.flush()
         data = pd.concat(results)
         print "Saving results"
+        sys.stdout.flush()
         data.to_pickle("human_comparison_data.pkl.gz")
     except KeyboardInterrupt:
         print 'terminating early'
