@@ -19,10 +19,10 @@ ROLE_TO_ONEHOT = {
 }
 
 def load_models():
-    import keras
     global PROPOSE_MODEL
     global VOTE_MODEL
-    if PROPOSE_MODEL is not None:
+    if PROPOSE_MODEL is None:
+        import keras
         PROPOSE_MODEL = keras.models.load_model(PROPOSE_MODELFILE)
         VOTE_MODEL = keras.models.load_model(VOTE_MODELFILE)
 

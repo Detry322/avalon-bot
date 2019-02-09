@@ -38,9 +38,9 @@ def parallel_human_compare():
     pool = multiprocessing.Pool()
     try:
         results = []
-        for bot in [RandomBot, RandomBotUV, SimpleBot, ObserveBot, NNBot, NNBotWithObservePropose]:
+        for bot in [NNBot, NNBotWithObservePropose, RandomBot, RandomBotUV, SimpleBot, ObserveBot]:
             for tremble in [0.0001, 0.001, 0.01, 0.05, 0.1, 0.15, 0.2]:
-                results.append(pool.apply_async(compute_human_statistics, (bot, tremble, True, False)))
+                results.append(pool.apply_async(compute_human_statistics, (bot, tremble, False, 5)))
         
         print "Waiting for results"
         results = [ result.get() for result in results ]
@@ -54,7 +54,7 @@ def parallel_human_compare():
 
 
 def human_compare():
-    stats = compute_human_statistics(RandomBot, verbose=False, num_players=5)
+    stats = compute_human_statistics(NNBot, verbose=False, num_players=5)
     print_human_statistics(stats)
 
 

@@ -161,23 +161,21 @@ def collect_stats(stats):
     return pd.DataFrame(stats, columns=['bot', 'trembling_hand_prob', 'type', 'move', 'role', 'seat', 'player', 'nll'])
 
 
-def load_human_data(cache=True):
+def load_human_data():
     global human_data
     if human_data is not None:
         return human_data
     with open(DATAFILE, 'r') as f:
-        result = json.load(f)
-    if cache:
-        human_data = result
-    return result
+        human_data = json.load(f)
+    return human_data
 
 
-def compute_human_statistics(bot_class, trembling_hand_prob=0.1, cache=True, verbose=True, num_players=None, max_num_players=7):
+def compute_human_statistics(bot_class, trembling_hand_prob=0.1, verbose=True, num_players=None, max_num_players=7):
     print "Analyzing {} with trembling_hand_prob={}".format(bot_class.__name__, trembling_hand_prob)
     stats = create_stats()
     if verbose:
         print "Loading human data"
-    data = load_human_data(cache=cache)
+    data = load_human_data()
     for game in data:
         process_game(game, bot_class, stats, trembling_hand_prob, verbose=verbose, num_players=num_players, max_num_players=max_num_players)
     return collect_stats(stats)
