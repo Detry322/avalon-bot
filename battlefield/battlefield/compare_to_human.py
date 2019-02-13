@@ -57,10 +57,11 @@ def handle_round(game, state, hidden_state, bots, round_, stats, trembling_hand_
                 'role': hidden_state[player],
                 'player': game['players'][player]['player_id'],
                 'type': 'propose',
-                'move': set(move.proposal),
+                'move': ','.join(map(str, sorted(move.proposal))),
                 'bot': bots[player].__class__.__name__,
                 'trembling_hand_prob': trembling_hand_prob,
-                'nll': -ll
+                'nll': -ll,
+                'num_players': len(hidden_state)
             })
         state = handle_transition(state, hidden_state, moves, bots)
 
@@ -76,7 +77,8 @@ def handle_round(game, state, hidden_state, bots, round_, stats, trembling_hand_
                 'move': 'up' if move.up else 'down',
                 'bot': bots[player].__class__.__name__,
                 'trembling_hand_prob': trembling_hand_prob,
-                'nll': -ll
+                'nll': -ll,
+                'num_players': len(hidden_state)
             })
         state = handle_transition(state, hidden_state, moves, bots)
 
@@ -95,7 +97,8 @@ def handle_round(game, state, hidden_state, bots, round_, stats, trembling_hand_
             'move': 'fail' if move.fail else 'succeed',
             'bot': bots[player].__class__.__name__,
             'trembling_hand_prob': trembling_hand_prob,
-            'nll': -ll
+            'nll': -ll,
+            'num_players': len(hidden_state)
         })
     state = handle_transition(state, hidden_state, moves, bots)
 
@@ -118,7 +121,8 @@ def handle_round(game, state, hidden_state, bots, round_, stats, trembling_hand_
                     'move': move.merlin,
                     'bot': bots[player].__class__.__name__,
                     'trembling_hand_prob': trembling_hand_prob,
-                    'nll': -ll
+                    'nll': -ll,
+                    'num_players': len(hidden_state)
                 })
         state = handle_transition(state, hidden_state, moves, bots)
     return state
@@ -159,7 +163,12 @@ def create_stats():
 
 
 def collect_stats(stats):
-    return pd.DataFrame(stats, columns=['bot', 'trembling_hand_prob', 'type', 'move', 'role', 'seat', 'player', 'nll'])
+    d = pd.DataFrame(stats, columns=['bot', 'trembling_hand_prob', 'num_players', 'type', 'move', 'role', 'seat', 'player', 'nll'])
+    d.bot = d.bot.astype('category')
+    d.type = d.type.astype('category')
+    d.move = d.move.astype('category')
+    d.role = d.role.astype('category')
+    return d
 
 
 def load_human_data():
