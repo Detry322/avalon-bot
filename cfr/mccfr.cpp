@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cstdint>
 #include <cassert>
 #include <random>
@@ -609,6 +610,27 @@ void run_mccfr(int t, int num_iterations) {
     }
 }
 
+void write_file(const string& filename, void* buffer, size_t buflen) {
+    ofstream file;
+    file.open(filename);
+    file.write((const char*) buffer, buflen);
+    file.close();
+}
+
+void save_buffers(int num_iterations, bool save_regrets) {
+    cout << "Saving files after " << num_iterations << " iterations" << endl;
+    write_file(to_string(num_iterations) + "_proposal_stratsum.dat", proposal_stratsum, NUM_PROPOSAL_FLOATS * sizeof(float));
+    write_file(to_string(num_iterations) + "_voting_stratsum.dat", voting_stratsum, NUM_VOTING_FLOATS * sizeof(float));
+    write_file(to_string(num_iterations) + "_mission_stratsum.dat", mission_stratsum, NUM_MISSION_FLOATS * sizeof(float));
+    write_file(to_string(num_iterations) + "_merlin_stratsum.dat", merlin_stratsum, NUM_MERLIN_FLOATS * sizeof(float));
+    if (save_regrets) {
+        write_file(to_string(num_iterations) + "_proposal_regretsum.dat", proposal_regretsum, NUM_PROPOSAL_FLOATS * sizeof(float));
+        write_file(to_string(num_iterations) + "_voting_regretsum.dat", voting_regretsum, NUM_VOTING_FLOATS * sizeof(float));
+        write_file(to_string(num_iterations) + "_mission_regretsum.dat", mission_regretsum, NUM_MISSION_FLOATS * sizeof(float));
+        write_file(to_string(num_iterations) + "_merlin_regretsum.dat", merlin_regretsum, NUM_MERLIN_FLOATS * sizeof(float));
+    }
+}
+
 
 int main() {
     allocate_buffers();
@@ -623,16 +645,24 @@ int main() {
 
     unsigned int num_cores = std::thread::hardware_concurrency();
     num_cores = 4;
+    unsigned int chunksize = 100;
 
     cout << "Parallelizing over " << num_cores << " cores." << endl;
 
-    vector<thread> threads(num_cores);
-    cout << "Spawning..." << endl;
-    for (int i = 0; i < num_cores; i++) {
-        threads[i] = std::thread(run_mccfr, 1, 10000);
-    }
-    cout << "Joining..." << endl;
-    for (int i = 0; i < num_cores; i++) {
-        threads[i].join();
+    int total_num_iterations = 0;
+    int t = 1;
+    while (true) {
+        vector<thread> threads(num_cores);
+        cout << "Spawning..." << endl;
+        for (int i = 0; i < num_cores; i++) {
+            threads[i] = std::thread(run_mccfr, t, chunksize);
+        }
+        cout << "Joining..." << endl;
+        for (int i = 0; i < num_cores; i++) {
+            threads[i].join();
+        }
+        t += chunksize;
+        total_num_iterations += num_cores * chunksize;
+        save_buffers(total_num_iterations, false);
     }
 }
