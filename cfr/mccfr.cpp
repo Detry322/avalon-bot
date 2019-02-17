@@ -3,6 +3,27 @@
 #include <cassert>
 #include <random>
 
+static uint32_t x=123456789, y=362436069, z=521288629;
+uint32_t xorshf96(void) {          //period 2^96-1
+    uint32_t t;
+    x ^= x << 16;
+    x ^= x >> 5;
+    x ^= x << 1;
+
+    t = x;
+    x = y;
+    y = z;
+    z = t ^ x ^ y;
+
+    return z;
+}
+
+float nextFloat() {
+    float x;
+    *((int*) &x) = (0x7fffff & xorshf96()) | 0x3f800000;
+    return x - 1;
+}
+
 using namespace std;
 
 float* proposal_regretsum = NULL;
@@ -309,8 +330,7 @@ void calculate_strategy(float* regretsum, int num_actions, float* strategy_out) 
 }
 
 int get_move(float* strategy, int num_actions) {
-    uniform_real_distribution<> dis(0.0, 1.0);
-    float target = dis(generator);
+    float target = nextFloat();
     float running_total = 0.0;
     int i = 0;
     for (; i < num_actions - 1; i++) {
