@@ -52,7 +52,7 @@ const int INDEX_TO_PROPOSAL_2[10] = {3, 5, 9, 17, 6, 10, 18, 12, 20, 24};
 const int INDEX_TO_PROPOSAL_3[10] = {7, 11, 19, 13, 21, 25, 14, 22, 26, 28};
 const int ROUND_TO_PROPOSE_SIZE[5] = {2, 3, 2, 3, 3};
 
-
+int games_explored = 0;
 
 enum Status {
     Status_propose,
@@ -241,7 +241,7 @@ int get_vote_bucket(const RoundState& state, int player, uint32_t hidden_state) 
         proposal
     );
     assert(index >= 0 && index < NUM_VOTING_BUCKETS);
-    return 0;
+    return index;
 }
 
 int get_mission_bucket(const RoundState& state, int player, uint32_t hidden_state) {
@@ -312,13 +312,14 @@ int get_move(float* strategy, int num_actions) {
     uniform_real_distribution<> dis(0.0, 1.0);
     float target = dis(generator);
     float running_total = 0.0;
-    for (int i = 0; i < num_actions; i++) {
-        if (running_total + strategy[i] > target) {
-            return i;
-        }
+    int i = 0;
+    for (; i < num_actions - 1; i++) {
         running_total += strategy[i];
+        if (running_total > target) {
+            break;
+        }
     }
-    return num_actions - 1;
+    return i;
 }
 
 float mccfr_propose(int t, const RoundState& state, uint32_t hidden_state, int traverser, float pi) {
@@ -336,6 +337,7 @@ float mccfr_propose(int t, const RoundState& state, uint32_t hidden_state, int t
         return mccfr(t, new_state, hidden_state, traverser, pi);
     }
 
+    // cout << "Making proposal decision" << endl;
     float action_values[NUM_POSSIBLE_PROPOSALS];
     float value = 0;
     for (int i = 0; i < NUM_POSSIBLE_PROPOSALS; i++) {
@@ -382,6 +384,7 @@ float mccfr_vote(int t, const RoundState& state, uint32_t hidden_state, int trav
         return mccfr(t, new_state, hidden_state, traverser, pi);
     }
 
+    // cout << "Making voting decision" << endl;
     float action_values[2];
     float value = 0;
     for (int i = 0; i < 2; i++) {
@@ -436,6 +439,7 @@ float mccfr_mission(int t, const RoundState& state, uint32_t hidden_state, int t
     int mybucket = get_mission_bucket(state, traverser, hidden_state);
     calculate_strategy(mission_regretsum + 2 * mybucket, 2, strategy);
 
+    // cout << "Making mission decision" << endl;
     float action_values[2];
     float value = 0;
     for (int i = 0; i < 2; i++) {
@@ -470,6 +474,7 @@ float mccfr_merlin(int t, const RoundState& state, uint32_t hidden_state, int tr
         return mccfr(t, new_state, hidden_state, traverser, pi);
     }
 
+    // cout << "Making merlin decision" << endl;
     float action_values[5];
     float value = 0;
     for (int i = 0; i < 5; i++) {
@@ -539,7 +544,12 @@ int main() {
     cout << "merlin " << 2 * merlin_arr_size / 1024 / 1024 << "MB" << endl;
 
     RoundState state = {};
-    uint32_t hidden_state = random_hidden();
-    mccfr(1, state, hidden_state, 0, 1.0);
+    
+    for (int t = 1; t < 50; t++) {
+        uint32_t hidden_state = random_hidden();
+        for (int player = 0; player < 5; player++) {
+            mccfr(t, state, hidden_state, player, 1.0);
+        }
+    }
     return 0;
 }
