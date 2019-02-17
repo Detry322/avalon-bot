@@ -2,8 +2,11 @@
 #include <cstdint>
 #include <cassert>
 #include <random>
+#include <mutex>
+#include <thread>
+#include <vector>
 
-static uint32_t rngx=123456789, rngy=362436069, rngz=521288629;
+static thread_local uint32_t rngx=123456789, rngy=362436069, rngz=521288629;
 uint32_t xorshf96(void) {          //period 2^96-1
     uint32_t t;
     rngx ^= rngx << 16;
@@ -34,7 +37,6 @@ float* mission_regretsum = NULL;
 float* mission_stratsum = NULL;
 float* merlin_regretsum = NULL;
 float* merlin_stratsum = NULL;
-
 
 const float BRANCHING_PROBABILITY = 0.5;
 // 162 possible "missions failed with you on it"
@@ -74,6 +76,10 @@ const int PROPOSAL_TO_INDEX_LOOKUP[32] = {-1, -1, -1, 0, -1, 1, 4, 0, -1, 2, 5, 
 const int INDEX_TO_PROPOSAL_2[10] = {3, 5, 9, 17, 6, 10, 18, 12, 20, 24};
 const int INDEX_TO_PROPOSAL_3[10] = {7, 11, 19, 13, 21, 25, 14, 22, 26, 28};
 const int ROUND_TO_PROPOSE_SIZE[5] = {2, 3, 2, 3, 3};
+
+const int NUM_MUTEXES = 1000;
+
+mutex mtxs[NUM_MUTEXES];
 
 int games_explored = 0;
 
@@ -301,14 +307,14 @@ int get_merlin_bucket(const RoundState& state, int player, uint32_t hidden_state
 default_random_engine generator;
 uint32_t random_hidden() {
     uniform_int_distribution<int> p(0, 4);
-    int merlin = p(generator);
-    int assassin = p(generator);
+    int merlin = xorshf96() % 5;
+    int assassin = xorshf96() % 5;
     while (assassin == merlin) {
-        assassin = p(generator);
+        assassin = xorshf96() % 5;
     }
-    int minion = p(generator);
+    int minion = xorshf96() % 5;
     while (minion == merlin || minion == assassin) {
-        minion = p(generator);
+        minion = xorshf96() % 5;
     }
     return (merlin << 16) | (assassin << 8) | (minion << 0);
 }
@@ -367,10 +373,12 @@ float mccfr_propose(int t, const RoundState& state, uint32_t hidden_state, int t
         value += action_values[i] * strategy[i];
     }
 
+    mtxs[bucket % NUM_MUTEXES].lock();
     for (int i = 0; i < NUM_POSSIBLE_PROPOSALS; i++) {
         proposal_regretsum[bucket * NUM_POSSIBLE_PROPOSALS + i] += (action_values[i] - value) * t;
         proposal_stratsum[bucket * NUM_POSSIBLE_PROPOSALS + i] += strategy[i] * pi * t;
     }
+    mtxs[bucket % NUM_MUTEXES].unlock();
 
     return value;
 }
@@ -424,10 +432,12 @@ float mccfr_vote(int t, const RoundState& state, uint32_t hidden_state, int trav
         value += action_values[i] * strategy[i];
     }
 
+    mtxs[mybucket % NUM_MUTEXES].lock();
     for (int i = 0; i < 2; i++) {
         voting_regretsum[mybucket * 2 + i] += (action_values[i] - value) * t;
         voting_stratsum[mybucket * 2 + i] += strategy[i] * pi * t;
     }
+    mtxs[mybucket % NUM_MUTEXES].unlock();
 
     return value;
 }
@@ -445,8 +455,6 @@ float mccfr_mission(int t, const RoundState& state, uint32_t hidden_state, int t
     float strategy[2];
     bool did_fail = false;
     for (int i = 0; i < 5; i++) {
-        // If the mission already failed
-        if (did_fail) continue;
         // If the examined person is me.
         if (i == traverser) continue;
         // If the person isn't on the mission.
@@ -458,6 +466,7 @@ float mccfr_mission(int t, const RoundState& state, uint32_t hidden_state, int t
         calculate_strategy(mission_regretsum + 2*bucket, 2, strategy);
         int fail = get_move(strategy, 2);
         did_fail |= (bool) fail;
+        if (did_fail) break;
     }
 
     // If I'm not on the mission, we're done. If I'm not evil, we're done.
@@ -487,11 +496,13 @@ float mccfr_mission(int t, const RoundState& state, uint32_t hidden_state, int t
         value += action_values[i] * strategy[i];
     }
 
+    mtxs[mybucket % NUM_MUTEXES].lock();
     for (int i = 0; i < 2; i++) {
         mission_regretsum[mybucket * 2 + i] += (action_values[i] - value) * t;
         mission_stratsum[mybucket * 2 + i] += strategy[i] * pi * t;
     }
-
+    mtxs[mybucket % NUM_MUTEXES].unlock();
+    
     return value;
 }
 
@@ -522,10 +533,13 @@ float mccfr_merlin(int t, const RoundState& state, uint32_t hidden_state, int tr
         value += action_values[i] * strategy[i];
     }
 
+
+    mtxs[bucket % NUM_MUTEXES].lock();
     for (int i = 0; i < 5; i++) {
         merlin_regretsum[bucket * 5 + i] += (action_values[i] - value) * t;
         merlin_stratsum[bucket * 5 + i] += strategy[i] * pi * t;
     }
+    mtxs[bucket % NUM_MUTEXES].unlock();
 
     return value;
 }
@@ -572,6 +586,30 @@ void allocate_buffers() {
     assert(merlin_stratsum != NULL);
 }
 
+mutex output_mtx;
+void seed_rng() {
+    auto thread_id = this_thread::get_id();
+    hash<std::thread::id> hasher;
+    rngx = (uint32_t) hasher(thread_id);
+    int num_refreshes = rngx % 19;
+    for (int i = 0; i < num_refreshes; i++) {
+        int result = xorshf96();
+    }
+}
+
+void run_mccfr(int t, int num_iterations) {
+    seed_rng();
+    RoundState state = {};
+    
+    for (int i = 0; i < num_iterations; i++) {
+        uint32_t hidden_state = random_hidden();
+        for (int player = 0; player < 5; player++) {
+            mccfr(t + i, state, hidden_state, player, 1.0);
+        }
+    }
+}
+
+
 int main() {
     allocate_buffers();
     int proposal_arr_size = NUM_PROPOSAL_FLOATS * sizeof(float);
@@ -583,14 +621,18 @@ int main() {
     cout << "mission " << 2 * mission_arr_size / 1024 / 1024 << "MB" << endl;
     cout << "merlin " << 2 * merlin_arr_size / 1024 / 1024 << "MB" << endl;
 
-    RoundState state = {};
-    
-    for (int t = 1; t < 50; t++) {
-        uint32_t hidden_state = random_hidden();
-        for (int player = 0; player < 5; player++) {
-            mccfr(t, state, hidden_state, player, 1.0);
-        }
+    unsigned int num_cores = std::thread::hardware_concurrency();
+    num_cores = 2;
+
+    cout << "Parallelizing over " << num_cores << " cores." << endl;
+
+    vector<thread> threads(num_cores);
+    cout << "Spawning..." << endl;
+    for (int i = 0; i < num_cores; i++) {
+        threads[i] = std::thread(run_mccfr, 1, 10000);
     }
-    cout << "Games explored: " << games_explored;
-    return 0;
+    cout << "Joining..." << endl;
+    for (int i = 0; i < num_cores; i++) {
+        threads[i].join();
+    }
 }
