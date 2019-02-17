@@ -1,5 +1,14 @@
 from battlefield.avalon import create_avalon_game
-from battlefield.bots import RandomBot, RandomBotUV, SimpleBot, ObserveBot, ISMCTSBot, MOISMCTSBot, HumanBot, NNBot, NNBotWithObservePropose, SimpleStatsBot
+from battlefield.bots import (
+    RandomBot, RandomBotUV,
+    SimpleBot,
+    ObserveBot,
+    ISMCTSBot, MOISMCTSBot,
+    HumanBot,
+    NNBot, NNBotWithObservePropose,
+    SimpleStatsBot,
+    SingleMCTSPlayoutBot, SingleMCTSHeuristicBot, SingleMCTSBaseOpponentBot
+)
 from battlefield.tournament import run_tournament, print_tournament_statistics, check_config
 from battlefield.compare_to_human import compute_human_statistics, print_human_statistics
 import multiprocessing
@@ -10,23 +19,23 @@ from collections import defaultdict
 
 TOURNAMENT_CONFIG = [
     {
-        'bot': ObserveBot,
+        'bot': SingleMCTSBaseOpponentBot,
         'role': 'merlin'
     },
     {
-        'bot': ObserveBot,
+        'bot': SingleMCTSBaseOpponentBot,
         'role': 'servant'
     },
     {
-        'bot': ObserveBot,
+        'bot': SingleMCTSBaseOpponentBot,
         'role': 'assassin'
     },
     {
-        'bot': ObserveBot,
+        'bot': SingleMCTSBaseOpponentBot,
         'role': 'servant'
     },
     {
-        'bot': ObserveBot,
+        'bot': SingleMCTSBaseOpponentBot,
         'role': 'minion'
     }
 ]
@@ -76,4 +85,4 @@ def human_compare():
 
 
 if __name__ == "__main__":
-    parallel_human_compare()
+    tournament()
