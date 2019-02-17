@@ -3,24 +3,24 @@
 #include <cassert>
 #include <random>
 
-static uint32_t x=123456789, y=362436069, z=521288629;
+static uint32_t rngx=123456789, rngy=362436069, rngz=521288629;
 uint32_t xorshf96(void) {          //period 2^96-1
     uint32_t t;
-    x ^= x << 16;
-    x ^= x >> 5;
-    x ^= x << 1;
+    rngx ^= rngx << 16;
+    rngx ^= rngx >> 5;
+    rngx ^= rngx << 1;
 
-    t = x;
-    x = y;
-    y = z;
-    z = t ^ x ^ y;
+    t = rngx;
+    rngx = rngy;
+    rngy = rngz;
+    rngz = t ^ rngx ^ rngy;
 
-    return z;
+    return rngz;
 }
 
 float nextFloat() {
     float x;
-    *((int*) &x) = (0x7fffff & xorshf96()) | 0x3f800000;
+    *((uint32_t*) &x) = (0x7fffff & xorshf96()) | 0x3f800000;
     return x - 1;
 }
 
@@ -35,6 +35,8 @@ float* mission_stratsum = NULL;
 float* merlin_regretsum = NULL;
 float* merlin_stratsum = NULL;
 
+
+const float BRANCHING_PROBABILITY = 0.5;
 // 162 possible "missions failed with you on it"
 // 21 possible missions failed with you proposed
 // 5 possible rounds
@@ -103,9 +105,9 @@ public:
         assert(this->is_terminal());
         bool is_evil = ((hidden_state & 0xFF) == player) || (((hidden_state >> 8) & 0xFF) == player);
         if (is_evil) {
-            return (this->propose_count > 4 || this->fails > 2) ? 1.0 : -1.0;
+            return (this->succeeds > 2) ? -1.0 : 1.0;
         } else {
-            return (this->propose_count > 4 || this->fails > 2) ? -1.0 : 1.0;
+            return (this->succeeds > 2) ? 1.0 : -1.0;
         }
     }
 
@@ -132,9 +134,8 @@ public:
         int missions_with_fail_index = MISSION_FAIL_LOOKUP[missions_with_fail_big_index];
         assert(proposals_with_fail_index >= 0);
         assert(missions_with_fail_index >= 0);
-        int round_index = this->succeeds + this->fails;
 
-        int result = (162 * 21 * round_index) + (21 * missions_with_fail_index) + proposals_with_fail_index;
+        int result = (162 * 5 * proposals_with_fail_index) + (5 * missions_with_fail_index) + this->round();
         assert(result >= 0 && result < HISTORY_SIZE);
         return result;
     }
@@ -380,6 +381,7 @@ float mccfr_vote(int t, const RoundState& state, uint32_t hidden_state, int trav
 
     uint32_t votes = 0;
     float strategy[2];
+    float strategy2[2];
     for (int i = 0; i < 5; i++) {
         if (i == traverser) {
             continue;
@@ -391,16 +393,25 @@ float mccfr_vote(int t, const RoundState& state, uint32_t hidden_state, int trav
         votes |= move << i;
     }
 
-    int mybucket = get_vote_bucket(state, traverser, hidden_state);
-    calculate_strategy(voting_regretsum + 2 * mybucket, 2, strategy);
     // Can do an optimization here if no choice will change outcome. (i.e. the mission has at least 3 upvotes and there are no bad people on it)
     // if my vote won't matter
+    int mybucket = get_vote_bucket(state, traverser, hidden_state);
+
     uint32_t evil_bitmap = (1 << (hidden_state & 0xFF)) | (1 << ((hidden_state >> 8) & 0xFF));
     if ((__builtin_popcount(votes) < 2) || (__builtin_popcount(votes) > 2 && (evil_bitmap & state.proposal) == 0)) {
         RoundState::ProgressVote(state, votes, &new_state);
         for (int i = 0; i < 2; i++) {
             voting_stratsum[mybucket * 2 + i] += strategy[i] * pi * t;
         }
+        return mccfr(t, new_state, hidden_state, traverser, pi);
+    }
+
+    calculate_strategy(voting_regretsum + 2 * mybucket, 2, strategy);
+
+    if (nextFloat() > BRANCHING_PROBABILITY) {
+        int move = get_move(strategy, 2);
+        votes |= move << traverser;
+        RoundState::ProgressVote(state, votes, &new_state);
         return mccfr(t, new_state, hidden_state, traverser, pi);
     }
 
@@ -459,6 +470,14 @@ float mccfr_mission(int t, const RoundState& state, uint32_t hidden_state, int t
     int mybucket = get_mission_bucket(state, traverser, hidden_state);
     calculate_strategy(mission_regretsum + 2 * mybucket, 2, strategy);
 
+    if (did_fail) {
+        RoundState::ProgressMission(state, did_fail, &new_state);
+        for (int i = 0; i < 2; i++) {
+            mission_stratsum[mybucket * 2 + i] += strategy[i] * pi * t;
+        }
+        return mccfr(t, new_state, hidden_state, traverser, pi);
+    }
+
     // cout << "Making mission decision" << endl;
     float action_values[2];
     float value = 0;
@@ -513,6 +532,7 @@ float mccfr_merlin(int t, const RoundState& state, uint32_t hidden_state, int tr
 
 float mccfr(int t, const RoundState& state, uint32_t hidden_state, int traverser, float pi) {
     if (state.is_terminal()) {
+        games_explored++;
         return state.terminal_payoff(traverser, hidden_state);
     }
 
@@ -571,5 +591,6 @@ int main() {
             mccfr(t, state, hidden_state, player, 1.0);
         }
     }
+    cout << "Games explored: " << games_explored;
     return 0;
 }
