@@ -622,7 +622,7 @@ int main() {
     cout << "merlin " << 2 * merlin_arr_size / 1024 / 1024 << "MB" << endl;
 
     unsigned int num_cores = std::thread::hardware_concurrency();
-    num_cores = 2;
+    num_cores = 4;
 
     cout << "Parallelizing over " << num_cores << " cores." << endl;
 
