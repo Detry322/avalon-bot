@@ -6,6 +6,7 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <cilk/cilk.h>
 
 static thread_local uint32_t rngx=123456789, rngy=362436069, rngz=521288629;
 uint32_t xorshf96(void) {          //period 2^96-1
@@ -78,7 +79,7 @@ const int INDEX_TO_PROPOSAL_2[10] = {3, 5, 9, 17, 6, 10, 18, 12, 20, 24};
 const int INDEX_TO_PROPOSAL_3[10] = {7, 11, 19, 13, 21, 25, 14, 22, 26, 28};
 const int ROUND_TO_PROPOSE_SIZE[5] = {2, 3, 2, 3, 3};
 
-const int NUM_MUTEXES = 1000;
+const int NUM_MUTEXES = 128;
 
 mutex mtxs[NUM_MUTEXES];
 
@@ -368,9 +369,12 @@ float mccfr_propose(int t, const RoundState& state, uint32_t hidden_state, int t
     // cout << "Making proposal decision" << endl;
     float action_values[NUM_POSSIBLE_PROPOSALS];
     float value = 0;
+    RoundState new_states[NUM_POSSIBLE_PROPOSALS] = {};
+    cilk_for (int i = 0; i < NUM_POSSIBLE_PROPOSALS; i++) {
+        RoundState::ProgressProposal(state, proposal_map[i], &new_states[i]);
+        action_values[i] = mccfr(t, new_states[i], hidden_state, traverser, pi * strategy[i]);
+    }
     for (int i = 0; i < NUM_POSSIBLE_PROPOSALS; i++) {
-        RoundState::ProgressProposal(state, proposal_map[i], &new_state);
-        action_values[i] = mccfr(t, new_state, hidden_state, traverser, pi * strategy[i]);
         value += action_values[i] * strategy[i];
     }
 
@@ -427,9 +431,12 @@ float mccfr_vote(int t, const RoundState& state, uint32_t hidden_state, int trav
     // cout << "Making voting decision" << endl;
     float action_values[2];
     float value = 0;
+    RoundState new_states[2] = {};
+    cilk_for (int i = 0; i < 2; i++) {
+        RoundState::ProgressVote(state, votes | (i << traverser), &new_states[i]);
+        action_values[i] = mccfr(t, new_states[i], hidden_state, traverser, pi * strategy[i]);
+    }
     for (int i = 0; i < 2; i++) {
-        RoundState::ProgressVote(state, votes | (i << traverser), &new_state);
-        action_values[i] = mccfr(t, new_state, hidden_state, traverser, pi * strategy[i]);
         value += action_values[i] * strategy[i];
     }
 
@@ -491,9 +498,12 @@ float mccfr_mission(int t, const RoundState& state, uint32_t hidden_state, int t
     // cout << "Making mission decision" << endl;
     float action_values[2];
     float value = 0;
+    RoundState new_states[2] = {};
+    cilk_for (int i = 0; i < 2; i++) {
+        RoundState::ProgressMission(state, did_fail | (bool) i, &new_states[i]);
+        action_values[i] = mccfr(t, new_states[i], hidden_state, traverser, pi * strategy[i]);
+    }
     for (int i = 0; i < 2; i++) {
-        RoundState::ProgressMission(state, did_fail | (bool) i, &new_state);
-        action_values[i] = mccfr(t, new_state, hidden_state, traverser, pi * strategy[i]);
         value += action_values[i] * strategy[i];
     }
 
@@ -528,9 +538,12 @@ float mccfr_merlin(int t, const RoundState& state, uint32_t hidden_state, int tr
     // cout << "Making merlin decision" << endl;
     float action_values[5];
     float value = 0;
+    RoundState new_states[5] = {};
     for (int i = 0; i < 5; i++) {
-        RoundState::ProgressMerlin(state, merlin == i, &new_state);
-        action_values[i] = mccfr(t, new_state, hidden_state, traverser, pi * strategy[i]);
+        RoundState::ProgressMerlin(state, merlin == i, &new_states[i]);
+        action_values[i] = mccfr(t, new_states[i], hidden_state, traverser, pi * strategy[i]);
+    }
+    for (int i = 0; i < 5; i++) {
         value += action_values[i] * strategy[i];
     }
 
@@ -547,7 +560,7 @@ float mccfr_merlin(int t, const RoundState& state, uint32_t hidden_state, int tr
 
 float mccfr(int t, const RoundState& state, uint32_t hidden_state, int traverser, float pi) {
     if (state.is_terminal()) {
-        games_explored++;
+        __sync_fetch_and_add(&games_explored, 1);
         return state.terminal_payoff(traverser, hidden_state);
     }
 
@@ -598,18 +611,6 @@ void seed_rng() {
     }
 }
 
-void run_mccfr(int t, int num_iterations) {
-    seed_rng();
-    RoundState state = {};
-    
-    for (int i = 0; i < num_iterations; i++) {
-        uint32_t hidden_state = random_hidden();
-        for (int player = 0; player < 5; player++) {
-            mccfr(t + i, state, hidden_state, player, 1.0);
-        }
-    }
-}
-
 void write_file(const string& filename, void* buffer, size_t buflen) {
     ofstream file;
     file.open(filename);
@@ -617,8 +618,8 @@ void write_file(const string& filename, void* buffer, size_t buflen) {
     file.close();
 }
 
-void save_buffers(int num_iterations, bool save_regrets) {
-    cout << "Saving files after " << num_iterations << " iterations" << endl;
+void save_checkpoint_buffers(int num_iterations, bool save_regrets) {
+    cout << "Saving checkpoint files after " << num_iterations << " iterations" << endl;
     write_file(to_string(num_iterations) + "_proposal_stratsum.dat", proposal_stratsum, NUM_PROPOSAL_FLOATS * sizeof(float));
     write_file(to_string(num_iterations) + "_voting_stratsum.dat", voting_stratsum, NUM_VOTING_FLOATS * sizeof(float));
     write_file(to_string(num_iterations) + "_mission_stratsum.dat", mission_stratsum, NUM_MISSION_FLOATS * sizeof(float));
@@ -631,6 +632,19 @@ void save_buffers(int num_iterations, bool save_regrets) {
     }
 }
 
+void save_buffers(int num_iterations, bool save_regrets) {
+    cout << "Saving files after " << num_iterations << " iterations" << endl;
+    write_file("latest_proposal_stratsum.dat", proposal_stratsum, NUM_PROPOSAL_FLOATS * sizeof(float));
+    write_file("latest_voting_stratsum.dat", voting_stratsum, NUM_VOTING_FLOATS * sizeof(float));
+    write_file("latest_mission_stratsum.dat", mission_stratsum, NUM_MISSION_FLOATS * sizeof(float));
+    write_file("latest_merlin_stratsum.dat", merlin_stratsum, NUM_MERLIN_FLOATS * sizeof(float));
+    if (save_regrets) {
+        write_file(to_string(num_iterations) + "_proposal_regretsum.dat", proposal_regretsum, NUM_PROPOSAL_FLOATS * sizeof(float));
+        write_file(to_string(num_iterations) + "_voting_regretsum.dat", voting_regretsum, NUM_VOTING_FLOATS * sizeof(float));
+        write_file(to_string(num_iterations) + "_mission_regretsum.dat", mission_regretsum, NUM_MISSION_FLOATS * sizeof(float));
+        write_file(to_string(num_iterations) + "_merlin_regretsum.dat", merlin_regretsum, NUM_MERLIN_FLOATS * sizeof(float));
+    }
+}
 
 int main() {
     allocate_buffers();
@@ -647,10 +661,30 @@ int main() {
     num_cores = 4;
     unsigned int chunksize = 100;
 
-    cout << "Parallelizing over " << num_cores << " cores." << endl;
+//    cout << "Parallelizing over " << num_cores << " cores." << endl;
 
-    int total_num_iterations = 0;
-    int t = 1;
+
+    seed_rng();
+    RoundState state = {};
+    for (int t = 1;; t++) {
+        uint32_t hidden_state = random_hidden();
+        cilk_for (int player = 0; player < 5; player++) {
+            mccfr(t, state, hidden_state, player, 1.0);
+        }
+        if (t % 100 == 0) {
+            cout << "T=" << t << " Games explored: " << games_explored << endl;
+            games_explored = 0;
+        }
+        if (t % 5000 == 0) {
+            save_buffers(t, false);
+        }
+        if (t % 100000 == 0) {
+            save_checkpoint_buffers(t, true);
+        }
+        cout.flush();
+    }
+
+/*
     while (true) {
         vector<thread> threads(num_cores);
         cout << "Spawning..." << endl;
@@ -664,5 +698,5 @@ int main() {
         t += chunksize;
         total_num_iterations += num_cores * chunksize;
         save_buffers(total_num_iterations, false);
-    }
+    }*/
 }
