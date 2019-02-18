@@ -77,10 +77,10 @@ def check_config(config):
 
 
 def print_tournament_statistics(tournament_statistics):
-    print "       Role |            Bot |      Evil |      Winrate |        Payoff "
-    print "------------------------------------------------------------------------"
+    print "       Role |                      Bot | Evil |      Winrate |        Payoff "
+    print "-----------------------------------------------------------------------------"
     for bot in tournament_statistics['bots']:
-        print "{: >11} | {: >14} | {: >9} | {: >11.02f}% | {: >13.02f} ".format(bot['role'], bot['bot'], 'Yes' if bot['role'] in EVIL_ROLES else '', 100*bot['win_percent'], bot['payoff'])
+        print "{: >11} | {: >24} | {: >4} | {: >11.02f}% | {: >13.02f} ".format(bot['role'], bot['bot'], 'Yes' if bot['role'] in EVIL_ROLES else '', 100*bot['win_percent'], bot['payoff'])
 
     for game_end, count in sorted(tournament_statistics['end_types'].items(), key=lambda x: x[1], reverse=True):
         print "{}: {} - {}".format(count, game_end[0], game_end[1])

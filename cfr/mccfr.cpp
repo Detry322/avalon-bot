@@ -6,7 +6,8 @@
 #include <mutex>
 #include <thread>
 #include <vector>
-#include <cilk/cilk.h>
+// #include <cilk/cilk.h>
+#define cilk_for for
 
 static thread_local uint32_t rngx=123456789, rngy=362436069, rngz=521288629;
 uint32_t xorshf96(void) {          //period 2^96-1
@@ -382,6 +383,7 @@ float mccfr_propose(int t, const RoundState& state, uint32_t hidden_state, int t
     for (int i = 0; i < NUM_POSSIBLE_PROPOSALS; i++) {
         proposal_regretsum[bucket * NUM_POSSIBLE_PROPOSALS + i] += (action_values[i] - value) * t;
         proposal_stratsum[bucket * NUM_POSSIBLE_PROPOSALS + i] += strategy[i] * pi * t;
+        assert(proposal_stratsum[bucket * NUM_POSSIBLE_PROPOSALS + i] >= 0);
     }
     mtxs[bucket % NUM_MUTEXES].unlock();
 
@@ -444,6 +446,7 @@ float mccfr_vote(int t, const RoundState& state, uint32_t hidden_state, int trav
     for (int i = 0; i < 2; i++) {
         voting_regretsum[mybucket * 2 + i] += (action_values[i] - value) * t;
         voting_stratsum[mybucket * 2 + i] += strategy[i] * pi * t;
+        assert(voting_stratsum[mybucket * 2 + i] >= 0);
     }
     mtxs[mybucket % NUM_MUTEXES].unlock();
 

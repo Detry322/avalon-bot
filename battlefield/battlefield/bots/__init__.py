@@ -6,4 +6,5 @@ from battlefield.bots.ismcts_bot import *
 from battlefield.bots.human_bot import *
 from battlefield.bots.nn_bot import *
 from battlefield.bots.stats_bot import *
-from battlefield.bots.single_mcts import *
+from battlefield.bots.single_mcts_bot import *
+from battlefield.bots.cfr_bot import *
