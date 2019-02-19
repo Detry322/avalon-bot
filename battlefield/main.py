@@ -20,15 +20,15 @@ from collections import defaultdict
 
 TOURNAMENT_CONFIG = [
     {
-        'bot': CFRBot(),
+        'bot': ObserveBot,
         'role': 'merlin'
     },
     {
-        'bot': CFRBot(),
+        'bot': ObserveBot,
         'role': 'servant'
     },
     {
-        'bot': ObserveBot,
+        'bot': CFRBot(3000000),
         'role': 'assassin'
     },
     {
@@ -36,14 +36,14 @@ TOURNAMENT_CONFIG = [
         'role': 'servant'
     },
     {
-        'bot': ObserveBot,
+        'bot': CFRBot(3000000),
         'role': 'minion'
     }
 ]
 
 def tournament():
     check_config(TOURNAMENT_CONFIG)
-    tournament_results = run_tournament(TOURNAMENT_CONFIG, num_games=1000, granularity=100)
+    tournament_results = run_tournament(TOURNAMENT_CONFIG, num_games=10000, granularity=100)
     print_tournament_statistics(tournament_results)
 
 
@@ -86,4 +86,4 @@ def human_compare():
 
 
 if __name__ == "__main__":
-    parallel_human_compare()
+    tournament()

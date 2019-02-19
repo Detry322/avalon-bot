@@ -423,7 +423,7 @@ float mccfr_vote(int t, const RoundState& state, uint32_t hidden_state, int trav
 
     calculate_strategy(voting_regretsum + 2 * mybucket, 2, strategy);
 
-    if (nextFloat() > BRANCHING_PROBABILITY) {
+    if (state.propose_count < 4 && nextFloat() > BRANCHING_PROBABILITY) {
         int move = get_move(strategy, 2);
         votes |= move << traverser;
         RoundState::ProgressVote(state, votes, &new_state);
@@ -531,29 +531,23 @@ float mccfr_merlin(int t, const RoundState& state, uint32_t hidden_state, int tr
     float strategy[5];
     calculate_strategy(merlin_regretsum + 5 * bucket, 5, strategy);
 
+    float correct_pick_prob = strategy[merlin];
     if (traverser != assassin) {
-        int merlin_pick = get_move(strategy, 5);
-        bool picked_correctly = merlin_pick == merlin;
-        RoundState::ProgressMerlin(state, picked_correctly, &new_state);
-        return mccfr(t, new_state, hidden_state, traverser, pi);
+        __sync_fetch_and_add(&games_explored, 1);
+        float expected_payoff = (1.0 - correct_pick_prob) - correct_pick_prob;
+        expected_payoff = (traverser == (hidden_state & 0xFF)) ? -expected_payoff : expected_payoff;
+        return expected_payoff;
     }
+
+    __sync_fetch_and_add(&games_explored, 5);
 
     // cout << "Making merlin decision" << endl;
-    float action_values[5];
-    float value = 0;
-    RoundState new_states[5] = {};
-    for (int i = 0; i < 5; i++) {
-        RoundState::ProgressMerlin(state, merlin == i, &new_states[i]);
-        action_values[i] = mccfr(t, new_states[i], hidden_state, traverser, pi * strategy[i]);
-    }
-    for (int i = 0; i < 5; i++) {
-        value += action_values[i] * strategy[i];
-    }
-
+    float value = correct_pick_prob + correct_pick_prob - 1.0;
 
     mtxs[bucket % NUM_MUTEXES].lock();
     for (int i = 0; i < 5; i++) {
-        merlin_regretsum[bucket * 5 + i] += (action_values[i] - value) * t;
+        float action_value = (i == merlin) ? 1.0 : -1.0;
+        merlin_regretsum[bucket * 5 + i] += (action_value - value) * t;
         merlin_stratsum[bucket * 5 + i] += strategy[i] * pi * t;
     }
     mtxs[bucket % NUM_MUTEXES].unlock();
@@ -621,6 +615,21 @@ void write_file(const string& filename, void* buffer, size_t buflen) {
     file.close();
 }
 
+
+void* read_file(const string& filename) {
+    ifstream in(filename, ios::in | ios::binary);
+    if (!in) {
+        return NULL;
+    }
+    in.seekg(0, ios::end);
+    size_t size = in.tellg();
+    void* buffer = malloc(size);
+    in.seekg(0, ios::beg);
+    in.read((char*) buffer, size);
+    in.close();
+    return buffer;
+}
+
 void save_checkpoint_buffers(int num_iterations, bool save_regrets) {
     cout << "Saving checkpoint files after " << num_iterations << " iterations" << endl;
     write_file(to_string(num_iterations) + "_proposal_stratsum.dat", proposal_stratsum, NUM_PROPOSAL_FLOATS * sizeof(float));
@@ -649,6 +658,18 @@ void save_buffers(int num_iterations, bool save_regrets) {
     }
 }
 
+void load_checkpoint_buffers(int num_iterations) {
+    cout << "Loading checkpoints from iteration " << num_iterations << endl;
+    proposal_stratsum = (float*) read_file(to_string(num_iterations) + "_proposal_stratsum.dat");
+    voting_stratsum = (float*) read_file(to_string(num_iterations) + "_voting_stratsum.dat");
+    mission_stratsum = (float*) read_file(to_string(num_iterations) + "_mission_stratsum.dat");
+    merlin_stratsum = (float*) read_file(to_string(num_iterations) + "_merlin_stratsum.dat");
+    proposal_regretsum = (float*) read_file(to_string(num_iterations) + "_proposal_regretsum.dat");
+    voting_regretsum = (float*) read_file(to_string(num_iterations) + "_voting_regretsum.dat");
+    mission_regretsum = (float*) read_file(to_string(num_iterations) + "_mission_regretsum.dat");
+    merlin_regretsum = (float*) read_file(to_string(num_iterations) + "_merlin_regretsum.dat");
+}
+
 int main() {
     allocate_buffers();
     int proposal_arr_size = NUM_PROPOSAL_FLOATS * sizeof(float);
@@ -666,8 +687,6 @@ int main() {
 
 //    cout << "Parallelizing over " << num_cores << " cores." << endl;
 
-
-    seed_rng();
     RoundState state = {};
     for (int t = 1;; t++) {
         uint32_t hidden_state = random_hidden();
