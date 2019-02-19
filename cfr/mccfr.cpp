@@ -6,8 +6,7 @@
 #include <mutex>
 #include <thread>
 #include <vector>
-// #include <cilk/cilk.h>
-#define cilk_for for
+#include <cilk/cilk.h>
 
 static thread_local uint32_t rngx=123456789, rngy=362436069, rngz=521288629;
 uint32_t xorshf96(void) {          //period 2^96-1
@@ -41,7 +40,7 @@ float* mission_stratsum = NULL;
 float* merlin_regretsum = NULL;
 float* merlin_stratsum = NULL;
 
-const float BRANCHING_PROBABILITY = 0.5;
+const float BRANCHING_PROBABILITY = 0.1;
 // 162 possible "missions failed with you on it"
 // 21 possible missions failed with you proposed
 // 5 possible rounds
@@ -396,7 +395,6 @@ float mccfr_vote(int t, const RoundState& state, uint32_t hidden_state, int trav
 
     uint32_t votes = 0;
     float strategy[2];
-    float strategy2[2];
     for (int i = 0; i < 5; i++) {
         if (i == traverser) {
             continue;
@@ -493,7 +491,7 @@ float mccfr_mission(int t, const RoundState& state, uint32_t hidden_state, int t
     if (did_fail) {
         RoundState::ProgressMission(state, did_fail, &new_state);
         for (int i = 0; i < 2; i++) {
-            mission_stratsum[mybucket * 2 + i] += strategy[i] * pi * t;
+            mission_stratsum[mybucket * 2 + i] += pi * strategy[i] * t;
         }
         return mccfr(t, new_state, hidden_state, traverser, pi);
     }
@@ -513,7 +511,7 @@ float mccfr_mission(int t, const RoundState& state, uint32_t hidden_state, int t
     mtxs[mybucket % NUM_MUTEXES].lock();
     for (int i = 0; i < 2; i++) {
         mission_regretsum[mybucket * 2 + i] += (action_values[i] - value) * t;
-        mission_stratsum[mybucket * 2 + i] += strategy[i] * pi * t;
+        mission_stratsum[mybucket * 2 + i] += pi * strategy[i] * t;
     }
     mtxs[mybucket % NUM_MUTEXES].unlock();
     
@@ -548,7 +546,7 @@ float mccfr_merlin(int t, const RoundState& state, uint32_t hidden_state, int tr
     for (int i = 0; i < 5; i++) {
         float action_value = (i == merlin) ? 1.0 : -1.0;
         merlin_regretsum[bucket * 5 + i] += (action_value - value) * t;
-        merlin_stratsum[bucket * 5 + i] += strategy[i] * pi * t;
+        merlin_stratsum[bucket * 5 + i] += pi * strategy[i] * t;
     }
     mtxs[bucket % NUM_MUTEXES].unlock();
 
@@ -671,7 +669,8 @@ void load_checkpoint_buffers(int num_iterations) {
 }
 
 int main() {
-    allocate_buffers();
+//    allocate_buffers();
+    load_checkpoint_buffers(4000000);
     int proposal_arr_size = NUM_PROPOSAL_FLOATS * sizeof(float);
     int voting_arr_size = NUM_VOTING_FLOATS * sizeof(float);
     int mission_arr_size = NUM_MISSION_FLOATS * sizeof(float);
@@ -681,14 +680,8 @@ int main() {
     cout << "mission " << 2 * mission_arr_size / 1024 / 1024 << "MB" << endl;
     cout << "merlin " << 2 * merlin_arr_size / 1024 / 1024 << "MB" << endl;
 
-    unsigned int num_cores = std::thread::hardware_concurrency();
-    num_cores = 4;
-    unsigned int chunksize = 100;
-
-//    cout << "Parallelizing over " << num_cores << " cores." << endl;
-
     RoundState state = {};
-    for (int t = 1;; t++) {
+    for (int t = 4000001;; t++) {
         uint32_t hidden_state = random_hidden();
         cilk_for (int player = 0; player < 5; player++) {
             mccfr(t, state, hidden_state, player, 1.0);
@@ -697,10 +690,10 @@ int main() {
             cout << "T=" << t << " Games explored: " << games_explored << endl;
             games_explored = 0;
         }
-        if (t % 5000 == 0) {
+        if (t % 10000 == 0) {
             save_buffers(t, false);
         }
-        if (t % 100000 == 0) {
+        if (t % 1000000 == 0) {
             save_checkpoint_buffers(t, true);
         }
         cout.flush();
