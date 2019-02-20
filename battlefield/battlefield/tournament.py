@@ -148,7 +148,7 @@ def run_all_combos_parallel(bots, roles):
     results = []
 
     for combination in itertools.combinations_with_replacement(bots, r=len(roles)):
-        combo_name = '_'.join(map(lambda c: c.__name__, combination))
+        combo_name = '-'.join(map(lambda c: c.__name__, combination))
         results.append(
             (combo_name, pool.apply_async(run_large_tournament, (combination, roles)))
         )
