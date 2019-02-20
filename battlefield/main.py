@@ -10,7 +10,7 @@ from battlefield.bots import (
     SingleMCTSPlayoutBot, SingleMCTSHeuristicBot, SingleMCTSBaseOpponentBot,
     CFRBot
 )
-from battlefield.tournament import run_tournament, print_tournament_statistics, check_config
+from battlefield.tournament import run_simple_tournament, run_large_tournament, run_all_combos_parallel, print_tournament_statistics, check_config
 from battlefield.compare_to_human import compute_human_statistics, print_human_statistics
 import multiprocessing
 import pandas as pd
@@ -20,30 +20,30 @@ from collections import defaultdict
 
 TOURNAMENT_CONFIG = [
     {
-        'bot': ObserveBot,
+        'bot': CFRBot(10000000),
         'role': 'merlin'
     },
     {
-        'bot': ObserveBot,
+        'bot': CFRBot(10000000),
         'role': 'servant'
     },
     {
-        'bot': CFRBot(3000000),
+        'bot': ObserveBot,
         'role': 'assassin'
     },
     {
-        'bot': ObserveBot,
+        'bot': CFRBot(10000000),
         'role': 'servant'
     },
     {
-        'bot': CFRBot(3000000),
+        'bot': ObserveBot,
         'role': 'minion'
     }
 ]
 
 def tournament():
     check_config(TOURNAMENT_CONFIG)
-    tournament_results = run_tournament(TOURNAMENT_CONFIG, num_games=10000, granularity=100)
+    tournament_results = run_simple_tournament(TOURNAMENT_CONFIG, num_games=1000, granularity=100)
     print_tournament_statistics(tournament_results)
 
 
@@ -86,4 +86,6 @@ def human_compare():
 
 
 if __name__ == "__main__":
-    tournament()
+    roles = ['merlin', 'assassin', 'minion', 'servant', 'servant']
+    bots = [RandomBot, ObserveBot, SimpleStatsBot, CFRBot(6000000), CFRBot(13000000)]
+    print run_all_combos_parallel(bots, roles)

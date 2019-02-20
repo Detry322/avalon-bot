@@ -1,3 +1,7 @@
+import itertools
+import pandas as pd
+import multiprocessing
+import gzip
 from collections import defaultdict
 
 from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_states, starting_hidden_states
@@ -21,7 +25,58 @@ def run_game(state, hidden_state, bots):
     return state.terminal_value(hidden_state), state.game_end
 
 
-def run_tournament(config, num_games=1000, granularity=100):
+
+def run_large_tournament(bots_classes, roles, games_per_matching=50):
+    print "Running {}".format(' '.join(map(lambda c: c.__name__, bots_classes)))
+
+    game = create_avalon_game(num_players=len(roles))
+    start_state = game.start_state()
+    result = []
+    all_hidden_states = possible_hidden_states(set(roles), num_players=len(roles))
+
+    seen_hidden_states = set([])
+    for hidden_state in itertools.permutations(roles):
+        if hidden_state in seen_hidden_states:
+            continue
+        seen_hidden_states.add(hidden_state)
+
+        beliefs = [
+            starting_hidden_states(player, hidden_state, all_hidden_states) for player in range(len(hidden_state))
+        ]
+        seen_bot_orders = set([])
+        for bot_order in itertools.permutations(bots_classes):
+            bot_order_str = tuple([bot_cls.__name__ for bot_cls in bot_order])
+            if bot_order_str in seen_bot_orders:
+                continue
+            seen_bot_orders.add(bot_order_str)
+
+            for _ in range(games_per_matching):
+                bots = [
+                    bot_cls(start_state, player, role, beliefs[player]) for player, (bot_cls, role) in enumerate(zip(bot_order, hidden_state))
+                ]
+                values, game_end = run_game(start_state, hidden_state, bots)
+                game_stat = {
+                    'winner': game_end[0],
+                    'win_type': game_end[1],
+                }
+                for player, (bot_cls, role) in enumerate(zip(bot_order, hidden_state)):
+                    game_stat['bot_{}'.format(player)] = bot_cls.__name__
+                    game_stat['bot_{}_role'.format(player)] = role
+                    game_stat['bot_{}_payoff'.format(player)] = values[player]
+                result.append(game_stat)
+
+    df = pd.DataFrame(result, columns=sorted(result[0].keys()))
+    df['winner'] = df['winner'].astype('category')
+    df['win_type'] = df['win_type'].astype('category')
+    for player in range(len(roles)):
+        df['bot_{}'.format(player)] = df['bot_{}'.format(player)].astype('category')
+        df['bot_{}_role'.format(player)] = df['bot_{}_role'.format(player)].astype('category')
+
+    return df
+
+
+
+def run_simple_tournament(config, num_games=1000, granularity=100):
     tournament_statistics = {
         'bots': [
             { 'bot': bot['bot'].__name__, 'role': bot['role'], 'wins': 0, 'total': 0, 'win_percent': 0, 'payoff': 0.0 }
@@ -85,3 +140,22 @@ def print_tournament_statistics(tournament_statistics):
     for game_end, count in sorted(tournament_statistics['end_types'].items(), key=lambda x: x[1], reverse=True):
         print "{}: {} - {}".format(count, game_end[0], game_end[1])
 
+
+
+
+def run_all_combos_parallel(bots, roles):
+    pool = multiprocessing.Pool()
+    results = []
+
+    for combination in itertools.combinations_with_replacement(bots, r=len(roles)):
+        combo_name = '_'.join(map(lambda c: c.__name__, combination))
+        results.append(
+            (combo_name, pool.apply_async(run_large_tournament, (combination, roles)))
+        )
+
+    for combo_name, async_result in results:
+        dataframe = async_result.get()
+        filename = 'tournaments/{}.msg.gz'.format(combo_name)
+        print "Writing {}".format(filename)
+        with gzip.open(filename, 'w') as f:
+            dataframe.to_msgpack(f)

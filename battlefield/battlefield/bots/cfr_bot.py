@@ -105,6 +105,10 @@ def get_merlin_history_bucket(bot, state):
     return (243 * missions_with_fail_index) + upvoted_fail
 
 
+num_decision_points = 0
+num_random_decisions = 0
+
+
 class _CFRBot(Bot):
     ITERATION = None
 
@@ -235,6 +239,7 @@ class _CFRBot(Bot):
             unnormalized = self.MERLIN_STRAT[5*bucket:5*(bucket + 1)]
         else:
             assert False
+
 
         if np.sum(unnormalized) == 0.0:
             return np.array([1.0/len(legal_actions)] * len(legal_actions))
