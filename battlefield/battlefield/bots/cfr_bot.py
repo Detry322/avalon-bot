@@ -115,7 +115,6 @@ class _CFRBot(Bot):
     def __init__(self, game, player, role, hidden_states):
         assert len(hidden_states[0]) == 5, "CFRBot can only play 5 player"
         assert self.ITERATION is not None, "Can't load datafiles for none"
-        self.PROPOSAL_STRAT, self.VOTING_STRAT, self.MISSION_STRAT, self.MERLIN_STRAT = load_datafiles(self.ITERATION)
         self.vote_up_fail_count = np.array([0]*5)
         self.propose_fail_count = np.array([0]*5)
         self.mission_fail_count = np.array([0]*5)
@@ -127,6 +126,22 @@ class _CFRBot(Bot):
             assert len(self.bad) == 2
         else:
             self.bad = None
+
+    @property
+    def PROPOSAL_STRAT(self):
+        return load_datafile(os.path.join(DATAFILE_BASE, '{}_proposal_stratsum.dat'.format(self.ITERATION)))
+
+    @property
+    def VOTING_STRAT(self):
+        return load_datafile(os.path.join(DATAFILE_BASE, '{}_voting_stratsum.dat'.format(self.ITERATION)))
+
+    @property
+    def MISSION_STRAT(self):
+        return load_datafile(os.path.join(DATAFILE_BASE, '{}_mission_stratsum.dat'.format(self.ITERATION)))
+
+    @property
+    def MERLIN_STRAT(self):
+        return load_datafile(os.path.join(DATAFILE_BASE, '{}_merlin_stratsum.dat'.format(self.ITERATION)))
 
 
     def get_general_perspective(self):

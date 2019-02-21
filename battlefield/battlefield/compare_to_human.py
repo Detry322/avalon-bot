@@ -21,7 +21,8 @@ def reconstruct_hidden_state(game):
     for role, p in game['roles'].items():
         if role not in set(['assassin', 'merlin', 'mordred', 'percival', 'morgana', 'oberon']):
             continue
-        roles[p] = role
+        if roles[p] != 'assassin':
+            roles[p] = role
     return tuple(roles)
 
 

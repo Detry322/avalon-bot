@@ -38,8 +38,8 @@ def filter_hidden_states(hidden_states, proposal, num_fails_observed):
 
 def possible_hidden_states(roles, num_players):
     roles = set(roles)
-    assert 'assassin' in roles, "All games require an assassin"
-    assert 'merlin' in roles, "All games require a merlin"
+    assert 'assassin' in roles, "All games require an assassin: {}".format(roles)
+    assert 'merlin' in roles, "All games require a merlin: {}".format(roles)
     output_roles = list(roles)
     num_good_needed, num_evil_needed = AVALON_PLAYER_COUNT[num_players]
     num_good_have = len(roles & GOOD_ROLES)

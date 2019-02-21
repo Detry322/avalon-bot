@@ -12,10 +12,12 @@ from battlefield.bots import (
 )
 from battlefield.tournament import run_simple_tournament, run_large_tournament, run_all_combos_parallel, print_tournament_statistics, check_config
 from battlefield.compare_to_human import compute_human_statistics, print_human_statistics
+from battlefield.predict_roles import predict_evil_over_human_data
 import multiprocessing
 import pandas as pd
 import sys
 import gzip
+import cPickle as pickle
 from collections import defaultdict
 
 TOURNAMENT_CONFIG = [
@@ -85,7 +87,29 @@ def human_compare():
     print_human_statistics(stats)
 
 
+STRING_TO_BOT = {
+    "RandomBot": RandomBot,
+    "RandomBotUV": RandomBotUV,
+    "SimpleBot": SimpleBot,
+    "ObserveBot": ObserveBot,
+    "SimpleStatsBot": SimpleStatsBot,
+    "CFRBot_3000000": CFRBot(3000000),
+    "CFRBot_6000000": CFRBot(6000000),
+    "CFRBot_10000000": CFRBot(10000000)
+}
+
+def predict_roles(bot, tremble):
+    bot = STRING_TO_BOT[bot]
+    tremble = float(tremble)
+    dataframe, particles = predict_evil_over_human_data(bot, tremble)
+    print "Writing dataframe..."
+    with gzip.open('predict_roles/{}_{}_df.msg.gz'.format(bot.__name__, tremble), 'w') as f:
+        dataframe.to_msgpack(f)
+
+    print "Writing particles..."
+    with gzip.open('predict_roles/{}_{}_particles.pkl.gz'.format(bot.__name__, tremble), 'w') as f:
+        pickle.dump(particles, f)
+
+
 if __name__ == "__main__":
-    roles = ['merlin', 'assassin', 'minion', 'servant', 'servant']
-    bots = [RandomBot, ObserveBot, SimpleStatsBot, CFRBot(6000000), CFRBot(13000000)]
-    print run_all_combos_parallel(bots, roles)
+    predict_roles(sys.argv[1], sys.argv[2])
