@@ -7,7 +7,7 @@ import sys
 PARENT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir))
 sys.path.append(PARENT_DIR)
 
-from battlefield.avalon import create_avalon_game
+from battlefield.avalon import AvalonState
 from battlefield.avalon_types import EVIL_ROLES, GOOD_ROLES, ProposeAction, VoteAction, MissionAction, PickMerlinAction, possible_hidden_states, starting_hidden_states
 
 DATAFILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'relabeled.json'))
@@ -105,7 +105,7 @@ def process_game(root, game):
             root.setdefault((player, perspective), { 'move_counts': {}, 'transitions': {}})
             for player, perspective in enumerate(perspectives)
         ]
-        state = create_avalon_game(len(hidden_state)).start_state()
+        state = AvalonState.start_state(len(hidden_state))
         for round_ in game['log']:
             tree_roots, state = handle_round(tree_roots, state, hidden_state, round_)
     except AssertionError:

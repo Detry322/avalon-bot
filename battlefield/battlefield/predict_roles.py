@@ -7,7 +7,7 @@ import sys
 
 from battlefield.compare_to_human import reconstruct_hidden_state, load_human_data
 from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_states, starting_hidden_states, MissionAction, VoteAction, ProposeAction
-from battlefield.avalon import create_avalon_game
+from battlefield.avalon import AvalonState
 
 def human_game_state_generator(avalon_start, human_game, hidden_state):
     # at each step, return old state, new state, and observation
@@ -181,7 +181,7 @@ def predict_evil_over_human_game(game, as_bot, tremble):
         print game['id']
         sys.stdout.flush()
         hidden_state = reconstruct_hidden_state(game)
-        avalon_start = create_avalon_game(len(hidden_state)).start_state()
+        avalon_start = AvalonState.start_state(len(hidden_state))
         game_generator = human_game_state_generator(avalon_start, game, hidden_state)
         nll, particles = get_hidden_state_nll_for_game(avalon_start, game_generator, hidden_state, as_bot, tremble)
         data = {

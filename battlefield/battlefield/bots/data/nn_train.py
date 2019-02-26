@@ -13,7 +13,6 @@ from sklearn.utils import shuffle
 PARENT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir))
 sys.path.append(PARENT_DIR)
 
-from battlefield.avalon import create_avalon_game
 from battlefield.avalon_types import filter_hidden_states, EVIL_ROLES, GOOD_ROLES, ProposeAction, VoteAction, MissionAction, PickMerlinAction, possible_hidden_states, starting_hidden_states
 VOTE_FILENAME = os.path.abspath(os.path.join(os.path.dirname(__file__), 'vote_data.npz'))
 PROPOSE_FILENAME = os.path.abspath(os.path.join(os.path.dirname(__file__), 'propose_data.npz'))

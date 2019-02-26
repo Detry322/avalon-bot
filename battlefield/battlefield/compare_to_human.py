@@ -5,7 +5,7 @@ import sys
 import pandas as pd
 
 from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_states, starting_hidden_states, ProposeAction, VoteAction, MissionAction, PickMerlinAction
-from battlefield.avalon import create_avalon_game
+from battlefield.avalon import AvalonState
 
 DATAFILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'bots', 'data', 'relabeled.json'))
 
@@ -147,7 +147,7 @@ def process_game(game, bot_class, stats, trembling_hand_prob, verbose=True, num_
             starting_hidden_states(player, hidden_state, possible)
             for player, _ in enumerate(hidden_state)
         ]
-        state = create_avalon_game(len(hidden_state)).start_state()
+        state = AvalonState.start_state(len(hidden_state))
         bots = [
             bot_class(state, player, role, perspectives[player])
             for player, role in enumerate(hidden_state)

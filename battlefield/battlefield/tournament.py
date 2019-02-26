@@ -5,7 +5,7 @@ import gzip
 from collections import defaultdict
 
 from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_states, starting_hidden_states
-from battlefield.avalon import create_avalon_game
+from battlefield.avalon import AvalonState
 
 def run_game(state, hidden_state, bots):
     while not state.is_terminal():
@@ -29,8 +29,7 @@ def run_game(state, hidden_state, bots):
 def run_large_tournament(bots_classes, roles, games_per_matching=50):
     print "Running {}".format(' '.join(map(lambda c: c.__name__, bots_classes)))
 
-    game = create_avalon_game(num_players=len(roles))
-    start_state = game.start_state()
+    start_state = AvalonState.start_state(len(roles))
     result = []
     all_hidden_states = possible_hidden_states(set(roles), num_players=len(roles))
 
@@ -76,7 +75,7 @@ def run_large_tournament(bots_classes, roles, games_per_matching=50):
 
 
 def run_game_and_create_bots(hidden_state, beliefs, config):
-    start_state = create_avalon_game(len(hidden_state)).start_state()
+    start_state = AvalonState.start_state(len(hidden_state))
     bots = [
         bot['bot'](start_state, player, bot['role'], beliefs[player])
         for player, bot in enumerate(config)
@@ -126,7 +125,7 @@ def run_simple_tournament(config, num_games=1000, granularity=100):
 def check_config(config):
     role_counts = defaultdict(lambda: 0)
 
-    game = create_avalon_game(num_players=len(config))
+    start_state = AvalonState.start_state(len(config))
 
     for bot in config:
         # Count roles

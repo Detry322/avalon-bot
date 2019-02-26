@@ -4,7 +4,15 @@ from game import GameState
 from battlefield.avalon_types import AVALON_PROPOSE_SIZES, AVALON_PLAYER_COUNT, EVIL_ROLES, GOOD_ROLES, ProposeAction, VoteAction, MissionAction, PickMerlinAction
 
 class AvalonState(GameState):
-    def __init__(self, proposer, propose_count, succeeds, fails, status, proposal, game_end):
+    NUM_PLAYERS = None
+    NUM_GOOD = None
+    NUM_EVIL = None
+    MISSION_SIZES = None
+
+    def __init__(self, proposer, propose_count, succeeds, fails, status, proposal, game_end, num_players):
+        self.NUM_PLAYERS = num_players
+        self.NUM_GOOD, self.NUM_EVIL = AVALON_PLAYER_COUNT[num_players]
+        self.MISSION_SIZES = AVALON_PROPOSE_SIZES[num_players]
         assert 0 <= proposer < self.NUM_PLAYERS, "Proposer invalid"
         assert 0 <= propose_count < 5, "Propose count invalid"
         assert 0 <= succeeds <= 3, "succeeds invalid"
@@ -30,11 +38,16 @@ class AvalonState(GameState):
 
 
     @classmethod
-    def start_state(cls):
+    def start_state(cls, num_players):
         """
-        Returns the starting state
+        Returns the starting state for a certain number of players
         """
-        return cls(proposer=0, propose_count=0, succeeds=0, fails=0, status='propose', proposal=None, game_end=None)
+        return cls(proposer=0, propose_count=0, succeeds=0, fails=0, status='propose', proposal=None, game_end=None, num_players=num_players)
+
+
+    def new(self, *args, **kwargs):
+        kwargs['num_players'] = self.NUM_PLAYERS
+        return self.__class__(*args, **kwargs)
 
 
     def is_terminal(self):
@@ -114,7 +127,7 @@ class AvalonState(GameState):
         new_proposer = (self.proposer + 1) % self.NUM_PLAYERS
 
         if new_count >= 5:
-            return self.__class__(
+            return self.new(
                 proposer=0,
                 propose_count=0,
                 succeeds=self.succeeds,
@@ -123,7 +136,7 @@ class AvalonState(GameState):
                 proposal=None,
                 game_end=('evil', 'Too many proposals and no resolution')
             )
-        return self.__class__(
+        return self.new(
             proposer=new_proposer,
             propose_count=new_count,
             succeeds=self.succeeds,
@@ -135,7 +148,7 @@ class AvalonState(GameState):
 
 
     def vote_pass_transition(self):
-        return self.__class__(
+        return self.new(
             proposer=self.proposer,
             propose_count=self.propose_count,
             succeeds=self.succeeds,
@@ -157,7 +170,7 @@ class AvalonState(GameState):
     def mission_fail_transition(self):
         new_fails = self.fails + 1
         if new_fails == 3:
-            return self.__class__(
+            return self.new(
                 proposer=0,
                 propose_count=0,
                 succeeds=self.succeeds,
@@ -166,7 +179,7 @@ class AvalonState(GameState):
                 proposal=None,
                 game_end=('evil', 'Too many bad fails')
             )
-        return self.__class__(
+        return self.new(
             proposer=(self.proposer + 1) % self.NUM_PLAYERS,
             propose_count=0,
             succeeds=self.succeeds,
@@ -180,7 +193,7 @@ class AvalonState(GameState):
     def mission_succeed_transition(self):
         new_succeeds = self.succeeds + 1
         if new_succeeds == 3:
-            return self.__class__(
+            return self.new(
                 proposer=0,
                 propose_count=0,
                 succeeds=new_succeeds,
@@ -189,7 +202,7 @@ class AvalonState(GameState):
                 proposal=None,
                 game_end=None
             )
-        return self.__class__(
+        return self.new(
             proposer=(self.proposer + 1) % self.NUM_PLAYERS,
             propose_count=0,
             succeeds=new_succeeds,
@@ -210,7 +223,7 @@ class AvalonState(GameState):
 
 
     def proposal_transition(self, hidden_state, proposal):
-        return self.__class__(
+        return self.new(
             proposer=self.proposer,
             propose_count=self.propose_count,
             succeeds=self.succeeds,
@@ -222,7 +235,7 @@ class AvalonState(GameState):
 
 
     def pick_merlin_transition(self, hidden_state, assassin_picked_correctly):
-        return self.__class__(
+        return self.new(
             proposer=self.proposer,
             propose_count=self.propose_count,
             succeeds=self.succeeds,
@@ -263,17 +276,8 @@ class AvalonState(GameState):
         return "<AvalonState " + " ".join("{}={}".format(*kv) for kv in sorted(self.__dict__.items())) + ">"
 
 
-def create_avalon_game(num_players):
-    class AvalonStateWithPlayers(AvalonState):
-        NUM_PLAYERS = num_players
-        NUM_GOOD, NUM_EVIL = AVALON_PLAYER_COUNT[num_players]
-        MISSION_SIZES = AVALON_PROPOSE_SIZES[num_players]
-
-    return AvalonStateWithPlayers
-
 if __name__ == "__main__":
-    A = create_avalon_game(5)
-    state = A.start_state()
+    state = AvalonState.start_state(5)
     hidden_state = ('merlin', 'minion', 'assassin', 'servant', 'servant')
     print state
     print hidden_state

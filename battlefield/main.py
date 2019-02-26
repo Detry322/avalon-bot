@@ -1,4 +1,3 @@
-from battlefield.avalon import create_avalon_game
 from battlefield.bots import (
     RandomBot, RandomBotUV,
     SimpleBot,
