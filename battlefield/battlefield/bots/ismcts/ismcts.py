@@ -4,7 +4,7 @@ import itertools
 import numpy as np
 from collections import defaultdict
 
-from battlefield.bots.ismcts.mcts_common import random_choice, determinization_iterator, simulate
+from battlefield.bots.ismcts.mcts_common import random_choice, determinization_iterator, simulate, fast_simulate
 
 class Node:
     def __init__(self, parent, incoming_edge):
@@ -142,7 +142,7 @@ def search_ismcts(searcher, initial_game_state, possible_hidden_states, num_iter
     for i, initial_hidden_state in determinization_iterator(possible_hidden_states, num_iterations):
         node, game_state, hidden_state = select_leaf(root, initial_game_state, initial_hidden_state)
         node, game_state, hidden_state = expand_if_needed(node, game_state, hidden_state)
-        rewards = simulate(game_state, hidden_state)
+        rewards = fast_simulate(game_state, hidden_state)
         backpropagate(initial_game_state, initial_hidden_state, node, rewards)
 
     moves = max(root.children, key=lambda action: root.children[action].visit_count)

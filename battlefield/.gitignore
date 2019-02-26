@@ -3,3 +3,4 @@ human_*.gz
 human/*.gz
 human/
 tournaments/
+predict_roles/

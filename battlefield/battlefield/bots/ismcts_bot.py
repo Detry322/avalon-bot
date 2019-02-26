@@ -26,7 +26,7 @@ class ISMCTSBot(Bot):
         if len(legal_actions) == 1:
             return legal_actions[0]
 
-        action, _ = search_ismcts(self.player, state, self.hidden_states, 100)
+        action, _ = search_ismcts(self.player, state, self.hidden_states, 500)
         return action
 
 
@@ -54,7 +54,7 @@ class MOISMCTSBot(Bot):
         if len(legal_actions) == 1:
             return legal_actions[0]
 
-        actions, _ = search_mtmoismcts(self.player, state, self.hidden_states, 100)
+        actions, _ = search_mtmoismcts(self.player, state, self.hidden_states, 1000)
         return actions[self.role in EVIL_ROLES]
 
 

@@ -1,6 +1,6 @@
 import math
 
-from battlefield.bots.ismcts.mcts_common import random_choice, determinization_iterator, simulate
+from battlefield.bots.ismcts.mcts_common import random_choice, determinization_iterator, simulate, fast_simulate
 
 class Node:
     def __init__(self, parent, incoming_edge):
@@ -33,7 +33,7 @@ class Node:
             available_actions,
             key=lambda action: (
                 (self.children[action].total_reward/self.children[action].visit_count) +
-                2000 * math.sqrt(math.log(self.children[action].availability_count)/self.children[action].visit_count)
+                1000 * math.sqrt(math.log(self.children[action].availability_count)/self.children[action].visit_count)
             )
         )
 
@@ -166,6 +166,7 @@ def backpropagate(nodes, rewards, determinization):
         nodes = traverse_observation(nodes, observation, create=False)
 
 
+
 def search_moismcts(searcher, initial_game_state, possible_hidden_states, num_iterations):
     roots = [ Node(parent=None, incoming_edge=None) for player in range(initial_game_state.NUM_PLAYERS) ]
 
@@ -173,7 +174,7 @@ def search_moismcts(searcher, initial_game_state, possible_hidden_states, num_it
         determinization = [(initial_game_state, initial_hidden_state)]
         nodes, determinization = select_leaf(roots, determinization)
         nodes, determinization = expand_if_needed(nodes, determinization)
-        rewards = simulate(*determinization[-1])
+        rewards = fast_simulate(*determinization[-1])
         backpropagate(nodes, rewards, determinization)
 
     moves = []

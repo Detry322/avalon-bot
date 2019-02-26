@@ -75,6 +75,14 @@ def run_large_tournament(bots_classes, roles, games_per_matching=50):
     return df
 
 
+def run_game_and_create_bots(hidden_state, beliefs, config):
+    start_state = create_avalon_game(len(hidden_state)).start_state()
+    bots = [
+        bot['bot'](start_state, player, bot['role'], beliefs[player])
+        for player, bot in enumerate(config)
+    ]
+    return run_game(start_state, hidden_state, bots)
+
 
 def run_simple_tournament(config, num_games=1000, granularity=100):
     tournament_statistics = {
@@ -85,23 +93,23 @@ def run_simple_tournament(config, num_games=1000, granularity=100):
         'end_types': {}
     }
 
-    game = create_avalon_game(num_players=len(config))
-    start_state = game.start_state()
+
     hidden_state = tuple([bot['role'] for bot in config])
     all_hidden_states = possible_hidden_states(set(hidden_state), num_players=len(config))
     beliefs = [
         starting_hidden_states(player, hidden_state, all_hidden_states) for player in range(len(config))
     ]
 
-    for i in range(num_games):
-        if i % granularity == 0:
-            print "Running game {}".format(i)
-        bots = [
-            bot['bot'](start_state, player, bot['role'], beliefs[player])
-            for player, bot in enumerate(config)
-        ]
-        payoffs, end_type = run_game(start_state, hidden_state, bots)
+    pool = multiprocessing.Pool()
+    results = []
 
+    for i in range(num_games):
+        results.append(pool.apply_async(run_game_and_create_bots, (hidden_state, beliefs, config)))
+
+    for i, result in enumerate(results):
+        if i % granularity == 0:
+            print "Waiting for game {}".format(i)
+        payoffs, end_type = result.get()
         tournament_statistics['end_types'][end_type] = 1 + tournament_statistics['end_types'].get(end_type, 0)
 
         for b, payoff in zip(tournament_statistics['bots'], payoffs):

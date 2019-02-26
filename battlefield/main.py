@@ -2,7 +2,7 @@ from battlefield.avalon import create_avalon_game
 from battlefield.bots import (
     RandomBot, RandomBotUV,
     SimpleBot,
-    ObserveBot,
+    ObserveBot, BetterObserveBot,
     ISMCTSBot, MOISMCTSBot,
     HumanBot,
     NNBot, NNBotWithObservePropose,
@@ -22,11 +22,11 @@ from collections import defaultdict
 
 TOURNAMENT_CONFIG = [
     {
-        'bot': CFRBot(10000000),
+        'bot': MOISMCTSBot,
         'role': 'merlin'
     },
     {
-        'bot': CFRBot(10000000),
+        'bot': ObserveBot,
         'role': 'servant'
     },
     {
@@ -34,7 +34,7 @@ TOURNAMENT_CONFIG = [
         'role': 'assassin'
     },
     {
-        'bot': CFRBot(10000000),
+        'bot': ObserveBot,
         'role': 'servant'
     },
     {
@@ -45,7 +45,7 @@ TOURNAMENT_CONFIG = [
 
 def tournament():
     check_config(TOURNAMENT_CONFIG)
-    tournament_results = run_simple_tournament(TOURNAMENT_CONFIG, num_games=1000, granularity=100)
+    tournament_results = run_simple_tournament(TOURNAMENT_CONFIG, num_games=100, granularity=1)
     print_tournament_statistics(tournament_results)
 
 
@@ -112,4 +112,4 @@ def predict_roles(bot, tremble):
 
 
 if __name__ == "__main__":
-    predict_roles(sys.argv[1], sys.argv[2])
+    tournament()
