@@ -33,7 +33,7 @@ class Node:
             available_actions,
             key=lambda action: (
                 (self.children[action].total_reward/self.children[action].visit_count) +
-                1000 * math.sqrt(math.log(self.children[action].availability_count)/self.children[action].visit_count)
+                5 * math.sqrt(math.log(self.children[action].availability_count)/self.children[action].visit_count)
             )
         )
 
@@ -63,6 +63,9 @@ def traverse_move(nodes, player, move):
 
 
 def traverse_observation(nodes, observation, create=True):
+    if isinstance(observation, tuple) and hasattr(observation[0], 'up'):
+        observation = len([o for o in observation if o.up]) > 2
+
     if create:
         for node in nodes:
             if observation not in node.children:

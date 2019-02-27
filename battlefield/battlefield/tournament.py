@@ -99,11 +99,13 @@ def run_simple_tournament(config, num_games=1000, granularity=100):
         starting_hidden_states(player, hidden_state, all_hidden_states) for player in range(len(config))
     ]
 
-    pool = multiprocessing.Pool()
+    # pool = multiprocessing.Pool()
     results = []
 
     for i in range(num_games):
-        results.append(pool.apply_async(run_game_and_create_bots, (hidden_state, beliefs, config)))
+        run_game_and_create_bots(hidden_state, beliefs, config)
+        exit(0)
+        # results.append(pool.apply_async(run_game_and_create_bots, (hidden_state, beliefs, config)))
 
     for i, result in enumerate(results):
         if i % granularity == 0:

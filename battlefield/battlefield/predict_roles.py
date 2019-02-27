@@ -1,12 +1,13 @@
 import pandas as pd
 import numpy as np
 import copy
+import gzip
 import itertools
 import multiprocessing
 import sys
 
 from battlefield.compare_to_human import reconstruct_hidden_state, load_human_data
-from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_states, starting_hidden_states, MissionAction, VoteAction, ProposeAction
+from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, AVALON_PLAYER_COUNT, possible_hidden_states, starting_hidden_states, MissionAction, VoteAction, ProposeAction
 from battlefield.avalon import AvalonState
 
 def human_game_state_generator(avalon_start, human_game, hidden_state):
@@ -222,4 +223,106 @@ def predict_evil_over_human_data(as_bot, tremble):
         all_particles[data['game']] = particles
 
     return pd.DataFrame(dataframe_data), all_particles
+
+
+import itertools
+def teams_iterator(num_players, who_failed):
+    _, num_evil = AVALON_PLAYER_COUNT[num_players]
+    for evil in itertools.combinations(range(num_players), r=num_evil):
+        if all(sum(evil[p] for p in mission) >= observation for mission, observation in who_failed):
+            yield tuple([i in evil for i in range(num_players)])
+
+
+def most_likely_team(team_probabilities, num_players, who_failed, actual):
+    lls = []
+    assignments = list(teams_iterator(num_players, who_failed))
+    for assignment in assignments:
+        ll = 0.0
+        for i in range(len(assignment)):
+            for j in range(i+1, len(assignment)):
+                same_team = assignment[i] == assignment[j]
+                ll += np.log(team_probabilities[i][j] if same_team else (1.0 - team_probabilities[i][j]))
+        lls.append(ll)
+    return max(zip(lls, assignments)), lls[assignments.index(actual)]
+
+
+def update_pairings(votes, vote_same_if_same_prob, vote_same_if_diff_prob, team_probabilities):
+    for i, vote_i in enumerate(votes):
+        for j, vote_j in enumerate(votes):
+            pr_o_same_team = vote_same_if_same_prob if vote_i == vote_j else (1.0 - vote_same_if_same_prob)
+            pr_o_diff_team = vote_same_if_diff_prob if vote_i == vote_j else (1.0 - vote_same_if_diff_prob)
+            pr_o = team_probabilities[i][j] * pr_o_same_team + (1.0 - team_probabilities[i][j]) * pr_o_diff_team
+            team_probabilities[i][j] = pr_o_same_team * team_probabilities[i][j] / pr_o
+
+
+
+def predict_evil_using_voting_on_game(game, vote_same_if_same_prob, vote_same_if_diff_prob):
+    try:
+        dataframe_data = []
+        hidden_state = reconstruct_hidden_state(game)
+        assert len(hidden_state) <= 7
+        team = tuple([role in EVIL_ROLES for role in hidden_state])
+        avalon_start = AvalonState.start_state(len(hidden_state))
+        game_generator = human_game_state_generator(avalon_start, game, hidden_state)
+
+        same_team_prob = np.ones((len(hidden_state), len(hidden_state))) / 2
+
+        vote_count = 0
+        mission_num = 0
+        who_failed = []
+        for old_state, new_state, observation in game_generator:
+            if old_state.status == 'run':
+                mission_num += 1
+                if old_state.fails > new_state.fails:
+                    who_failed.append((old_state.proposal, observation))
+            if old_state.status == 'vote':
+                vote_count += 1
+                update_pairings(observation, vote_same_if_same_prob, vote_same_if_diff_prob, same_team_prob)
+                (nll_picked, pick), nll_correct = most_likely_team(same_team_prob, len(hidden_state), who_failed, team)
+                dataframe_data.append({
+                    'game': game['id'],
+                    'num_players': len(hidden_state),
+                    'vsis_prob': vote_same_if_same_prob,
+                    'vsid_prob': vote_same_if_diff_prob,
+                    'mission': mission_num,
+                    'vote_count': vote_count,
+                    'nll_correct': nll_correct,
+                    'nll_picked': nll_picked,
+                    'correct': pick == team,
+                })
+        sys.stdout.flush()
+        return dataframe_data
+    except ValueError:
+        return []
+    except AssertionError:
+        return []
+
+
+def wrapper(args):
+    return predict_evil_using_voting_on_game(*args)
+
+
+def predict_evil_using_voting(pool, vote_same_if_same_prob=0.7, vote_same_if_diff_prob=0.3):
+    print "Starting {} {}".format(vote_same_if_same_prob, vote_same_if_diff_prob)
+    sys.stdout.flush()
+    human_data = load_human_data()
+
+    results = pool.map(wrapper, [(game, vote_same_if_same_prob, vote_same_if_diff_prob) for game in human_data])
+
+    dataframe_data = []
+    map(dataframe_data.extend, results)
+
+    df = pd.DataFrame(dataframe_data)
+
+    print "Writing dataframe for {} {}".format(vote_same_if_same_prob, vote_same_if_diff_prob)
+    sys.stdout.flush()
+    with gzip.open("voting_predict/{}_{}.msg.gz".format(vote_same_if_same_prob, vote_same_if_diff_prob), 'w') as f:
+        df.to_msgpack(f)
+
+
+def grid_search():
+    pool = multiprocessing.Pool(40)
+    for a in np.arange(0.1, 0.91, 0.02):
+        for b in np.arange(0.1, 0.91, 0.02):
+            predict_evil_using_voting(pool, a, b)
 

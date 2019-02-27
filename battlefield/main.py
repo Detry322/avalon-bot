@@ -1,7 +1,7 @@
 from battlefield.bots import (
     RandomBot, RandomBotUV,
     SimpleBot,
-    ObserveBot, BetterObserveBot,
+    ObserveBot, ExamineAgreementBot,
     ISMCTSBot, MOISMCTSBot,
     HumanBot,
     NNBot, NNBotWithObservePropose,
@@ -11,7 +11,8 @@ from battlefield.bots import (
 )
 from battlefield.tournament import run_simple_tournament, run_large_tournament, run_all_combos_parallel, print_tournament_statistics, check_config
 from battlefield.compare_to_human import compute_human_statistics, print_human_statistics
-from battlefield.predict_roles import predict_evil_over_human_data
+from battlefield.predict_roles import predict_evil_over_human_data, predict_evil_using_voting, grid_search
+from battlefield.determine_reachable_states import determine_reachable
 import multiprocessing
 import pandas as pd
 import sys
@@ -21,7 +22,7 @@ from collections import defaultdict
 
 TOURNAMENT_CONFIG = [
     {
-        'bot': MOISMCTSBot,
+        'bot': ObserveBot,
         'role': 'merlin'
     },
     {
@@ -33,7 +34,7 @@ TOURNAMENT_CONFIG = [
         'role': 'assassin'
     },
     {
-        'bot': ObserveBot,
+        'bot': ExamineAgreementBot,
         'role': 'servant'
     },
     {
@@ -44,7 +45,8 @@ TOURNAMENT_CONFIG = [
 
 def tournament():
     check_config(TOURNAMENT_CONFIG)
-    tournament_results = run_simple_tournament(TOURNAMENT_CONFIG, num_games=100, granularity=1)
+    print "hidden", tuple(x['role'] for x in TOURNAMENT_CONFIG)
+    tournament_results = run_simple_tournament(TOURNAMENT_CONFIG, num_games=1, granularity=1)
     print_tournament_statistics(tournament_results)
 
 
@@ -111,4 +113,7 @@ def predict_roles(bot, tremble):
 
 
 if __name__ == "__main__":
-    tournament()
+    grid_search()
+    # predict_evil_using_voting()
+    # tournament()0
+#    determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)

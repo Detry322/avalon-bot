@@ -40,6 +40,7 @@ class MOISMCTSBot(Bot):
         self.game = game
         self.player = player
         self.role = role
+        self.is_evil = role in EVIL_ROLES
         self.hidden_states = hidden_states
 
 
@@ -54,7 +55,16 @@ class MOISMCTSBot(Bot):
         if len(legal_actions) == 1:
             return legal_actions[0]
 
-        actions, _ = search_mtmoismcts(self.player, state, self.hidden_states, 1000)
+        print state
+        actions, roots = search_mtmoismcts(self.player, state, self.hidden_states, 10000)
+        root = roots[self.player][self.is_evil]
+        while '_no_move' in root.children:
+            root = root.children['_no_move']
+        print "MOVES: "
+        for move in root.children:
+            child = root.children[move]
+            print move, child.total_reward / child.visit_count, child.visit_count, "CHOSEN" if move == actions[self.is_evil] else ""
+        # import IPython; IPython.embed()
         return actions[self.role in EVIL_ROLES]
 
 

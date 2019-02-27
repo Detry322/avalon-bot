@@ -180,6 +180,8 @@ def load_human_data():
     sys.stdout.flush()
     with open(DATAFILE, 'r') as f:
         human_data = json.load(f)
+    print "Done loading human"
+    sys.stdout.flush()
     return human_data
 
 
