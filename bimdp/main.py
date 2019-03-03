@@ -17,11 +17,11 @@ def observe():
     game = ProposalGame
     rounds = [
         Round(1, [1, 3], 'success'),
-        Round(2, [2, 3], 'success'),
-        Round(3, [2, 3], 'success'),
+        Round(2, [2, 3], 'fail'),
+        Round(3, [2, 3], 'fail'),
     ]
     playthrough = create_playthrough(rounds)
-    k = 3
+    k = 2
     solver = Solver(game, gamma=4.0)
     observe_playthrough_verbose(solver, playthrough, k)
 
