@@ -32,7 +32,7 @@ def observer_update_belief(solver, belief, belief_tensor, state, next_state, obs
     return new_belief
 
 
-def observe_playthrough(solver, playthrough, k=2):
+def observe_playthrough_verbose(solver, playthrough, k=2):
     belief = np.ones(len(solver.game.HIDDEN_STATES))
     belief /= np.sum(belief)
 
@@ -52,3 +52,21 @@ def observe_playthrough(solver, playthrough, k=2):
 
 
     print "Final belief: {}".format(belief)
+
+
+def observe_playthrough(solver, playthrough, k=2):
+    belief = np.ones(len(solver.game.HIDDEN_STATES))
+    belief /= np.sum(belief)
+
+    belief_tensor = solver.game.get_starting_belief_tensor(k)
+
+    result = []
+
+    for state, next_state, observation in playthrough:
+        new_belief = observer_update_belief(solver, belief, belief_tensor, state, next_state, observation)
+        belief = new_belief
+        result.append(belief)
+        belief_tensor = solver.update_tensor(belief_tensor, state, next_state, observation)
+
+    return result
+

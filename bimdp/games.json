@@ -1,0 +1,5462 @@
+{
+  "0": {
+    "id": "0", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "1": {
+    "id": "1", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "10": {
+    "id": "10", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "100": {
+    "id": "100", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "101": {
+    "id": "101", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "102": {
+    "id": "102", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "103": {
+    "id": "103", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "104": {
+    "id": "104", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "105": {
+    "id": "105", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "106": {
+    "id": "106", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "107": {
+    "id": "107", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "108": {
+    "id": "108", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "109": {
+    "id": "109", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "11": {
+    "id": "11", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "110": {
+    "id": "110", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "111": {
+    "id": "111", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "112": {
+    "id": "112", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "113": {
+    "id": "113", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "114": {
+    "id": "114", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "115": {
+    "id": "115", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "116": {
+    "id": "116", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "117": {
+    "id": "117", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "118": {
+    "id": "118", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "119": {
+    "id": "119", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "12": {
+    "id": "12", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "120": {
+    "id": "120", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "121": {
+    "id": "121", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "122": {
+    "id": "122", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "123": {
+    "id": "123", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "124": {
+    "id": "124", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "125": {
+    "id": "125", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "126": {
+    "id": "126", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "127": {
+    "id": "127", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "128": {
+    "id": "128", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "129": {
+    "id": "129", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "13": {
+    "id": "13", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "130": {
+    "id": "130", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "131": {
+    "id": "131", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "132": {
+    "id": "132", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "133": {
+    "id": "133", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "134": {
+    "id": "134", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "135": {
+    "id": "135", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "136": {
+    "id": "136", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "137": {
+    "id": "137", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "138": {
+    "id": "138", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "139": {
+    "id": "139", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "14": {
+    "id": "14", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "140": {
+    "id": "140", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "141": {
+    "id": "141", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "142": {
+    "id": "142", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "143": {
+    "id": "143", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "144": {
+    "id": "144", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "145": {
+    "id": "145", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "146": {
+    "id": "146", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "147": {
+    "id": "147", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "148": {
+    "id": "148", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "149": {
+    "id": "149", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "15": {
+    "id": "15", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "150": {
+    "id": "150", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "151": {
+    "id": "151", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "152": {
+    "id": "152", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "153": {
+    "id": "153", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "154": {
+    "id": "154", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "155": {
+    "id": "155", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "156": {
+    "id": "156", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "157": {
+    "id": "157", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "158": {
+    "id": "158", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "159": {
+    "id": "159", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "16": {
+    "id": "16", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "160": {
+    "id": "160", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "161": {
+    "id": "161", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "162": {
+    "id": "162", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "163": {
+    "id": "163", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "164": {
+    "id": "164", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "165": {
+    "id": "165", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "166": {
+    "id": "166", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "167": {
+    "id": "167", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "168": {
+    "id": "168", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "169": {
+    "id": "169", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "17": {
+    "id": "17", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "170": {
+    "id": "170", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "171": {
+    "id": "171", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "172": {
+    "id": "172", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "173": {
+    "id": "173", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "174": {
+    "id": "174", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "175": {
+    "id": "175", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "176": {
+    "id": "176", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "177": {
+    "id": "177", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "178": {
+    "id": "178", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "179": {
+    "id": "179", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "18": {
+    "id": "18", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "180": {
+    "id": "180", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "181": {
+    "id": "181", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "182": {
+    "id": "182", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "183": {
+    "id": "183", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "184": {
+    "id": "184", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "185": {
+    "id": "185", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "186": {
+    "id": "186", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "187": {
+    "id": "187", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "188": {
+    "id": "188", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "189": {
+    "id": "189", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "19": {
+    "id": "19", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "190": {
+    "id": "190", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "191": {
+    "id": "191", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "192": {
+    "id": "192", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "193": {
+    "id": "193", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "194": {
+    "id": "194", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "195": {
+    "id": "195", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "196": {
+    "id": "196", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "197": {
+    "id": "197", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "198": {
+    "id": "198", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "199": {
+    "id": "199", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "2": {
+    "id": "2", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "20": {
+    "id": "20", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "200": {
+    "id": "200", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "201": {
+    "id": "201", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "202": {
+    "id": "202", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "203": {
+    "id": "203", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "204": {
+    "id": "204", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "205": {
+    "id": "205", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "206": {
+    "id": "206", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "207": {
+    "id": "207", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "208": {
+    "id": "208", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "209": {
+    "id": "209", 
+    "rounds": [
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "21": {
+    "id": "21", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "22": {
+    "id": "22", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "23": {
+    "id": "23", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "24": {
+    "id": "24", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "25": {
+    "id": "25", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "26": {
+    "id": "26", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "27": {
+    "id": "27", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "28": {
+    "id": "28", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "29": {
+    "id": "29", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "3": {
+    "id": "3", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "30": {
+    "id": "30", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "31": {
+    "id": "31", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "32": {
+    "id": "32", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "33": {
+    "id": "33", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "34": {
+    "id": "34", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "35": {
+    "id": "35", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "36": {
+    "id": "36", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "37": {
+    "id": "37", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "38": {
+    "id": "38", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "39": {
+    "id": "39", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "4": {
+    "id": "4", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "40": {
+    "id": "40", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "41": {
+    "id": "41", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "42": {
+    "id": "42", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "43": {
+    "id": "43", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "44": {
+    "id": "44", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "45": {
+    "id": "45", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "46": {
+    "id": "46", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "47": {
+    "id": "47", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "48": {
+    "id": "48", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "49": {
+    "id": "49", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "5": {
+    "id": "5", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "50": {
+    "id": "50", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "51": {
+    "id": "51", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "52": {
+    "id": "52", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "53": {
+    "id": "53", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "54": {
+    "id": "54", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "55": {
+    "id": "55", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "56": {
+    "id": "56", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "57": {
+    "id": "57", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "58": {
+    "id": "58", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "59": {
+    "id": "59", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "6": {
+    "id": "6", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "60": {
+    "id": "60", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "61": {
+    "id": "61", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "62": {
+    "id": "62", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "63": {
+    "id": "63", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "64": {
+    "id": "64", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "65": {
+    "id": "65", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "66": {
+    "id": "66", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "67": {
+    "id": "67", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "68": {
+    "id": "68", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "69": {
+    "id": "69", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "7": {
+    "id": "7", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "70": {
+    "id": "70", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "71": {
+    "id": "71", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "72": {
+    "id": "72", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "73": {
+    "id": "73", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "74": {
+    "id": "74", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "75": {
+    "id": "75", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "76": {
+    "id": "76", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "77": {
+    "id": "77", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "78": {
+    "id": "78", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "79": {
+    "id": "79", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "8": {
+    "id": "8", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "80": {
+    "id": "80", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "81": {
+    "id": "81", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "82": {
+    "id": "82", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "83": {
+    "id": "83", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "84": {
+    "id": "84", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "85": {
+    "id": "85", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "86": {
+    "id": "86", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "87": {
+    "id": "87", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "88": {
+    "id": "88", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "89": {
+    "id": "89", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "9": {
+    "id": "9", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "90": {
+    "id": "90", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "91": {
+    "id": "91", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "92": {
+    "id": "92", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "93": {
+    "id": "93", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "94": {
+    "id": "94", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "95": {
+    "id": "95", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "96": {
+    "id": "96", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "97": {
+    "id": "97", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }
+    ]
+  }, 
+  "98": {
+    "id": "98", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "fail"
+      }
+    ]
+  }, 
+  "99": {
+    "id": "99", 
+    "rounds": [
+      {
+        "proposal": [
+          1, 
+          3
+        ], 
+        "result": "fail"
+      }, 
+      {
+        "proposal": [
+          2, 
+          3
+        ], 
+        "result": "success"
+      }, 
+      {
+        "proposal": [
+          1, 
+          2
+        ], 
+        "result": "success"
+      }
+    ]
+  }
+}

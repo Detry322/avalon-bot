@@ -42,9 +42,10 @@ def all_actions(player, action, opponent_possible_actions):
 NotPossible = ("not possible",)
 
 class Solver:
-    def __init__(self, game):
+    def __init__(self, game, gamma=1.0):
         self.game = game
         self.memoized_player_solve = {}
+        self.gamma = gamma
 
 
     def _get_opponent_moves(self, state, h, belief_tensor):
@@ -201,7 +202,7 @@ class Solver:
         # Do some softmax stuff
         payoffs = np.array(payoffs)
         payoffs -= np.max(payoffs)
-        probs = np.exp(payoffs)
+        probs = np.exp(payoffs * self.gamma)
         probs /= np.sum(probs)
         return {
             move: (prob, np.array([

@@ -1,4 +1,6 @@
 import numpy as np
+import os
+import json
 from collections import namedtuple
 import itertools as it
 
@@ -78,10 +80,10 @@ class ProposalGame(Game):
             else:
                 return [Move(type='Pass', extra=None)]
 
-        if state.round == cls.NUM_PLAYERS and hidden_state.evil != player:
-            moves = [Move(type='Pick', extra=p) for p in range(cls.NUM_PLAYERS)]
-            moves.append(Move(type='Pick', extra=None))
-            return moves
+        # if state.round == cls.NUM_PLAYERS and hidden_state.evil != player:
+        #     moves = [Move(type='Pick', extra=p) for p in range(cls.NUM_PLAYERS)]
+        #     moves.append(Move(type='Pick', extra=None))
+        #     return moves
 
         return [Move(type=None, extra=None)]
 
@@ -91,10 +93,10 @@ class ProposalGame(Game):
         good_reward = 0
         if state.proposal is not None:
             good_reward = 1 if not any([move.type == 'Fail' for move in moves]) else -1
-        elif state.round == N:
-            correct = sum(1 if move.type == 'Pick' and move.extra == hidden_state.evil else 0 for move in moves)
-            incorrect = sum(1 if move.type == 'Pick' and move.extra != hidden_state.evil and move.extra is not None else 0 for move in moves)
-            good_reward = 10*correct - 100*incorrect
+        # elif state.round == N:
+        #     correct = sum(1 if move.type == 'Pick' and move.extra == hidden_state.evil else 0 for move in moves)
+        #     incorrect = sum(1 if move.type == 'Pick' and move.extra != hidden_state.evil and move.extra is not None else 0 for move in moves)
+        #     good_reward = 10*correct - 100*incorrect
 
         return [(EVIL_REWARD if player == hidden_state.evil else GOOD_REWARD) * good_reward for player in range(cls.NUM_PLAYERS)]
 
@@ -114,9 +116,10 @@ class ProposalGame(Game):
     @classmethod
     def transition(cls, state, hidden_state, moves):
         if state.round == N:
-            return PhysicalState(round=N+1, proposal=None)
-        elif state.round == N+1:
             return None
+            # return PhysicalState(round=N+1, proposal=None)
+        # elif state.round == N+1:
+        #     return None
         else:
             if state.proposal is None:
                 # search through moves to find the proposal
@@ -128,7 +131,7 @@ class ProposalGame(Game):
 
     @classmethod
     def state_is_final(cls, state):
-        return state.round == (N + 1)
+        return state.round == N #(N + 1)
 
 
     @classmethod
@@ -150,3 +153,18 @@ class ProposalGame(Game):
                 for player in state.proposal:
                     actions[player] = Move(type='Fail', extra=None) if traitor == player else Move(type='Pass', extra=None)
         return actions
+
+
+def load_games():
+    filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'games.json')
+    with open(filename, 'r') as f:
+        data = json.loads(f.read())
+
+    result = {}
+    for game_id, log in data.items():
+        result[int(game_id)] = [
+            Round(1, log['rounds'][0]['proposal'], log['rounds'][0]['result']),
+            Round(2, log['rounds'][1]['proposal'], log['rounds'][1]['result']),
+            Round(3, log['rounds'][2]['proposal'], log['rounds'][2]['result']),
+        ]
+    return result
