@@ -11,7 +11,7 @@ def all_actions(possible_actions):
             prob *= p
         yield (moves, prob)
 
-def observe_playthrough(solver, playthrough, k=2):
+def observe_playthrough_verbose(solver, playthrough, k=2):
     belief = np.ones(len(solver.game.HIDDEN_STATES))
     belief /= np.sum(belief)
     particles = solver.my_particles
@@ -38,6 +38,19 @@ def observe_playthrough(solver, playthrough, k=2):
 
 
     print "Final belief: {}".format(belief)
+
+def observe_playthrough(solver, playthrough, k=2):
+    result = []
+    belief = np.ones(len(solver.game.HIDDEN_STATES))
+    belief /= np.sum(belief)
+    particles = solver.my_particles
+    for state, next_state, observation in playthrough:
+        new_particles = solver.generate_and_prune_new_particles(solver.game, state, observation, k, particles)
+        belief = solver.get_belief_given_particles(solver.game, new_particles)
+        result.append(belief)
+        particles = new_particles
+    return result
+
 
 def prettyprint(particle):
     print "-------- PARTICLE ---------"

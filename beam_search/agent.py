@@ -37,12 +37,10 @@ EPSILON = 0.005
 
 # ------------ UTILS ------------
 
-# Add and normalize arrays of log probabilities
-
 def log_add(x, y):
-    x = max(x, y)
-    y = min(x, y)
     return x + y
+
+# Add and normalize arrays of log probabilities
 
 def log_normalize_and_convert(arr):
     return np.exp(arr - max(arr)) / np.sum(np.exp(arr - max(arr)))
@@ -51,7 +49,7 @@ def log_normalize_and_convert(arr):
 # ------------ AGENT ------------
 
 class Agent(object):
-    def __init__(self, game, level, my_starting_distribution, is_bad):
+    def __init__(self, game, level, my_starting_distribution, is_bad, num_iterations):
         self.game = game
         self.level = level      
         self.belief = my_starting_distribution
@@ -59,7 +57,7 @@ class Agent(object):
         self.is_bad = is_bad
         self.index = 0 # or something idk
         self.my_particles = self.generate_and_prune_new_particles(game, None, None, self.level, None)
-        self.MCTS_NITER = 100
+        self.MCTS_NITER = num_iterations
         self.THRESHOLD = -3000
 
     def _initial_particles(self, game, level, hidden_states=None):
@@ -106,11 +104,6 @@ class Agent(object):
 
     def base_strategy(self, game, player, state, hidden_state):
         ''' level 0 strat ''' 
-        if state.proposal is not None and player in state.proposal:
-            if hidden_state.evil == player:
-                return {Move(type='Pass', extra=None) : EPSILON, Move(type='Fail', extra=None) : 1. - EPSILON }
-            else:
-                return {Move(type='Pass', extra=None) : 1.}
         moves = game.possible_moves(player, state, hidden_state)
         return {move : 1. / len(moves) for move in moves}
 
@@ -296,8 +289,6 @@ class Agent(object):
                     game, prev_state, actions, observation, particle.Hypothesis.h, new_TOM, level
                 ))
                 if new_score < self.THRESHOLD:
-                    if level == self.level:
-                        print(actions, new_score)
                     continue
                 new_hypothesis = Hypothesis(particle.Hypothesis.h, new_actions, new_score)
                 new_particle = Particle(new_hypothesis, new_TOM)
