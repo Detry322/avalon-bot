@@ -6,7 +6,10 @@ from battlefield.avalon_types import VoteAction
 
 # Plays randomly
 class RandomBot(Bot):
-    def __init__(self, game, player, role, hidden_states):
+    def __init__(self):
+        pass
+
+    def reset(self, game, player, role, hidden_states):
         self.game = game
         self.player = player
         self.role = role
@@ -26,7 +29,11 @@ class RandomBot(Bot):
 
 
 class RandomBotUV(Bot):
-    def __init__(self, game, player, role, hidden_states):
+    def __init__(self):
+        pass
+
+
+    def reset(self, game, player, role, hidden_states):
         self.game = game
         self.player = player
         self.role = role

@@ -254,6 +254,9 @@ class AvalonState(GameState):
         observation: the communal observation made by all of the players
         """
         assert len(moves) == len(self.moving_players()), "More players moved than allowed"
+        for player, move in zip(self.moving_players(), moves):
+            assert move in self.legal_actions(player, hidden_state), '{}, {}, {}, {}'.format(move, self, player, hidden_state)
+
         if self.status == 'merlin':
             chosen_player = moves[hidden_state.index('assassin')].merlin
             assassin_picked_correctly = chosen_player == hidden_state.index('merlin')

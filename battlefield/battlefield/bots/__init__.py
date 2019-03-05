@@ -8,3 +8,4 @@ from battlefield.bots.nn_bot import *
 from battlefield.bots.stats_bot import *
 from battlefield.bots.single_mcts_bot import *
 from battlefield.bots.cfr_bot import *
+from battlefield.bots.learning_bot import *

@@ -178,7 +178,11 @@ def heuristic_value_func(state, hidden_state, player):
 
 # Plays randomly, except always fails missions if bad.
 class SingleMCTSPlayoutBot(Bot):
-    def __init__(self, game, player, role, hidden_states):
+    def __init__(self):
+        pass
+
+
+    def reset(self, game, player, role, hidden_states):
         self.game = game
         self.player = player
         self.role = role
@@ -206,7 +210,11 @@ class SingleMCTSPlayoutBot(Bot):
 
 # Plays randomly, except always fails missions if bad.
 class SingleMCTSHeuristicBot(Bot):
-    def __init__(self, game, player, role, hidden_states):
+    def __init__(self):
+        pass
+
+
+    def reset(self, game, player, role, hidden_states):
         self.game = game
         self.player = player
         self.role = role
@@ -233,7 +241,11 @@ class SingleMCTSHeuristicBot(Bot):
 
 
 class SingleMCTSBaseOpponentBot(Bot):
-    def __init__(self, game, player, role, hidden_states):
+    def __init__(self):
+        pass
+
+
+    def reset(self, game, player, role, hidden_states):
         self.game = game
         self.player = player
         self.role = role

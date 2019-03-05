@@ -45,7 +45,11 @@ def onehot(player, num_players=5):
 
 # Plays via two neural nets
 class NNBot(Bot):
-    def __init__(self, game, player, role, hidden_states):
+    def __init__(self):
+        pass
+
+
+    def reset(self, game, player, role, hidden_states):
         load_models()
         self.game = game
         self.player = player

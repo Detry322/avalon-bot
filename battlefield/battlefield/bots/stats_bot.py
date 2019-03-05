@@ -6,13 +6,16 @@ from battlefield.avalon_types import EVIL_ROLES, GOOD_ROLES, MissionAction, Vote
 
 # Plays randomly, except always fails missions if bad.
 class SimpleStatsBot(Bot):
-    def __init__(self, game, player, role, hidden_states):
+    def __init__(self):
+        pass
+
+
+    def reset(self, game, player, role, hidden_states):
         self.game = game
         self.player = player
         self.role = role
         self.hidden_states = hidden_states
         self.is_evil = role in EVIL_ROLES
-
 
 
     def handle_transition(self, old_state, new_state, observation, move=None):

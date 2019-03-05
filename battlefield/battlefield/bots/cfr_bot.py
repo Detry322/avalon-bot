@@ -112,7 +112,10 @@ num_random_decisions = 0
 class _CFRBot(Bot):
     ITERATION = None
 
-    def __init__(self, game, player, role, hidden_states):
+    def __init__(self):
+        pass
+
+    def reset(self, game, player, role, hidden_states):
         assert len(hidden_states[0]) == 5, "CFRBot can only play 5 player"
         assert self.ITERATION is not None, "Can't load datafiles for none"
         self.vote_up_fail_count = np.array([0]*5)
@@ -125,7 +128,7 @@ class _CFRBot(Bot):
             self.bad = tuple(sorted([ i for i, role in enumerate(hidden_states[0]) if role in EVIL_ROLES ]))
             assert len(self.bad) == 2
         else:
-            self.bad = None
+            self.bad = None 
 
     @property
     def PROPOSAL_STRAT(self):

@@ -2,6 +2,7 @@ import itertools
 import pandas as pd
 import multiprocessing
 import gzip
+import random
 from collections import defaultdict
 
 from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_states, starting_hidden_states
@@ -50,9 +51,9 @@ def run_large_tournament(bots_classes, roles, games_per_matching=50):
             seen_bot_orders.add(bot_order_str)
 
             for _ in range(games_per_matching):
-                bots = [
-                    bot_cls(start_state, player, role, beliefs[player]) for player, (bot_cls, role) in enumerate(zip(bot_order, hidden_state))
-                ]
+                bots = [ bot_cls() for _ in hidden_state ]
+                for player, (bot, role) in enumerate(zip(bots, hidden_state)):
+                    bot.reset(start_state, player, role, beliefs[player])
                 values, game_end = run_game(start_state, hidden_state, bots)
                 game_stat = {
                     'winner': game_end[0],
@@ -76,10 +77,9 @@ def run_large_tournament(bots_classes, roles, games_per_matching=50):
 
 def run_game_and_create_bots(hidden_state, beliefs, config):
     start_state = AvalonState.start_state(len(hidden_state))
-    bots = [
-        bot['bot'](start_state, player, bot['role'], beliefs[player])
-        for player, bot in enumerate(config)
-    ]
+    bots = [ bot['bot']() for bot in config ]
+    for player, (bot, config) in enumerate(zip(bots, config)):
+        bot.reset(start_state, player, config['role'], beliefs[player])
     return run_game(start_state, hidden_state, bots)
 
 
@@ -168,3 +168,67 @@ def run_all_combos_parallel(bots, roles):
         print "Writing {}".format(filename)
         with gzip.open(filename, 'w') as f:
             dataframe.to_msgpack(f)
+
+
+
+
+def run_learning_tournament(bot_classes, winrate_track=None, winrate_window=1000):
+    bots = [
+        ( bot_class(), bot_class.__name__, num == winrate_track )
+        for num, bot_class in enumerate(bot_classes)
+    ]
+
+    hidden_state = ['merlin', 'servant', 'servant', 'assassin', 'minion']
+    all_hidden_states = possible_hidden_states(set(hidden_state), num_players=len(hidden_state))
+
+    beliefs_for_hidden_state = {}
+    start_state = AvalonState.start_state(len(hidden_state))
+
+    wins = []
+    game_num = 0
+
+    while True:
+        game_num += 1
+        random.shuffle(hidden_state)
+        random.shuffle(bots)
+        bot_ids = [ bot_name for _, bot_name, _ in bots ]
+
+        if tuple(hidden_state) not in beliefs_for_hidden_state:
+            beliefs_for_hidden_state[tuple(hidden_state)] = [
+                starting_hidden_states(
+                    player,
+                    tuple(hidden_state),
+                    all_hidden_states
+                ) for player in range(len(hidden_state))
+            ]
+
+        beliefs = beliefs_for_hidden_state[tuple(hidden_state)]
+
+        track_num = None
+
+        bot_objs = []
+        for i, (bot, bot_name, track) in enumerate(bots):
+            if track:
+                track_num = i
+            bot.reset(start_state, i, hidden_state[i], beliefs[i])
+            bot.set_bot_ids(bot_ids)
+            bot_objs.append(bot)
+
+        results, _ = run_game(start_state, tuple(hidden_state), bot_objs)
+
+        for i, (bot, bot_name, track) in enumerate(bots):
+            bot.show_roles(hidden_state, bot_ids)
+
+        if track_num is not None:
+            wins.append(int(results[track_num] > 0))
+            if len(wins) > winrate_window:
+                wins.pop(0)
+
+        if game_num % 10 == 0 and winrate_track is not None:
+            print "Winrate: {}%".format(100 * float(sum(wins)) / len(wins))
+
+
+
+
+
+

@@ -8,7 +8,11 @@ from battlefield.avalon_types import filter_hidden_states, EVIL_ROLES, GOOD_ROLE
 from collections import defaultdict
 
 class ObserveBot(Bot):
-    def __init__(self, game, player, role, hidden_states):
+    def __init__(self):
+        pass
+
+
+    def reset(self, game, player, role, hidden_states):
         self.game = game
         self.player = player
         self.role = role
@@ -92,8 +96,11 @@ def update_pairings(votes, team_probabilities):
 
 
 class ExamineAgreementBot(Bot):
-    def __init__(self, *args):
-        self.bot = ObserveBot(*args)
+    def __init__(self):
+        self.bot = ObserveBot()
+
+    def reset(self, *args):
+        self.bot.reset(*args)
         self.team_probabilities = np.ones((len(args[3][0]), len(args[3][0]))) / 2
 
 

@@ -36,7 +36,10 @@ class ISMCTSBot(Bot):
 
 
 class MOISMCTSBot(Bot):
-    def __init__(self, game, player, role, hidden_states):
+    def __init__(self):
+        pass
+
+    def reset(self, game, player, role, hidden_states):
         self.game = game
         self.player = player
         self.role = role

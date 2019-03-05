@@ -149,7 +149,7 @@ def process_game(game, bot_class, stats, trembling_hand_prob, verbose=True, num_
         ]
         state = AvalonState.start_state(len(hidden_state))
         bots = [
-            bot_class(state, player, role, perspectives[player])
+            bot_class.create_and_reset(state, player, role, perspectives[player])
             for player, role in enumerate(hidden_state)
         ]
         for round_ in game['log']:

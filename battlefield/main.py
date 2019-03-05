@@ -7,9 +7,10 @@ from battlefield.bots import (
     NNBot, NNBotWithObservePropose,
     SimpleStatsBot,
     SingleMCTSPlayoutBot, SingleMCTSHeuristicBot, SingleMCTSBaseOpponentBot,
-    CFRBot
+    CFRBot,
+    LearningBot
 )
-from battlefield.tournament import run_simple_tournament, run_large_tournament, run_all_combos_parallel, print_tournament_statistics, check_config
+from battlefield.tournament import run_simple_tournament, run_large_tournament, run_all_combos_parallel, print_tournament_statistics, check_config, run_learning_tournament
 from battlefield.compare_to_human import compute_human_statistics, print_human_statistics
 from battlefield.predict_roles import predict_evil_over_human_data, predict_evil_using_voting, grid_search
 from battlefield.determine_reachable_states import determine_reachable
@@ -113,7 +114,9 @@ def predict_roles(bot, tremble):
 
 
 if __name__ == "__main__":
-    grid_search()
+    bots = [ LearningBot, ObserveBot, RandomBotUV, RandomBotUV, RandomBot ]
+    run_learning_tournament(bots, winrate_track=0)
+    # grid_search()
     # predict_evil_using_voting()
     # tournament()0
 #    determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)

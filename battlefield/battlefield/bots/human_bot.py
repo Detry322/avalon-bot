@@ -34,6 +34,10 @@ def load_human_data():
 
 class HumanBot(Bot):
     def __init__(self, game, player, role, hidden_states):
+        pass
+
+
+    def reset(self, game, player, role, hidden_states):
         self.game = game
         self.player = player
         self.role = role

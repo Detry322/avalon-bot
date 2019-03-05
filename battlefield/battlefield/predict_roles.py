@@ -144,7 +144,7 @@ def get_hidden_state_nll_for_game(avalon_start, game_generator, real_hidden_stat
         {
             'prob': 1.0 / len(all_possible_hidden),
             'bots': [
-                bot_class(avalon_start, player, hidden_state[player], perspective)
+                bot_class.create_and_reset(avalon_start, player, hidden_state[player], perspective)
                 for player, perspective in enumerate(player_perspectives)
             ],
             'hidden_state': hidden_state,
