@@ -1,5 +1,8 @@
 import random
 import numpy as np
+import itertools
+import os
+import cPickle as pickle
 from collections import defaultdict
 
 from battlefield.bots.bot import Bot
@@ -78,7 +81,7 @@ def move_index_to_move(move_index, state):
 
 
 
-C = 5
+C = 10
 class Node:
     def __init__(self, num_moves):
         self.choose_counts = np.zeros(num_moves).astype(np.int)
@@ -95,15 +98,22 @@ class Node:
         weight_factor = average_payoff + C * np.sqrt(np.log(total_choices) / self.choose_counts)
         return np.argmax(weight_factor)
 
+def _bucket_defaultdict_func():
+    return {
+        'merlin': np.zeros((81, 5)),
+        'propose': np.zeros((55 * 81 * 2, 10)),
+        'run': np.zeros((1, 2)),
+        'vote': np.zeros((55 * 36 + 55, 2))
+    }
 
+
+OPPONENT_BUCKET_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data', '1000000_buckets.pkl'))
 class LearningBot(Bot):
     def __init__(self):
-        self.opponent_buckets = defaultdict(lambda: {
-            'merlin': np.zeros((81, 5)).astype(np.int),
-            'propose': np.zeros((55 * 81 * 2, 10)).astype(np.int),
-            'run': np.zeros((1, 2)).astype(np.int),
-            'vote': np.zeros((55 * 36 + 55, 2)).astype(np.int)
-        })
+        # self.opponent_buckets = defaultdict(_bucket_defaultdict_func)
+        with open(OPPONENT_BUCKET_FILE, 'r') as f:
+            self.opponent_buckets = pickle.load(f)
+
         self.history = []
         self.my_buckets = {
             'merlin': defaultdict(lambda: Node(5)),
@@ -111,6 +121,7 @@ class LearningBot(Bot):
             'run': defaultdict(lambda: Node(2)),
             'vote': defaultdict(lambda: Node(2)),
         }
+        self.cfr_regret = self.opponent_buckets['__cfr_regret__']
         self.game_num = 0
 
 
@@ -122,9 +133,12 @@ class LearningBot(Bot):
         self.fails = []
         self.role = role
         self.game_num += 1
-        self.should_search = (self.game_num >= 100000) and (self.game_num % 10 == 0)
-        if self.game_num == 100000:
-            print "Searching from here on out..."
+
+        print "Training..."
+        random.shuffle(self.hidden_states)
+        for i, h in enumerate(self.hidden_states):
+            print i
+            self.cfr_search_fast(game, tuple(h), [], 1.0, i, {})
 
 
     def set_bot_ids(self, bot_ids):
@@ -227,7 +241,7 @@ class LearningBot(Bot):
                     bucket_data = self.opponent_buckets[self.bot_ids[player]][bucket_type][bucket]
 
                     uniform_prob = np.ones(len(bucket_data))/len(bucket_data)
-                    tremble_prob = 1.0/np.sqrt(np.sum(bucket_data) + 1)
+                    tremble_prob = 1.0/np.sqrt(4*np.sum(bucket_data) + 1)
                     if np.sum(bucket_data) == 0:
                         move_probs = uniform_prob
                     else:
@@ -268,16 +282,213 @@ class LearningBot(Bot):
         for _ in range(num_iterations):
             self.single_mcts_search(state)
 
+    def cfr_search(self, state, hidden_state, fails, strategy_probability, t, cache):
+        if state.is_terminal():
+            return state.terminal_value(hidden_state)[self.player]
+
+        cache_key = (state.as_key(), tuple(fails))
+        if cache_key in cache:
+            return cache[cache_key]
+
+        if np.random.random() < 0.0001:
+            print len(cache)
+
+        player_statuses = [
+            [0, 0, 0, 0, 0]
+            for _ in hidden_state
+        ]
+        for proposal, _ in fails:
+            for p in range(len(hidden_state)):
+                p_on = p in proposal
+                for player in proposal:
+                    player_statuses[p][player] = max(player_statuses[p][player], 2 if p_on else 1)
+
+
+        moving_players = state.moving_players()
+        my_move_index = None
+        moves = [None] * len(moving_players)
+        for i in range(len(moving_players)):
+            player = moving_players[i]
+            if hidden_state[player] not in EVIL_ROLES and state.status == 'run':
+                moves[i] = [(MissionAction(fail=False), 1.0)]
+                continue
+
+            if hidden_state[player] != 'assassin' and state.status == 'merlin':
+                moves[i] = [(PickMerlinAction(merlin=np.random.choice(len(hidden_state))), 1.0)]
+                continue
+
+            bucket_type, bucket = history_to_bucket(hidden_state, player, [(None, state)], player_statuses[player])
+            if player == self.player:
+                my_move_index = i
+                moves[i] = [(None, 1.0)]
+                continue
+            else:
+                bucket_data = self.opponent_buckets[player][bucket_type][bucket]
+                uniform_prob = np.ones(len(bucket_data))/len(bucket_data)
+                tremble_prob = 1.0/np.sqrt(3 * np.sum(bucket_data) + 1)
+                if np.sum(bucket_data) == 0:
+                    move_probs = uniform_prob
+                else:
+                    move_probs = tremble_prob * uniform_prob + (1.0 - tremble_prob) * bucket_data / np.sum(bucket_data)
+
+            moves[i] = [(move_index_to_move(j, state), move_probs[j]) for j in range(len(move_probs))]
+
+        if my_move_index is None:
+            value = 0.0
+            for moves_and_probs in itertools.product(*moves):
+                moves, probs = zip(*moves_and_probs)
+                p = np.prod(probs)
+                if p == 0.0:
+                    continue
+                new_state, _, observation = state.transition(moves, hidden_state)
+                if state.status == 'run' and observation > 0:
+                    fails.append((state.proposal, observation))
+                value += p * self.cfr_search(new_state, hidden_state, fails, strategy_probability, t, cache)
+                if state.status == 'run' and observation > 0:
+                    fails.pop()
+            cache[cache_key] = value
+            return value
+
+
+        bucket_type, bucket = history_to_bucket(hidden_state, self.player, [(None, state)], player_statuses[self.player])
+        my_strategy = np.clip(self.cfr_regret[bucket_type][bucket], 0, None)
+
+        if np.sum(my_strategy) == 0:
+            p = np.ones(len(my_strategy))/len(my_strategy)
+        else:
+            p = my_strategy / np.sum(my_strategy)
+        values = np.zeros(len(my_strategy))
+
+        for moves_and_probs in itertools.product(*moves):
+            moves, probs = zip(*moves_and_probs)
+            other_p = np.prod(probs)
+            if other_p == 0.0:
+                continue
+
+            moves = list(moves)
+            for action_index in range(len(values)):
+                moves[my_move_index] = move_index_to_move(action_index, state)
+                new_state, _, observation = state.transition(moves, hidden_state)
+                if state.status == 'run' and observation > 0:
+                    fails.append((state.proposal, observation))
+                values[action_index] += other_p * self.cfr_search(new_state, hidden_state, fails, strategy_probability * p[action_index], t, cache)
+                if state.status == 'run' and observation > 0:
+                    fails.pop()
+
+        strategy_value = np.dot(values, p)
+        regrets = values - strategy_value
+        self.cfr_regret[bucket_type][bucket] += regrets * t
+
+        cache[cache_key] = strategy_value
+        return strategy_value
+
+
+    def cfr_search_fast(self, state, hidden_state, fails, strategy_probability, t, cache):
+        if state.is_terminal():
+            return state.terminal_value(hidden_state)[self.player]
+
+        cache_key = (state.as_key(), tuple(fails))
+        if cache_key in cache:
+            return cache[cache_key]
+
+        if np.random.random() < 0.0001:
+            print len(cache)
+
+        player_statuses = [
+            [0, 0, 0, 0, 0]
+            for _ in hidden_state
+        ]
+        for proposal, _ in fails:
+            for p in range(len(hidden_state)):
+                p_on = p in proposal
+                for player in proposal:
+                    player_statuses[p][player] = max(player_statuses[p][player], 2 if p_on else 1)
+
+
+        moving_players = state.moving_players()
+        my_move_index = None
+        moves = [None] * len(moving_players)
+        for i in range(len(moving_players)):
+            player = moving_players[i]
+            if hidden_state[player] not in EVIL_ROLES and state.status == 'run':
+                moves[i] = MissionAction(fail=False)
+                continue
+
+            if hidden_state[player] != 'assassin' and state.status == 'merlin':
+                moves[i] = PickMerlinAction(merlin=np.random.choice(len(hidden_state)))
+                continue
+
+            bucket_type, bucket = history_to_bucket(hidden_state, player, [(None, state)], player_statuses[player])
+            if player == self.player:
+                my_move_index = i
+                # moves[i] = [(None, 1.0)]
+                continue
+            else:
+                bucket_data = self.opponent_buckets[player][bucket_type][bucket]
+                uniform_prob = np.ones(len(bucket_data))/len(bucket_data)
+                tremble_prob = 1.0/np.sqrt(3 * np.sum(bucket_data) + 1)
+                if np.sum(bucket_data) == 0:
+                    move_probs = uniform_prob
+                else:
+                    move_probs = tremble_prob * uniform_prob + (1.0 - tremble_prob) * bucket_data / np.sum(bucket_data)
+
+            moves[i] = move_index_to_move(np.random.choice(len(move_probs), p=move_probs), state)
+
+
+        if my_move_index is None:
+            value = 0.0
+            new_state, _, observation = state.transition(moves, hidden_state)
+            if state.status == 'run' and observation > 0:
+                fails.append((state.proposal, observation))
+            value = self.cfr_search_fast(new_state, hidden_state, fails, strategy_probability, t, cache)
+            if state.status == 'run' and observation > 0:
+                fails.pop()
+            cache[cache_key] = value
+            return value
+
+
+        bucket_type, bucket = history_to_bucket(hidden_state, self.player, [(None, state)], player_statuses[self.player])
+        my_strategy = np.clip(self.cfr_regret[bucket_type][bucket], 0, None)
+
+        if np.sum(my_strategy) == 0:
+            p = np.ones(len(my_strategy))/len(my_strategy)
+        else:
+            p = my_strategy / np.sum(my_strategy)
+        values = np.zeros(len(my_strategy))
+
+        for action_index in range(len(values)):
+            moves[my_move_index] = move_index_to_move(action_index, state)
+            new_state, _, observation = state.transition(moves, hidden_state)
+            if state.status == 'run' and observation > 0:
+                fails.append((state.proposal, observation))
+            values[action_index] = self.cfr_search_fast(new_state, hidden_state, fails, strategy_probability * p[action_index], t, cache)
+            if state.status == 'run' and observation > 0:
+                fails.pop()
+
+        strategy_value = np.dot(values, p)
+        regrets = values - strategy_value
+        self.cfr_regret[bucket_type][bucket] += regrets * t
+
+        cache[cache_key] = strategy_value
+        return strategy_value
+
 
     def get_action(self, state, legal_actions):
         if len(legal_actions) == 1:
             return legal_actions[0]
 
-        if self.should_search:
-            self.mcts_search(state, num_iterations=100)
+        # if self.should_search:
+        #     self.mcts_search(state, num_iterations=100)
 
         bucket_type, bucket = history_to_bucket(self.hidden_states[0], self.player, self.history, self.player_status)
-        return move_index_to_move(self.my_buckets[bucket_type][bucket].select_move(), state)
+        my_strategy = np.clip(self.cfr_regret[bucket_type][bucket], 0, None)
+
+        if np.sum(my_strategy) == 0:
+            p = np.ones(len(my_strategy))/len(my_strategy)
+        else:
+            p = my_strategy / np.sum(my_strategy)
+
+        return move_index_to_move(np.random.choice(len(p), p=p), state)
 
 
     def get_move_probabilities(self, state, legal_actions):

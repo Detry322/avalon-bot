@@ -172,7 +172,7 @@ def run_all_combos_parallel(bots, roles):
 
 
 
-def run_learning_tournament(bot_classes, winrate_track=None, winrate_window=1000):
+def run_learning_tournament(bot_classes, winrate_track=None, winrate_window=10000000):
     bots = [
         ( bot_class(), bot_class.__name__, num == winrate_track )
         for num, bot_class in enumerate(bot_classes)

@@ -4,3 +4,4 @@ human/*.gz
 human/
 tournaments/
 predict_roles/
+*.pkl
