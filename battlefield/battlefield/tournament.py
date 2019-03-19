@@ -228,7 +228,46 @@ def run_learning_tournament(bot_classes, winrate_track=None, winrate_window=1000
             print "Winrate: {}%".format(100 * float(sum(wins)) / len(wins))
 
 
+def run_single_threaded_tournament(config, num_games=1000, granularity=100):
+    tournament_statistics = {
+        'bots': [
+            { 'bot': bot['bot'].__name__, 'role': bot['role'], 'wins': 0, 'total': 0, 'win_percent': 0, 'payoff': 0.0 }
+            for bot in config
+        ],
+        'end_types': {}
+    }
 
+
+    hidden_state = tuple([bot['role'] for bot in config])
+    all_hidden_states = possible_hidden_states(set(hidden_state), num_players=len(config))
+    beliefs = [
+        starting_hidden_states(player, hidden_state, all_hidden_states) for player in range(len(config))
+    ]
+
+    start_state = AvalonState.start_state(len(hidden_state))
+    bots = [ bot['bot']() for bot in config ]
+
+    # pool = multiprocessing.Pool()
+    results = []
+
+    for i in range(num_games):
+        if i % granularity == 0:
+            print i
+        for player, (bot, c) in enumerate(zip(bots, config)):
+            bot.reset(start_state, player, c['role'], beliefs[player])
+
+        payoffs, end_type = run_game(start_state, hidden_state, bots)
+        tournament_statistics['end_types'][end_type] = 1 + tournament_statistics['end_types'].get(end_type, 0)
+
+        for b, payoff in zip(tournament_statistics['bots'], payoffs):
+            b['wins'] += 1 if payoff > 0.0 else 0
+            b['payoff'] += payoff
+            b['total'] += 1
+
+    for b in tournament_statistics['bots']:
+        b['win_percent'] = float(b['wins'])/float(b['total'])
+
+    return tournament_statistics
 
 
 

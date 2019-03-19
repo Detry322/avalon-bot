@@ -8,9 +8,18 @@ from battlefield.bots import (
     SimpleStatsBot,
     SingleMCTSPlayoutBot, SingleMCTSHeuristicBot, SingleMCTSBaseOpponentBot,
     CFRBot,
-    LearningBot
+    LearningBot,
+    ObserveBeaterBot
 )
-from battlefield.tournament import run_simple_tournament, run_large_tournament, run_all_combos_parallel, print_tournament_statistics, check_config, run_learning_tournament
+from battlefield.tournament import (
+    run_simple_tournament,
+    run_large_tournament,
+    run_all_combos_parallel,
+    print_tournament_statistics,
+    check_config,
+    run_learning_tournament,
+    run_single_threaded_tournament
+)
 from battlefield.compare_to_human import compute_human_statistics, print_human_statistics
 from battlefield.predict_roles import predict_evil_over_human_data, predict_evil_using_voting, grid_search
 from battlefield.determine_reachable_states import determine_reachable
@@ -35,7 +44,7 @@ TOURNAMENT_CONFIG = [
         'role': 'assassin'
     },
     {
-        'bot': ExamineAgreementBot,
+        'bot': ObserveBeaterBot,
         'role': 'servant'
     },
     {
@@ -47,7 +56,7 @@ TOURNAMENT_CONFIG = [
 def tournament():
     check_config(TOURNAMENT_CONFIG)
     print "hidden", tuple(x['role'] for x in TOURNAMENT_CONFIG)
-    tournament_results = run_simple_tournament(TOURNAMENT_CONFIG, num_games=1, granularity=1)
+    tournament_results = run_single_threaded_tournament(TOURNAMENT_CONFIG, num_games=2000, granularity=200)
     print_tournament_statistics(tournament_results)
 
 
@@ -114,9 +123,9 @@ def predict_roles(bot, tremble):
 
 
 if __name__ == "__main__":
-    bots = [ LearningBot, ObserveBot, RandomBotUV, RandomBotUV, RandomBot ]
-    run_learning_tournament(bots, winrate_track=0)
+    # bots = [ ObserveBeaterBot, ObserveBot, ObserveBot, ObserveBot, ObserveBot ]
+    # run_learning_tournament(bots, winrate_track=0)
     # grid_search()
     # predict_evil_using_voting()
-    # tournament()0
-#    determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)
+    tournament()
+   # determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)

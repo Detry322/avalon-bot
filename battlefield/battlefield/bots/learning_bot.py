@@ -121,6 +121,7 @@ class LearningBot(Bot):
             'run': defaultdict(lambda: Node(2)),
             'vote': defaultdict(lambda: Node(2)),
         }
+        # This is incorrect - we need stratsum here instead 
         self.cfr_regret = self.opponent_buckets['__cfr_regret__']
         self.game_num = 0
 
