@@ -55,18 +55,18 @@ class ObserveBot(Bot):
 
 
     def get_move_probabilities(self, state, legal_actions):
-        move_counts = defaultdict(lambda: 0)
+        move_weights = defaultdict(lambda: 0)
         for role_guess in self.hidden_states:
             actions = self.get_action(state, legal_actions, role_guess=role_guess, return_all=True)
             if not isinstance(actions, list):
                 actions = [actions]
             for action in actions:
-                move_counts[action] += 1
+                move_weights[action] += 1.0 / len(actions)
 
         result = np.zeros(len(legal_actions))
 
-        for move, count in move_counts.items():
-            result[legal_actions.index(move)] = count
+        for move, weight in move_weights.items():
+            result[legal_actions.index(move)] = weight
 
         return result / np.sum(result)
 

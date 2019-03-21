@@ -182,6 +182,7 @@ def predict_evil_over_human_game(game, as_bot, tremble):
         print game['id']
         sys.stdout.flush()
         hidden_state = reconstruct_hidden_state(game)
+        assert frozenset(hidden_state) == frozenset(['merlin', 'assassin', 'minion', 'servant'])
         avalon_start = AvalonState.start_state(len(hidden_state))
         game_generator = human_game_state_generator(avalon_start, game, hidden_state)
         nll, particles = get_hidden_state_nll_for_game(avalon_start, game_generator, hidden_state, as_bot, tremble)

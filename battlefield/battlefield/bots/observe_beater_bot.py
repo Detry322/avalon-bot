@@ -125,22 +125,25 @@ class ObserveBeaterBot(Bot):
 
     def reset(self, game, player, role, hidden_states):
         if self.game_num == 0:
-            num_iterations = 1000000
-            print "Training for {} iterations...".format(num_iterations)
+            with open('100000_strat.pkl') as f:
+                self.cfr_strat = pickle.load(f)
+                
+            # num_iterations = 1000000
+            # print "Training for {} iterations...".format(num_iterations)
 
-            hidden_state = ['minion', 'merlin', 'servant', 'servant', 'assassin']
-            for i in range(num_iterations):
-                print i
-                search_player = np.random.choice(5)
-                random.shuffle(hidden_state)
-                # hidden_state = random.choice(hidden_states)
-                self.cfr_search(search_player, game, tuple(hidden_state), [], 1.0, i + 1)
+            # hidden_state = ['minion', 'merlin', 'servant', 'servant', 'assassin']
+            # for i in range(num_iterations):
+            #     print i
+            #     search_player = np.random.choice(5)
+            #     random.shuffle(hidden_state)
+            #     # hidden_state = random.choice(hidden_states)
+            #     self.cfr_search(search_player, game, tuple(hidden_state), [], 1.0, i + 1)
 
-            with open('1000000_0.15_regret.pkl', 'w') as f:
-                pickle.dump(self.cfr_regret, f)
+            # with open('1000000_0.15_regret.pkl', 'w') as f:
+            #     pickle.dump(self.cfr_regret, f)
 
-            with open('1000000_0.15_strat.pkl', 'w') as f:
-                pickle.dump(self.cfr_strat, f)
+            # with open('1000000_0.15_strat.pkl', 'w') as f:
+            #     pickle.dump(self.cfr_strat, f)
 
 
         self.player = player

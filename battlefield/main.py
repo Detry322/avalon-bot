@@ -3,7 +3,7 @@ from battlefield.bots import (
     SimpleBot,
     ObserveBot, ExamineAgreementBot,
     ISMCTSBot, MOISMCTSBot,
-    HumanBot,
+    HumanBot, HumanLikeBot,
     NNBot, NNBotWithObservePropose,
     SimpleStatsBot,
     SingleMCTSPlayoutBot, SingleMCTSHeuristicBot, SingleMCTSBaseOpponentBot,
@@ -18,11 +18,13 @@ from battlefield.tournament import (
     print_tournament_statistics,
     check_config,
     run_learning_tournament,
-    run_single_threaded_tournament
+    run_single_threaded_tournament,
+    run_and_print_game
 )
 from battlefield.compare_to_human import compute_human_statistics, print_human_statistics
 from battlefield.predict_roles import predict_evil_over_human_data, predict_evil_using_voting, grid_search
 from battlefield.determine_reachable_states import determine_reachable
+from battlefield.subgame import calculate_subgame_ll, test_calculate
 import multiprocessing
 import pandas as pd
 import sys
@@ -33,23 +35,23 @@ from collections import defaultdict
 TOURNAMENT_CONFIG = [
     {
         'bot': ObserveBot,
-        'role': 'merlin'
-    },
-    {
-        'bot': ObserveBot,
-        'role': 'servant'
-    },
-    {
-        'bot': ObserveBot,
         'role': 'assassin'
-    },
-    {
-        'bot': ObserveBeaterBot,
-        'role': 'servant'
     },
     {
         'bot': ObserveBot,
         'role': 'minion'
+    },
+    {
+        'bot': ObserveBot,
+        'role': 'servant'
+    },
+    {
+        'bot': ObserveBot,
+        'role': 'servant'
+    },
+    {
+        'bot': ObserveBot,
+        'role': 'merlin'
     }
 ]
 
@@ -127,5 +129,9 @@ if __name__ == "__main__":
     # run_learning_tournament(bots, winrate_track=0)
     # grid_search()
     # predict_evil_using_voting()
-    tournament()
-   # determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)
+    # tournament()
+    # run_and_print_game(TOURNAMENT_CONFIG)
+    # determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)
+    # test_calculate()
+    df, _ = predict_evil_over_human_data(HumanLikeBot, 0.01)
+    import IPython; IPython.embed()

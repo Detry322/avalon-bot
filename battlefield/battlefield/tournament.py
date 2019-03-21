@@ -270,4 +270,72 @@ def run_single_threaded_tournament(config, num_games=1000, granularity=100):
     return tournament_statistics
 
 
+def run_and_print_game(config):
+    bot_counts = {}
+    bot_names = []
+    for bot in config:
+        base_name = bot['bot'].__name__
+        bot_counts[base_name] = bot_counts.get(base_name, 0) + 1
+        bot_names.append("{}_{}".format(base_name, bot_counts[base_name]))
 
+    print "       Role |                      Bot | Evil "
+    print "----------------------------------------------"
+    for name, bconf in zip(bot_names, config):
+        print "{: >11} | {: >24} | {: >4}".format(bconf['role'], name, 'Yes' if bconf['role'] in EVIL_ROLES else '')
+
+    hidden_state = tuple([bot['role'] for bot in config])
+    all_hidden_states = possible_hidden_states(set(hidden_state), num_players=len(config))
+    beliefs = [
+        starting_hidden_states(player, hidden_state, all_hidden_states) for player in range(len(config))
+    ]
+    state = AvalonState.start_state(len(hidden_state))
+    bots = [ bot['bot']() for bot in config ]
+    for i, bot in enumerate(bots):
+        bot.reset(state, i, hidden_state[i], beliefs[i])
+
+    print "=============== Round 1 ================"
+    while not state.is_terminal():
+
+        moving_players = state.moving_players()
+        moves = [
+            bots[player].get_action(state, state.legal_actions(player, hidden_state))
+            for player in moving_players
+        ]
+        if state.status == 'propose':
+            player = moving_players[0]
+            legal_actions = state.legal_actions(player, hidden_state)
+            move_probs = bots[player].get_move_probabilities(state, legal_actions)
+            move_prob = move_probs[legal_actions.index(moves[0])]
+            print "Proposal #{}. {} proposes ({:0.2f}):".format(state.propose_count + 1, bot_names[moving_players[0]], move_prob)
+            for player in moves[0].proposal:
+                print " - {}".format(bot_names[player])
+        elif state.status == 'vote':
+            for player, move in zip(moving_players, moves):
+                legal_actions = state.legal_actions(player, hidden_state)
+                move_probs = bots[player].get_move_probabilities(state, legal_actions)
+                move_prob = move_probs[legal_actions.index(move)]
+                print "{: >24} votes {: <4} ({:0.2f})".format(bot_names[player], 'UP' if move.up else 'DOWN', move_prob)
+        elif state.status == 'run':
+            print "--- Mission results ---"
+            for player, move in zip(moving_players, moves):
+                print "{: >24}: {}".format(bot_names[player], 'FAIL' if move.fail else 'SUCCEED')
+        elif state.status == 'merlin':
+            print "===== Final chance: pick merlin! ====="
+            assassin = hidden_state.index('assassin')
+            assassin_pick = moves[assassin].merlin
+            print '{} picked {} ({})'.format(bot_names[assassin], bot_names[assassin_pick], 'CORRECT' if assassin_pick == hidden_state.index('merlin') else 'WRONG')
+
+        new_state, _, observation = state.transition(moves, hidden_state)
+        for player, bot in enumerate(bots):
+            if player in moving_players:
+                move = moves[moving_players.index(player)]
+            else:
+                move = None
+            bot.handle_transition(state, new_state, observation, move=move)
+
+        if state.status == 'run' and new_state.status == 'propose':
+            print "=============== Round {} ================".format(new_state.succeeds + new_state.fails + 1)
+
+        state = new_state
+
+    print state.game_end
