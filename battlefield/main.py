@@ -34,11 +34,11 @@ from collections import defaultdict
 
 TOURNAMENT_CONFIG = [
     {
-        'bot': ObserveBot,
-        'role': 'assassin'
+        'bot': RandomBot,
+        'role': 'merlin'
     },
     {
-        'bot': ObserveBot,
+        'bot': RandomBot,
         'role': 'minion'
     },
     {
@@ -46,12 +46,12 @@ TOURNAMENT_CONFIG = [
         'role': 'servant'
     },
     {
-        'bot': ObserveBot,
+        'bot': RandomBot,
         'role': 'servant'
     },
     {
-        'bot': ObserveBot,
-        'role': 'merlin'
+        'bot': RandomBot,
+        'role': 'assassin'
     }
 ]
 
@@ -129,9 +129,9 @@ if __name__ == "__main__":
     # run_learning_tournament(bots, winrate_track=0)
     # grid_search()
     # predict_evil_using_voting()
-    # tournament()
+    tournament()
     # run_and_print_game(TOURNAMENT_CONFIG)
     # determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)
     # test_calculate()
-    df, _ = predict_evil_over_human_data(HumanLikeBot, 0.01)
-    import IPython; IPython.embed()
+    # df, _ = predict_evil_over_human_data(HumanLikeBot, 0.01)
+    # import IPython; IPython.embed()

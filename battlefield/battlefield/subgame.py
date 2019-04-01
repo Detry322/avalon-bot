@@ -4,9 +4,10 @@ import numpy as np
 import warnings
 from collections import defaultdict
 
-from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_states, starting_hidden_states, ProposeAction, VoteAction, MissionAction
+from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_states, starting_hidden_states, ProposeAction, VoteAction, MissionAction, PickMerlinAction
 from battlefield.avalon import AvalonState
 from battlefield.bots import SimpleStatsBot, ObserveBot, RandomBot, HumanLikeBot
+from battlefield.bots.observe_beater_bot import get_python_perspective
 
 
 def calculate_observation_ll(hidden_state, bot_classes, observation_history, tremble=0.0):
@@ -79,18 +80,157 @@ def calculate_observation_ll(hidden_state, bot_classes, observation_history, tre
                 move = None
             bot.handle_transition(state, new_state, observation, move=move)
         state = new_state
-
     return log_likelihood
+
 
 def calculate_subgame_ll(roles, num_players, bot_classes, observation_history, tremble=0.0):
     hidden_states = possible_hidden_states(roles, num_players)
-    probabilities = np.zeros(len(hidden_states))
+    ll = np.zeros(len(hidden_states))
 
     for h, hidden_state in enumerate(hidden_states):
         with np.errstate(divide='ignore'):
-            probabilities[h] = calculate_observation_ll(hidden_state, bot_classes, observation_history, tremble=tremble)
+            ll[h] = calculate_observation_ll(hidden_state, bot_classes, observation_history, tremble=tremble)
 
-    return hidden_states, probabilities
+    return hidden_states, ll
+
+
+def calculate_pi_i_infoset_ll(player, bot_class, hidden_states, observation_history, tremble=0.0):
+    state = AvalonState.start_state(len(hidden_states[0]))
+    bot = bot_class()
+    bot.reset(state, player, hidden_states[0][player], hidden_states)
+
+    log_likelihood = 0.0
+
+    for obs_type, observation in observation_history:
+        moving_players = state.moving_players()
+        moves = []
+        
+        assert obs_type == state.status, "Incorrect matchup {} != {}".format(obs_type, state.status)
+        moving_players = state.moving_players()
+        moves = []
+
+
+
+
+
+UNIFORM_STRATS = {
+    2: np.ones(2) / 2.0,
+    5: np.ones(5) / 5.0,
+    10: np.ones(10) / 10.0
+}
+
+def calculate_strategy(regrets):
+    reg = np.clip(regrets, 0, None)
+    s = np.sum(reg)
+    if s == 0:
+        return UNIFORM_STRATS[len(regrets)]
+    reg /= s
+    return reg
+
+
+def get_action_index(strat):
+    target = np.random.random()
+    for i in range(len(strat)):
+        if target < strat[i]:
+            return i
+        target -= strat[i]
+    return len(strat) - 1
+
+
+def subgame_cfr(state, hidden_state, perspectives, me, regrets, strats, observations, strategy_probability, t):
+    if state.is_terminal():
+        return state.terminal_value(hidden_state)[me]
+
+    observation_history = tuple(observations)
+
+    moving_players = state.moving_players()
+    my_move_index = None
+    moves = [None] * len(moving_players)
+    for i, player in enumerate(moving_players):
+        if hidden_state[player] not in EVIL_ROLES and state.status == 'run':
+            moves[i] = MissionAction(fail=False)
+            continue
+
+        if hidden_state[player] != 'assassin' and state.status == 'merlin':
+            moves[i] = PickMerlinAction(merlin=np.random.choice(len(hidden_state)))
+            continue
+
+        perspective = perspectives[player]
+
+        if player == me:
+            my_move_index = i
+            continue
+        
+        move_probs = calculate_strategy(regrets[state.status][(perspective, observation_history)])
+        legal_actions = state.legal_actions(player, hidden_state)
+        moves[i] = legal_actions[get_action_index(move_probs)]
+
+
+    if my_move_index is None:
+        new_state, _, observation = state.transition(moves, hidden_state)
+        if state.status == 'vote':
+            observation = tuple([vote.up for vote in observation])
+        observations.append(observation)
+        value = subgame_cfr(new_state, hidden_state, perspectives, me, regrets, strats, observations, strategy_probability, t)
+        observations.pop()
+        return value
+
+
+    perspective = perspectives[me]
+    p = calculate_strategy(regrets[state.status][(perspective, observation_history)])
+
+    values = np.zeros(len(p))
+
+    legal_actions = state.legal_actions(me, hidden_state)
+    for action_index in range(len(values)):
+        moves[my_move_index] = legal_actions[action_index]
+        new_state, _, observation = state.transition(moves, hidden_state)
+        if state.status == 'vote':
+            observation = tuple([vote.up for vote in observation])
+        observations.append(observation)
+        values[action_index] = subgame_cfr(new_state, hidden_state, perspectives, me, regrets, strats, observations, strategy_probability * p[action_index], t)
+        observations.pop()
+
+    strategy_value = np.dot(values, p)
+    new_regrets = values - strategy_value
+    key = (perspective, observation_history)
+    regrets[state.status][key] += new_regrets * t
+    strats[state.status][key] += p * strategy_probability * t
+    return strategy_value
+
+
+
+def solve_subgame(hidden_states, lls, state, iterations=1000):
+    assert state.succeeds == 2 and state.fails == 2 and state.propose_count > 2
+    lls = lls - np.max(lls)
+    probs = np.exp(lls)
+    probs /= np.sum(probs)
+
+    regrets = {
+        'propose': defaultdict(lambda: np.zeros(10)),
+        'vote': defaultdict(lambda: np.zeros(2)),
+        'run': defaultdict(lambda: np.zeros(2)),
+        'merlin': defaultdict(lambda: np.zeros(5)),
+    }
+
+    strats = {
+        'propose': defaultdict(lambda: np.zeros(10)),
+        'vote': defaultdict(lambda: np.zeros(2)),
+        'run': defaultdict(lambda: np.zeros(2)),
+        'merlin': defaultdict(lambda: np.zeros(5)),
+    }
+
+    for t in range(iterations):
+        if t % 100 == 0:
+            print t
+        h = np.random.choice(len(hidden_states), p=probs)
+        hidden_state = hidden_states[h]
+        perspectives = [
+            get_python_perspective(hidden_state, player) for player in range(5)
+        ]
+        for player in range(5):
+            subgame_cfr(state, hidden_state, perspectives, player, regrets, strats, [], 1.0, t + 1.0)
+
 
 
 def test_calculate():
@@ -124,6 +264,37 @@ def test_calculate():
     #     ('propose', (0, 1, 3)),
     #     ('vote', (True, False, False, False, True)),
     # ]
+    # observation_history = [
+    #     # Round 1
+    #     ('propose', (0, 4)),
+    #     ('vote', (True, True, True, True, False)),
+    #     ('run', 1),
+    #     # Round 2
+    #     ('propose', (1, 3, 4)),
+    #     ('vote', (True, True, False, True, False)),
+    #     ('run', 1),
+    #     # Round 3
+    #     ('propose', (1, 2)),
+    #     ('vote', (True, True, False, False, False)),
+    #     ('propose', (2, 3)),
+    #     ('vote', (False, False, True, True, True)),
+    #     ('run', 0),
+    #     # Round 4
+    #     ('propose', (2, 3, 4)),
+    #     ('vote', (False, False, True, True, True)),
+    #     ('run', 0),
+    #     # # Round 5
+    #     ('propose', (0, 1, 3)),
+    #     ('vote', (True, True, False, False, False)),
+    #     ('propose', (1, 3, 4)),
+    #     ('vote', (True, True, False, False, False)),
+    #     ('propose', (0, 2, 3)),
+    #     ('vote', (True, True, False, False, False)),
+    #     ('propose', (2, 3, 4)),
+    #     ('vote', (False, False, False, True, True)),
+    #     ('propose', (2, 3, 4)),
+    #     ('vote', (True, True, True, False, True))
+    # ]
     observation_history = [
         # Round 1
         ('propose', (0, 4)),
@@ -132,28 +303,29 @@ def test_calculate():
         # Round 2
         ('propose', (1, 3, 4)),
         ('vote', (True, True, False, True, False)),
-        # ('run', 1),
+        ('run', 1),
         # Round 3
-        # ('propose', (1, 2)),
-        # ('vote', (True, True, False, False, False)),
-        # ('propose', (2, 3)),
-        # ('vote', (False, False, True, True, True)),
-        # ('run', 0),
-        # # Round 4
-        # ('propose', (2, 3, 4)),
-        # ('vote', (False, False, True, True, True)),
-        # ('run', 0),
-        # # # Round 5
-        # ('propose', (0, 1, 3)),
-        # ('vote', (True, True, False, False, False)),
-        # ('propose', (1, 3, 4)),
-        # ('vote', (True, True, False, False, False)),
-        # ('propose', (0, 2, 3)),
-        # ('vote', (True, True, False, False, False)),
-        # ('propose', (2, 3, 4)),
-        # ('vote', (False, False, False, True, True)),
-        # ('propose', (2, 3, 4)),
-        # ('vote', (True, True, True, False, True))
+        ('propose', (1, 2)),
+        ('vote', (True, True, False, False, False)),
+        ('propose', (2, 3)),
+        ('vote', (False, False, True, False, True)),
+        ('propose', (2, 4)),
+        ('vote', (False, False, True, True, True)),
+        ('run', 0),
+        # Round 4
+        ('propose', (2, 3, 4)),
+        ('vote', (False, False, True, True, True)),
+        ('run', 0),
+        # # Round 5
+        # person 1
+        ('propose', (0, 1, 3)),
+        ('vote', (True, True, False, False, False)),
+        # person 2
+        ('propose', (1, 3, 4)),
+        ('vote', (True, True, False, False, False)),
+        # person 3
+        ('propose', (0, 2, 3)),
+        ('vote', (True, True, False, False, False)),
     ]
 
     hidden_states, lls = calculate_subgame_ll(roles, 5, bot_classes, observation_history, tremble=0.0)
@@ -164,5 +336,9 @@ def test_calculate():
     multiple = np.max(probs) / 50
     for hidden_state, prob in zip(hidden_states, probs):
         print "{: >10} {: >10} {: >10} {: >10} {: >10}: {prob}".format(*hidden_state, prob='#' * int(prob / multiple))
+
+    print "Solving subgame"
+    state = AvalonState(proposer=4, propose_count=3, succeeds=2, fails=2, status='propose', proposal=None, game_end=None, num_players=5)
+    solve_subgame(hidden_states, lls, state, iterations=1000000)
 
 

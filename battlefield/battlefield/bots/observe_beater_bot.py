@@ -125,7 +125,7 @@ class ObserveBeaterBot(Bot):
 
     def reset(self, game, player, role, hidden_states):
         if self.game_num == 0:
-            with open('100000_strat.pkl') as f:
+            with open('1000000_0.15_strat.pkl') as f:
                 self.cfr_strat = pickle.load(f)
                 
             # num_iterations = 1000000
