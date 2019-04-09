@@ -128,8 +128,8 @@ if __name__ == "__main__":
     # bots = [ ObserveBeaterBot, ObserveBot, ObserveBot, ObserveBot, ObserveBot ]
     # run_learning_tournament(bots, winrate_track=0)
     # grid_search()
-    # predict_evil_using_voting()
-    tournament()
+    predict_evil_using_voting()
+    # tournament()
     # run_and_print_game(TOURNAMENT_CONFIG)
     # determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)
     # test_calculate()

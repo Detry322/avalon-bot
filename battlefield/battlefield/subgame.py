@@ -94,25 +94,6 @@ def calculate_subgame_ll(roles, num_players, bot_classes, observation_history, t
     return hidden_states, ll
 
 
-def calculate_pi_i_infoset_ll(player, bot_class, hidden_states, observation_history, tremble=0.0):
-    state = AvalonState.start_state(len(hidden_states[0]))
-    bot = bot_class()
-    bot.reset(state, player, hidden_states[0][player], hidden_states)
-
-    log_likelihood = 0.0
-
-    for obs_type, observation in observation_history:
-        moving_players = state.moving_players()
-        moves = []
-        
-        assert obs_type == state.status, "Incorrect matchup {} != {}".format(obs_type, state.status)
-        moving_players = state.moving_players()
-        moves = []
-
-
-
-
-
 UNIFORM_STRATS = {
     2: np.ones(2) / 2.0,
     5: np.ones(5) / 5.0,
@@ -199,6 +180,90 @@ def subgame_cfr(state, hidden_state, perspectives, me, regrets, strats, observat
     return strategy_value
 
 
+def get_player_values(hidden_state, state, perspectives, observations, strats, probability):
+    if probability < 0.000000001:
+        return np.zeros(len(hidden_state))
+
+    if state.is_terminal():
+        return probability * np.array(state.terminal_value(hidden_state))
+
+    observation_history = tuple(observations)
+    moving_players = state.moving_players()
+
+    unnormalized_strats = [
+        (
+            np.array([1.0])
+            if hidden_state[player] not in EVIL_ROLES and state.status == 'run' else
+            np.array([1.0, 0, 0, 0, 0])
+            if hidden_state[player] != 'assassin' and state.status == 'merlin' else
+            strats[state.status][(perspectives[player], observation_history)]
+        ) for player in moving_players
+    ]
+    normalized_strats = [ strat / np.sum(strat) if np.sum(strat) != 0 else np.ones(len(strat)) / len(strat) for strat in unnormalized_strats ]
+    legal_actions = [ state.legal_actions(player, hidden_state) for player in moving_players ]
+    
+    values = np.zeros(len(hidden_state))
+
+    transition_cache = None
+    for move_indices in itertools.product(*[range(len(player_strat)) for player_strat in normalized_strats]):
+        moves = [actions[index] for actions, index in zip(legal_actions, move_indices)]
+        p = 1.0
+        for strat, index in zip(normalized_strats, move_indices):
+            p *= strat[index]
+            if p == 0:
+                break
+        if p == 0.0:
+            continue
+
+        if state.status == 'vote' and transition_cache is not None:
+            new_state = transition_cache
+            observation = moves
+        else:
+            new_state, _, observation = state.transition(moves, hidden_state)
+
+        if transition_cache is None:
+            transition_cache = new_state
+
+        if state.status == 'vote':
+            observation = tuple([vote.up for vote in observation])
+        observations.append(observation)
+        values += get_player_values(hidden_state, new_state, perspectives, observations, strats, p * probability)
+        observations.pop()
+    return values
+
+
+def get_player_values_for_state(hidden_states, probs, state, strats):
+    player_values_in_state = np.zeros((len(hidden_states), len(hidden_states[0])))
+
+    for h, hidden_state in enumerate(hidden_states):
+        print "player values", h
+        if probs[h] == 0:
+            continue
+        perspectives = [
+            get_python_perspective(hidden_state, player) for player in range(5)
+        ]
+        player_values_in_state[h] = get_player_values(hidden_state, state, perspectives, [], strats, 1.0)
+    return player_values_in_state
+
+
+def get_counterfactual_value(player, hidden_states_by_index, player_values_in_state, probs):
+    value = 0.0
+    prob_sum = 0.0
+    for index in hidden_states_by_index:
+        value += player_values_in_state[index][player] * probs[index]
+        prob_sum += probs[index]
+
+    return value / prob_sum
+
+
+def get_counterfactual_value_by_perspective(perspective, hidden_states, player_values_in_state, probs):
+    _, player, _ = perspective
+    indices = []
+    for h, hidden_state in enumerate(hidden_states):
+        if get_python_perspective(hidden_state, player) == perspective:
+            indices.append(h)
+    return get_counterfactual_value(player, indices, player_values_in_state, probs)
+
 
 def solve_subgame(hidden_states, lls, state, iterations=1000):
     assert state.succeeds == 2 and state.fails == 2 and state.propose_count > 2
@@ -230,6 +295,18 @@ def solve_subgame(hidden_states, lls, state, iterations=1000):
         ]
         for player in range(5):
             subgame_cfr(state, hidden_state, perspectives, player, regrets, strats, [], 1.0, t + 1.0)
+
+    print "Retreiving player values..."
+    player_values_in_state = get_player_values_for_state(hidden_states, probs, state, strats)
+    interesting_perspective = ('player', 3, None)
+    print "Player 3's perspective (if servant): {}".format(
+        get_counterfactual_value_by_perspective(
+            interesting_perspective,
+            hidden_states,
+            player_values_in_state,
+            probs
+        )
+    )
 
 
 
@@ -328,7 +405,7 @@ def test_calculate():
         ('vote', (True, True, False, False, False)),
     ]
 
-    hidden_states, lls = calculate_subgame_ll(roles, 5, bot_classes, observation_history, tremble=0.0)
+    hidden_states, lls = calculate_subgame_ll(roles, 5, bot_classes, observation_history, tremble=1e-8)
     lls -= np.max(lls)
     
     probs = np.exp(lls)
@@ -338,7 +415,7 @@ def test_calculate():
         print "{: >10} {: >10} {: >10} {: >10} {: >10}: {prob}".format(*hidden_state, prob='#' * int(prob / multiple))
 
     print "Solving subgame"
-    state = AvalonState(proposer=4, propose_count=3, succeeds=2, fails=2, status='propose', proposal=None, game_end=None, num_players=5)
-    solve_subgame(hidden_states, lls, state, iterations=1000000)
+    state = AvalonState(proposer=3, propose_count=3, succeeds=2, fails=2, status='propose', proposal=None, game_end=None, num_players=5)
+    solve_subgame(hidden_states, lls, state, iterations=100000)
 
 
