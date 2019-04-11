@@ -3,7 +3,7 @@ TARGET := deeprole
 CC := clang++
 
 EXTRA_CFLAGS ?=
-CFLAGS := -Wall -std=c++11
+CFLAGS := -Wall -std=c++17
 
 ifeq ($(DEBUG),1)
   CFLAGS += -O0 -g
@@ -29,7 +29,7 @@ all: $(TARGET)
 %.o: %.cpp .cflags
 	$(CC) $(CFLAGS) -c $<
 
-$(TARGET): main.o
+$(TARGET): main.o lookahead.o lookup_tables.o
 	$(CC) -o $(TARGET) $^ $(LDFLAGS)
 
 clean::
