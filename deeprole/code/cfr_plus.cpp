@@ -174,11 +174,26 @@ void calculate_strategy(LookaheadNode* node) {
 }
 
 static void calculate_propose_cfvs(LookaheadNode* node) {
-    // todo
+    for (int player = 0; player < NUM_PLAYERS; player++) {
+        for (int proposal = 0; proposal < NUM_PROPOSAL_OPTIONS; proposal++) {
+            auto& child = node->children[proposal];
+            if (player == node->proposer) {
+                node->counterfactual_values[player] += child->counterfactual_values[player] * node->propose_strategy->col(proposal);
+            } else {
+                node->counterfactual_values[player] += child->counterfactual_values[player];
+            }
+        }
+    }
 }
 
 static void calculate_vote_cfvs(LookaheadNode* node) {
-    // todo
+    for (int player = 0; player < NUM_PLAYERS; player++) {
+        for (int vote_pattern = 0; vote_pattern < (1 << NUM_PLAYERS); vote_pattern++) {
+            auto& child = node->children[vote_pattern];
+            int vote = (vote_pattern >> player) & 1;
+            node->counterfactual_values[player] += child->counterfactual_values[player] * node->vote_strategy->at(player).col(vote);
+        }
+    }
 }
 
 static void calculate_mission_cfvs(LookaheadNode* node) {
@@ -186,7 +201,7 @@ static void calculate_mission_cfvs(LookaheadNode* node) {
 }
 
 static void calculate_merlin_cfvs(LookaheadNode* node) {
-
+    // todo
 };
 
 static void calculate_terminal_cfvs(LookaheadNode* node) {
@@ -200,6 +215,10 @@ static void calculate_neural_net_cfvs(LookaheadNode* node) {
 void calculate_counterfactual_values(LookaheadNode* node) {
     for (auto& child : node->children) {
         calculate_counterfactual_values(child.get());
+    }
+
+    for (int player = 0; player < NUM_PLAYERS; player++) {
+        node->counterfactual_values[player].setZero();
     }
 
     switch (node->type) {
