@@ -2,6 +2,7 @@
 #include <vector>
 #include "optionparser.h"
 #include "lookahead.h"
+#include "cfr_plus.h"
 
 using namespace std;
 
@@ -28,6 +29,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    test();
+    auto lookahead = create_avalon_lookahead(2, 2, 3, 3, 2);
+    cfr_plus(lookahead.get());
     return 0;
 }
