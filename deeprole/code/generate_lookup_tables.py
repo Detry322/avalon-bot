@@ -2,6 +2,15 @@ import itertools
 
 NUM_PLAYERS = 5
 
+print """\
+#include "lookup_tables.h"
+
+const int PROPOSAL_TO_INDEX_LOOKUP[32] = {-1, -1, -1, 0, -1, 1, 4, 0, -1, 2, 5, 1, 7, 3, 6, -1, -1, 3, 6, 2, 8, 4, 7, -1, 9, 5, 8, -1, 9, -1, -1, -1};
+const int INDEX_TO_PROPOSAL_2[10] = {3, 5, 9, 17, 6, 10, 18, 12, 20, 24};
+const int INDEX_TO_PROPOSAL_3[10] = {7, 11, 19, 13, 21, 25, 14, 22, 26, 28};
+const int ROUND_TO_PROPOSE_SIZE[5] = {2, 3, 2, 3, 3};
+"""
+
 VIEWPOINT_TO_BAD = [[] for _ in range(NUM_PLAYERS)]
 
 for player, viewpoint_arr in enumerate(VIEWPOINT_TO_BAD):
@@ -26,6 +35,7 @@ const int VIEWPOINT_TO_BAD[NUM_PLAYERS][NUM_VIEWPOINTS] = {
 
 
 ASSIGNMENT_TO_VIEWPOINT = []
+ASSIGNMENT_TO_EVIL = []
 
 for assignment in itertools.permutations(range(NUM_PLAYERS), 3):
     merlin, assassin, minion = assignment
@@ -33,6 +43,7 @@ for assignment in itertools.permutations(range(NUM_PLAYERS), 3):
     viewpoint = [0] * NUM_PLAYERS
 
     bad = (1 << assassin) | (1 << minion)
+    ASSIGNMENT_TO_EVIL.append(bad)
     merlin_viewpoint = 1 + VIEWPOINT_TO_BAD[merlin][1:7].index(bad)
     assassin_viewpoint = 7 + VIEWPOINT_TO_BAD[assassin][7:11].index(minion)
     minion_viewpoint = 11 + VIEWPOINT_TO_BAD[minion][11:15].index(assassin)
@@ -50,6 +61,10 @@ const int ASSIGNMENT_TO_VIEWPOINT[NUM_ASSIGNMENTS][NUM_PLAYERS] = {
     ("{" + ",  ".join(["{:> 3}".format(v) for v in viewpoint_arr]) + " }")
     for viewpoint_arr in ASSIGNMENT_TO_VIEWPOINT
 ]))
+
+print """
+const int ASSIGNMENT_TO_EVIL[NUM_ASSIGNMENTS] = %s;
+""" % ("{" + ", ".join(["{:> 3}".format(v) for v in ASSIGNMENT_TO_EVIL]) + " }")
 
 
 VIEWPOINT_TO_PARTNER_VIEWPOINT = [[] for _ in range(NUM_PLAYERS)]

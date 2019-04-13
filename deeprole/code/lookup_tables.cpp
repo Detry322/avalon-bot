@@ -5,6 +5,7 @@ const int INDEX_TO_PROPOSAL_2[10] = {3, 5, 9, 17, 6, 10, 18, 12, 20, 24};
 const int INDEX_TO_PROPOSAL_3[10] = {7, 11, 19, 13, 21, 25, 14, 22, 26, 28};
 const int ROUND_TO_PROPOSE_SIZE[5] = {2, 3, 2, 3, 3};
 
+
 const int VIEWPOINT_TO_BAD[NUM_PLAYERS][NUM_VIEWPOINTS] = {
     { -1,    6,   10,   18,   12,   20,   24,    1,    2,    3,    4,    1,    2,    3,    4 },
     { -1,    5,    9,   17,   12,   20,   24,    0,    2,    3,    4,    0,    2,    3,    4 },
@@ -12,6 +13,7 @@ const int VIEWPOINT_TO_BAD[NUM_PLAYERS][NUM_VIEWPOINTS] = {
     { -1,    3,    5,   17,    6,   18,   20,    0,    1,    2,    4,    0,    1,    2,    4 },
     { -1,    3,    5,    9,    6,   10,   12,    0,    1,    2,    3,    0,    1,    2,    3 }
 };
+
 
 const int ASSIGNMENT_TO_VIEWPOINT[NUM_ASSIGNMENTS][NUM_PLAYERS] = {
     {  1,    8,   12,    0,    0 },
@@ -75,6 +77,10 @@ const int ASSIGNMENT_TO_VIEWPOINT[NUM_ASSIGNMENTS][NUM_PLAYERS] = {
     {  0,   13,    0,    8,    5 },
     {  0,    0,   13,    9,    6 }
 };
+
+
+const int ASSIGNMENT_TO_EVIL[NUM_ASSIGNMENTS] = {  6,  10,  18,   6,  12,  20,  10,  12,  24,  18,  20,  24,   5,   9,  17,   5,  12,  20,   9,  12,  24,  17,  20,  24,   3,   9,  17,   3,  10,  18,   9,  10,  24,  17,  18,  24,   3,   5,  17,   3,   6,  18,   5,   6,  20,  17,  18,  20,   3,   5,   9,   3,   6,  10,   5,   6,  12,   9,  10,  12 };
+
 
 const int VIEWPOINT_TO_PARTNER_VIEWPOINT[NUM_PLAYERS][NUM_VIEWPOINTS] = {
     { -1,   -1,   -1,   -1,   -1,   -1,   -1,   11,   11,   11,   11,    7,    7,    7,    7 },

@@ -27,6 +27,23 @@ static double my_single_pass_responsibility(LookaheadNode* node, int me, int my_
     return pow(outcome_prob, my_responsibility_exponent);
 }
 
+static void add_middle_cfvs(LookaheadNode* node, int me, int my_viewpoint, int my_partner, double* pass_cfv, double* fail_cfv) {
+    assert(node->type == MISSION);
+    assert(VIEWPOINT_TO_BAD[me][my_viewpoint] == my_partner);
+    assert(my_viewpoint >= NUM_GOOD_VIEWPOINTS);
+    int partner_viewpoint = VIEWPOINT_TO_PARTNER_VIEWPOINT[me][my_viewpoint];
+    assert(VIEWPOINT_TO_PARTNER_VIEWPOINT[my_partner][partner_viewpoint] == my_viewpoint);
+    assert(node->proposal & (1 << me));
+    assert(node->proposal & (1 << my_partner));
+
+    double partner_responsibility = my_single_pass_responsibility(node, my_partner, partner_viewpoint, me);
+    double middle_cfv = node->children[1]->counterfactual_values[me](my_viewpoint);
+    middle_cfv /= partner_responsibility;
+    double partner_pass_prob = node->mission_strategy->at(my_partner)(partner_viewpoint, 0);
+    *pass_cfv += middle_cfv * partner_pass_prob;
+    *fail_cfv += middle_cfv * (1.0 - partner_pass_prob);
+}
+
 static void fill_reach_probabilities_for_mission_node(LookaheadNode* node) {
     assert(node->type == MISSION);
 
@@ -184,20 +201,77 @@ static void calculate_propose_cfvs(LookaheadNode* node) {
             }
         }
     }
+
+    // Update regrets
+    for (int proposal = 0; proposal < NUM_PROPOSAL_OPTIONS; proposal++) {
+        node->propose_regrets->col(proposal) = node->children[proposal]->counterfactual_values[node->proposer] - node->counterfactual_values[node->proposer];
+    }
+    *(node->propose_regrets) = node->propose_regrets->max(0.0);
 }
 
 static void calculate_vote_cfvs(LookaheadNode* node) {
     for (int player = 0; player < NUM_PLAYERS; player++) {
+        VoteData cfvs = VoteData::Constant(0.0);
+
         for (int vote_pattern = 0; vote_pattern < (1 << NUM_PLAYERS); vote_pattern++) {
             auto& child = node->children[vote_pattern];
             int vote = (vote_pattern >> player) & 1;
-            node->counterfactual_values[player] += child->counterfactual_values[player] * node->vote_strategy->at(player).col(vote);
+            cfvs.col(vote) += child->counterfactual_values[player];
         }
+
+        // Update regrets
+        node->counterfactual_values[player] = (cfvs * node->vote_strategy->at(player)).rowwise().sum();
+        node->vote_regrets->at(player) += cfvs.colwise() - node->counterfactual_values[player];
+        node->vote_regrets->at(player) = node->vote_regrets->at(player).max(0.0);
     }
 }
 
 static void calculate_mission_cfvs(LookaheadNode* node) {
-    // todo
+    // For players not on the mission, the CFVs are just the sum.
+    for (int player = 0; player < NUM_PLAYERS; player++) {
+        // Skip players on the mission
+        if ((1 << player) & node->proposal) continue;
+
+        for (int num_fails = 0; num_fails < NUM_EVIL + 1; num_fails++) {
+            node->counterfactual_values[player] += node->children[num_fails]->counterfactual_values[player];
+        }
+    }
+
+    // For players on the mission, the CFVs are a little more complicated.
+    for (int player = 0; player < NUM_PLAYERS; player++) {
+        // Skip players not on the mission.
+        if (((1 << player) & node->proposal) == 0) continue;
+
+        // For good viewpoints, CFVs are just the sum of the number of possible fails
+        for (int viewpoint = 0; viewpoint < NUM_GOOD_VIEWPOINTS; viewpoint++) {
+            for (int num_fails = 0; num_fails < NUM_EVIL + 1; num_fails++) {
+                node->counterfactual_values[player](viewpoint) += node->children[num_fails]->counterfactual_values[player](viewpoint);
+            }   
+        }
+
+        // For bad viewpoints, CFVs are split.
+        for (int viewpoint = NUM_GOOD_VIEWPOINTS; viewpoint < NUM_VIEWPOINTS; viewpoint++) {
+            double pass_cfv = 0.0;
+            double fail_cfv = 0.0;
+            int partner = VIEWPOINT_TO_BAD[player][viewpoint];
+            if ((1 << partner) & node->proposal) {
+                // The partner is on the mission.
+                pass_cfv = node->children[0]->counterfactual_values[player](viewpoint);
+                fail_cfv = node->children[2]->counterfactual_values[player](viewpoint);
+                add_middle_cfvs(node, player, viewpoint, partner, &pass_cfv, &fail_cfv);
+            } else {
+                // The partner is not on the mission. CFVs are "simple" - 0 or 1 fails possible.
+                assert(node->children[2]->counterfactual_values[player](viewpoint) == 0.0);
+                pass_cfv = node->children[0]->counterfactual_values[player](viewpoint);
+                fail_cfv = node->children[1]->counterfactual_values[player](viewpoint);
+            }
+            double my_pass_prob = node->mission_strategy->at(player)(viewpoint, 0);
+            double result_cfv = pass_cfv * my_pass_prob + fail_cfv * (1.0 - my_pass_prob);
+            node->mission_regrets->at(player)(viewpoint, 0) += pass_cfv - result_cfv;
+            node->mission_regrets->at(player)(viewpoint, 1) += fail_cfv - result_cfv;
+        }
+        node->mission_regrets->at(player) = node->mission_regrets->at(player).max(0.0);
+    }
 }
 
 static void calculate_merlin_cfvs(LookaheadNode* node) {

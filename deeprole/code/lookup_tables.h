@@ -15,6 +15,7 @@ extern const int INDEX_TO_PROPOSAL_3[10];
 extern const int ROUND_TO_PROPOSE_SIZE[5];
 extern const int VIEWPOINT_TO_BAD[NUM_PLAYERS][NUM_VIEWPOINTS];
 extern const int ASSIGNMENT_TO_VIEWPOINT[NUM_ASSIGNMENTS][NUM_PLAYERS];
+extern const int ASSIGNMENT_TO_EVIL[NUM_ASSIGNMENTS];
 
 // Only applicable to 5 and 6 player avalon.
 extern const int VIEWPOINT_TO_PARTNER_VIEWPOINT[NUM_PLAYERS][NUM_VIEWPOINTS];
