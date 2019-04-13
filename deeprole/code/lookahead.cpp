@@ -132,6 +132,12 @@ void allocate_lookahead_vectors(LookaheadNode* node) {
             node->merlin_regrets->at(i).setZero();
             node->merlin_strategy->at(i).setZero();
         }
+        // Intentional missing break.
+    }
+    case TERMINAL_NO_CONSENSUS:
+    case TERMINAL_TOO_MANY_FAILS:
+    case TERMINAL_PROPOSE_NN: {
+        node->full_reach_probs = std::make_unique<AssignmentProbs>();
     } break;
     default: break;
     }

@@ -10,6 +10,8 @@
 #include "cfr_plus.h"
 #include "lookup_tables.h"
 
+using namespace std;
+
 static double my_single_pass_responsibility(LookaheadNode* node, int me, int my_viewpoint, int my_partner) {
     assert(node->type == MISSION);
     assert(VIEWPOINT_TO_BAD[me][my_viewpoint] == my_partner);
@@ -130,6 +132,24 @@ static void fill_reach_probabilities(LookaheadNode* node) {
     }
 }
 
+static void populate_full_reach_probs(LookaheadNode* node) {
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
+        double probability = 1.0;
+        int evil = ASSIGNMENT_TO_EVIL[i];
+        for (auto fail : node->fails) {
+            if (__builtin_popcount(fail.first & evil) < fail.second) {
+                probability = 0.0;
+                break;
+            }
+        }
+        for (int player = 0; player < NUM_PLAYERS && probability != 0; player++) {
+            int viewpoint = ASSIGNMENT_TO_VIEWPOINT[i][player];
+            probability *= node->reach_probs[player](viewpoint);
+        }
+        (*(node->full_reach_probs))(i) = probability;
+    }
+}
+
 void calculate_strategy(LookaheadNode* node) {
     switch (node->type) {
     case PROPOSE: {
@@ -179,6 +199,12 @@ void calculate_strategy(LookaheadNode* node) {
             player_strategy = player_strategy.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.2; });
             player_strategy = (1.0 - TREMBLE_VALUE) * player_strategy + TREMBLE_VALUE * MerlinData::Constant(0.2);
         }
+        // Intentional missing break.
+    }
+    case TERMINAL_NO_CONSENSUS:
+    case TERMINAL_TOO_MANY_FAILS:
+    case TERMINAL_PROPOSE_NN: {
+        populate_full_reach_probs(node);
     } break;
     default: break;
     }
@@ -274,21 +300,78 @@ static void calculate_mission_cfvs(LookaheadNode* node) {
     }
 }
 
-static void calculate_merlin_cfvs(LookaheadNode* node) {
-    // todo
+static void calculate_merlin_cfvs(LookaheadNode* node, const AssignmentProbs& starting_probs) {
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
+        int merlin = ASSIGNMENT_TO_ROLES[i][0];
+        int assassin = ASSIGNMENT_TO_ROLES[i][1];
+        int assassin_viewpoint = ASSIGNMENT_TO_VIEWPOINT[i][assassin];
+        int evil = ASSIGNMENT_TO_EVIL[i];
+        double reach_prob = (*(node->full_reach_probs))(i) * starting_probs(i);
+        if (reach_prob == 0.0) continue;
+
+        double correct_prob = node->merlin_strategy->at(assassin)(assassin_viewpoint, merlin);
+
+        for (int player = 0; player < NUM_PLAYERS; player++) {
+            int viewpoint = ASSIGNMENT_TO_VIEWPOINT[i][player];
+            double counterfactual_reach_prob = reach_prob / node->reach_probs[player](viewpoint);
+            if ((1 << player) & evil) {
+                node->counterfactual_values[player](viewpoint) += counterfactual_reach_prob * (
+                    EVIL_WIN_PAYOFF * correct_prob +
+                    EVIL_LOSE_PAYOFF * (1.0 - correct_prob)
+                );
+            } else {
+                node->counterfactual_values[player](viewpoint) += counterfactual_reach_prob * (
+                    GOOD_LOSE_PAYOFF * correct_prob +
+                    GOOD_WIN_PAYOFF * (1.0 - correct_prob)
+                );
+            }
+        }
+
+        double assassin_counterfactual_reach_prob = reach_prob / node->reach_probs[assassin](assassin_viewpoint);
+        double expected_assassin_payoff = assassin_counterfactual_reach_prob * (
+            EVIL_WIN_PAYOFF * correct_prob +
+            EVIL_LOSE_PAYOFF * (1.0 - correct_prob)
+        );
+        for (int assassin_choice = 0; assassin_choice < NUM_PLAYERS; assassin_choice++) {
+            // double choice_prob = node->merlin_strategy->at(assassin)(assassin_viewpoint, assassin_choice);
+            double payoff = (
+                (assassin_choice == merlin) ?
+                (EVIL_WIN_PAYOFF * assassin_counterfactual_reach_prob) :
+                (EVIL_LOSE_PAYOFF * assassin_counterfactual_reach_prob)
+            );
+
+            node->merlin_strategy->at(assassin)(assassin_viewpoint, assassin_choice) += payoff - expected_assassin_payoff;
+        }
+    }
+
+    for (int player = 0; player < NUM_PLAYERS; player++) {
+        node->merlin_strategy->at(player) = node->merlin_strategy->at(player).max(0.0);
+    }
 };
 
-static void calculate_terminal_cfvs(LookaheadNode* node) {
-    // todo
+static void calculate_terminal_cfvs(LookaheadNode* node, const AssignmentProbs& starting_probs) {
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
+        int evil = ASSIGNMENT_TO_EVIL[i];
+        double reach_prob = (*(node->full_reach_probs))(i) * starting_probs(i);
+        for (int player = 0; player < NUM_PLAYERS; player++) {
+            int viewpoint = ASSIGNMENT_TO_VIEWPOINT[i][player];
+            double counterfactual_reach_prob = reach_prob / node->reach_probs[player](viewpoint);
+            if ((1 << player) & evil) {
+                node->counterfactual_values[player](viewpoint) += counterfactual_reach_prob * EVIL_WIN_PAYOFF; // In these terminal nodes, evil wins, good loses.
+            } else {
+                node->counterfactual_values[player](viewpoint) += counterfactual_reach_prob * GOOD_LOSE_PAYOFF;
+            }
+        }
+    }
 }
 
-static void calculate_neural_net_cfvs(LookaheadNode* node) {
+static void calculate_neural_net_cfvs(LookaheadNode* node, const AssignmentProbs& starting_probs) {
     assert(false); // No support for neural net yet.
 };
 
-void calculate_counterfactual_values(LookaheadNode* node) {
+void calculate_counterfactual_values(LookaheadNode* node, const AssignmentProbs& starting_probs) {
     for (auto& child : node->children) {
-        calculate_counterfactual_values(child.get());
+        calculate_counterfactual_values(child.get(), starting_probs);
     }
 
     for (int player = 0; player < NUM_PLAYERS; player++) {
@@ -303,16 +386,21 @@ void calculate_counterfactual_values(LookaheadNode* node) {
     case MISSION:
         calculate_mission_cfvs(node); break;
     case TERMINAL_MERLIN:
-        calculate_merlin_cfvs(node); break;
+        calculate_merlin_cfvs(node, starting_probs); break;
     case TERMINAL_NO_CONSENSUS:
     case TERMINAL_TOO_MANY_FAILS:
-        calculate_terminal_cfvs(node); break;
+        calculate_terminal_cfvs(node, starting_probs); break;
     case TERMINAL_PROPOSE_NN:
-        calculate_neural_net_cfvs(node); break;
+        calculate_neural_net_cfvs(node, starting_probs); break;
     }
 }
 
 void cfr_plus(LookaheadNode* root) {
-    calculate_strategy(root);
-    calculate_counterfactual_values(root);
+    AssignmentProbs starting_probs = AssignmentProbs::Constant(1.0/NUM_ASSIGNMENTS);
+    for (int i = 0; i < 10; i++) { 
+        calculate_strategy(root);
+        calculate_counterfactual_values(root, starting_probs);
+        cout << "Iteration " << i << " " << root->counterfactual_values[0].transpose() << endl;
+    }
 }
+

@@ -36,9 +36,12 @@ const int VIEWPOINT_TO_BAD[NUM_PLAYERS][NUM_VIEWPOINTS] = {
 
 ASSIGNMENT_TO_VIEWPOINT = []
 ASSIGNMENT_TO_EVIL = []
+ASSIGNMENT_TO_ROLES = []
 
 for assignment in itertools.permutations(range(NUM_PLAYERS), 3):
     merlin, assassin, minion = assignment
+
+    ASSIGNMENT_TO_ROLES.append(assignment)
 
     viewpoint = [0] * NUM_PLAYERS
 
@@ -66,6 +69,14 @@ print """
 const int ASSIGNMENT_TO_EVIL[NUM_ASSIGNMENTS] = %s;
 """ % ("{" + ", ".join(["{:> 3}".format(v) for v in ASSIGNMENT_TO_EVIL]) + " }")
 
+print """
+const int ASSIGNMENT_TO_ROLES[NUM_ASSIGNMENTS][3] = {
+    %s
+};
+""" % (",\n    ".join([
+    ("{" + ",  ".join(["{:> 3}".format(v) for v in assignment_arr]) + " }")
+    for assignment_arr in ASSIGNMENT_TO_ROLES
+]))
 
 VIEWPOINT_TO_PARTNER_VIEWPOINT = [[] for _ in range(NUM_PLAYERS)]
 

@@ -13,6 +13,7 @@ typedef Eigen::Array<double, NUM_VIEWPOINTS, NUM_PROPOSAL_OPTIONS> ProposeData;
 typedef Eigen::Array<double, NUM_VIEWPOINTS, 2> VoteData;
 typedef Eigen::Array<double, NUM_VIEWPOINTS, 2> MissionData;
 typedef Eigen::Array<double, NUM_VIEWPOINTS, NUM_PLAYERS> MerlinData;
+typedef Eigen::Array<double, NUM_ASSIGNMENTS, 1> AssignmentProbs;
 
 enum NodeType {
     PROPOSE,
@@ -35,6 +36,8 @@ struct LookaheadNode {
 
     ViewpointVector reach_probs[NUM_PLAYERS];
     ViewpointVector counterfactual_values[NUM_PLAYERS];
+    
+    std::unique_ptr<AssignmentProbs> full_reach_probs;
 
     std::unique_ptr<ProposeData> propose_regrets;
     std::unique_ptr<ProposeData> propose_strategy;

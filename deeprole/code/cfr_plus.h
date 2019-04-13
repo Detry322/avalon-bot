@@ -4,7 +4,7 @@
 #include "./lookahead.h"
 
 void calculate_strategy(LookaheadNode* node);
-void calculate_counterfactual_values(LookaheadNode* node);
+void calculate_counterfactual_values(LookaheadNode* node, const AssignmentProbs& starting_probs);
 
 void cfr_plus(LookaheadNode* root);
 
