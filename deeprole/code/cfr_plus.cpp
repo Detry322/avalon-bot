@@ -42,8 +42,8 @@ static void add_middle_cfvs(LookaheadNode* node, int me, int my_viewpoint, int m
     double middle_cfv = node->children[1]->counterfactual_values[me](my_viewpoint);
     middle_cfv /= partner_responsibility;
     double partner_pass_prob = node->mission_strategy->at(my_partner)(partner_viewpoint, 0);
-    *pass_cfv += middle_cfv * partner_pass_prob;
-    *fail_cfv += middle_cfv * (1.0 - partner_pass_prob);
+    *pass_cfv += middle_cfv * (1.0 - partner_pass_prob);
+    *fail_cfv += middle_cfv * partner_pass_prob;
 }
 
 static void fill_reach_probabilities_for_mission_node(LookaheadNode* node) {
@@ -156,7 +156,13 @@ void calculate_strategy(LookaheadNode* node) {
         // Initialize the node's memory
         auto& player_regrets = *(node->propose_regrets);
         auto& player_strategy = *(node->propose_strategy);
+        #ifdef CFR_PLUS
+        // These are already maxed
         player_strategy = player_regrets;
+        #else
+        // These aren't so we have to max them.
+        player_strategy = player_regrets.max(0.0);
+        #endif
 
         auto sums = player_strategy.rowwise().sum();
         player_strategy.colwise() /= sums;
@@ -168,7 +174,14 @@ void calculate_strategy(LookaheadNode* node) {
             auto& player_regrets = node->vote_regrets->at(i);
             auto& player_strategy = node->vote_strategy->at(i);
 
+            #ifdef CFR_PLUS
+            // These are already maxed
             player_strategy = player_regrets;
+            #else
+            // These aren't so we have to max them.
+            player_strategy = player_regrets.max(0.0);
+            #endif
+
             auto sums = player_strategy.rowwise().sum();
             player_strategy.colwise() /= sums;
             player_strategy = player_strategy.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.5; });
@@ -181,7 +194,14 @@ void calculate_strategy(LookaheadNode* node) {
             auto& player_regrets = node->mission_regrets->at(i);
             auto& player_strategy = node->mission_strategy->at(i);
 
+            #ifdef CFR_PLUS
+            // These are already maxed
             player_strategy = player_regrets;
+            #else
+            // These aren't so we have to max them.
+            player_strategy = player_regrets.max(0.0);
+            #endif
+
             auto sums = player_strategy.rowwise().sum();
             player_strategy.colwise() /= sums;
             player_strategy = player_strategy.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.5; });
@@ -193,7 +213,14 @@ void calculate_strategy(LookaheadNode* node) {
             auto& player_regrets = node->merlin_regrets->at(i);
             auto& player_strategy = node->merlin_strategy->at(i);
 
+            #ifdef CFR_PLUS
+            // These are already maxed
             player_strategy = player_regrets;
+            #else
+            // These aren't so we have to max them.
+            player_strategy = player_regrets.max(0.0);
+            #endif
+
             auto sums = player_strategy.rowwise().sum();
             player_strategy.colwise() /= sums;
             player_strategy = player_strategy.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.2; });
@@ -232,7 +259,9 @@ static void calculate_propose_cfvs(LookaheadNode* node) {
     for (int proposal = 0; proposal < NUM_PROPOSAL_OPTIONS; proposal++) {
         node->propose_regrets->col(proposal) = node->children[proposal]->counterfactual_values[node->proposer] - node->counterfactual_values[node->proposer];
     }
+    #ifdef CFR_PLUS
     *(node->propose_regrets) = node->propose_regrets->max(0.0);
+    #endif
 }
 
 static void calculate_vote_cfvs(LookaheadNode* node) {
@@ -248,7 +277,9 @@ static void calculate_vote_cfvs(LookaheadNode* node) {
         // Update regrets
         node->counterfactual_values[player] = (cfvs * node->vote_strategy->at(player)).rowwise().sum();
         node->vote_regrets->at(player) += cfvs.colwise() - node->counterfactual_values[player];
+        #ifdef CFR_PLUS
         node->vote_regrets->at(player) = node->vote_regrets->at(player).max(0.0);
+        #endif
     }
 }
 
@@ -293,10 +324,13 @@ static void calculate_mission_cfvs(LookaheadNode* node) {
             }
             double my_pass_prob = node->mission_strategy->at(player)(viewpoint, 0);
             double result_cfv = pass_cfv * my_pass_prob + fail_cfv * (1.0 - my_pass_prob);
+            node->counterfactual_values[player](viewpoint) = result_cfv;
             node->mission_regrets->at(player)(viewpoint, 0) += pass_cfv - result_cfv;
             node->mission_regrets->at(player)(viewpoint, 1) += fail_cfv - result_cfv;
         }
+        #ifdef CFR_PLUS
         node->mission_regrets->at(player) = node->mission_regrets->at(player).max(0.0);
+        #endif
     }
 }
 
@@ -344,10 +378,14 @@ static void calculate_merlin_cfvs(LookaheadNode* node, const AssignmentProbs& st
         }
     }
 
+    #ifdef CFR_PLUS
     for (int player = 0; player < NUM_PLAYERS; player++) {
         node->merlin_strategy->at(player) = node->merlin_strategy->at(player).max(0.0);
     }
+    #endif
 };
+
+#define ASSERT(left,operator,right) { if(!((left) operator (right))){ std::cerr << "ASSERT FAILED: " << #left << #operator << #right << " @ " << __FILE__ << " (" << __LINE__ << "). " << #left << "=" << (left) << "; " << #right << "=" << (right) << std::endl; } }
 
 static void calculate_terminal_cfvs(LookaheadNode* node, const AssignmentProbs& starting_probs) {
     for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
@@ -393,14 +431,33 @@ void calculate_counterfactual_values(LookaheadNode* node, const AssignmentProbs&
     case TERMINAL_PROPOSE_NN:
         calculate_neural_net_cfvs(node, starting_probs); break;
     }
+
+    #ifndef NDEBUG
+    double check = 0.0;
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        check += (node->counterfactual_values[i] * node->reach_probs[i]).sum();
+    }
+    ASSERT(abs(check), <, 1e-15);
+    assert(abs(check) < 1e-15);
+    #endif
 }
 
 void cfr_plus(LookaheadNode* root) {
     AssignmentProbs starting_probs = AssignmentProbs::Constant(1.0/NUM_ASSIGNMENTS);
-    for (int i = 0; i < 10; i++) { 
+    ViewpointVector value_weights[NUM_PLAYERS];
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        value_weights[i].setZero();
+    }
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
+        for (int p = 0; p < NUM_PLAYERS; p++) {
+            value_weights[p](ASSIGNMENT_TO_VIEWPOINT[i][p]) += starting_probs(i);
+        }
+    }
+
+    for (int i = 0; i < 10000; i++) { 
         calculate_strategy(root);
         calculate_counterfactual_values(root, starting_probs);
-        cout << "Iteration " << i << " " << root->counterfactual_values[0].transpose() << endl;
+        cout << i << " " << root->counterfactual_values[0].transpose() << endl;
     }
 }
 

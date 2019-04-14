@@ -8,7 +8,7 @@ CFLAGS := -Wall -std=c++17
 ifeq ($(DEBUG),1)
   CFLAGS += -O0 -g
 else
-  CFLAGS += -O2 -g
+  CFLAGS += -O3 -DNDEBUG
 endif
 
 CFLAGS += $(EXTRA_CFLAGS)
