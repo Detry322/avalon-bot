@@ -257,7 +257,7 @@ static void calculate_propose_cfvs(LookaheadNode* node) {
 
     // Update regrets
     for (int proposal = 0; proposal < NUM_PROPOSAL_OPTIONS; proposal++) {
-        node->propose_regrets->col(proposal) = node->children[proposal]->counterfactual_values[node->proposer] - node->counterfactual_values[node->proposer];
+        node->propose_regrets->col(proposal) += node->children[proposal]->counterfactual_values[node->proposer] - node->counterfactual_values[node->proposer];
     }
     #ifdef CFR_PLUS
     *(node->propose_regrets) = node->propose_regrets->max(0.0);
@@ -374,13 +374,13 @@ static void calculate_merlin_cfvs(LookaheadNode* node, const AssignmentProbs& st
                 (EVIL_LOSE_PAYOFF * assassin_counterfactual_reach_prob)
             );
 
-            node->merlin_strategy->at(assassin)(assassin_viewpoint, assassin_choice) += payoff - expected_assassin_payoff;
+            node->merlin_regrets->at(assassin)(assassin_viewpoint, assassin_choice) += payoff - expected_assassin_payoff;
         }
     }
 
     #ifdef CFR_PLUS
     for (int player = 0; player < NUM_PLAYERS; player++) {
-        node->merlin_strategy->at(player) = node->merlin_strategy->at(player).max(0.0);
+        node->merlin_regrets->at(player) = node->merlin_regrets->at(player).max(0.0);
     }
     #endif
 };
