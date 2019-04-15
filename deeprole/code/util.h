@@ -35,8 +35,6 @@ void prepare_initialization(
     Initialization* init
 );
 
-std::unique_ptr<LookaheadNode> lookahead_from_initialization(const Initialization& init);
-
 void run_initialization_with_cfr(
     const int iterations,
     const int wait_iterations,

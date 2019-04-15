@@ -9,11 +9,16 @@
 
 using namespace std;
 
-enum optionIndex { UNKNOWN, HELP };
+enum optionIndex { UNKNOWN, HELP, NUM_DATAPOINTS, NUM_ITERATIONS, NUM_WAIT_ITERS, OUT_DIR, FILE_SUFFIX};
 
 const option::Descriptor usage[] = {
-    { UNKNOWN,   0,   "",    "",       option::Arg::None,       "USAGE: deeprole [options]\n\nOptions:"},
-    { HELP,      0,   "h",    "help",   option::Arg::None,       "  \t-h, --help  \tPrint usage and exit." },
+    { UNKNOWN,           0,   "",              "",        option::Arg::None,       "USAGE: deeprole [options]\n\nOptions:"},
+    { HELP,              0,   "h",         "help",        option::Arg::None,       "  \t-h, --help  \tPrint usage and exit." },
+    { NUM_DATAPOINTS,    0,   "n",  "ndatapoints",    option::Arg::Optional,       "  \t-n<num>, --ndatapoints=<num>  \tNumber of datapoints to generate (10000 default)" },
+    { NUM_ITERATIONS,    0,   "i",   "iterations",    option::Arg::Optional,       "  \t-i<num>, --iterations=<num>  \tNum of iterations to run for (default: 4000)"},
+    { NUM_WAIT_ITERS,    0,   "w",       "witers",    option::Arg::Optional,       "  \t-w<num>, --witers=<num>  \tNum of iterations to ignore (default: 1000)"},
+    { OUT_DIR,           0,   "o",          "out",    option::Arg::Optional,       "  \t-o<directory>, --out=<num>  \tThe output directory to write to (default: .)"},
+    { FILE_SUFFIX,       0,   "x",       "suffix",    option::Arg::Optional,       "  \t-x<text>, --suffix=<suffix>  \tCode to append to every filename (default: random)"},
     { 0, 0, 0, 0, 0, 0 }
 };
 
@@ -98,7 +103,7 @@ void generate_datapoints(
         prepare_initialization(depth, num_succeeds, num_fails, propose_count, &init);
         run_initialization_with_cfr(iterations, wait_iterations, &init);
 
-        fs << init.Stringify() << endl;
+        fs << init.Stringify() << endl << flush;
     }
     fs.close();
 }
@@ -125,8 +130,28 @@ int main(int argc, char* argv[]) {
         option::printUsage(std::cout, usage);
         return 0;
     }
+
+    std::string s_num_datapoints;
+    std::string s_num_iterations;
+    std::string s_num_wait_iters;
+    std::string out_dir = "deeprole_output";
+    std::string file_suffix;
+    if (options[NUM_DATAPOINTS]) s_num_datapoints = std::string(options[NUM_DATAPOINTS].last()->arg);
+    if (options[NUM_ITERATIONS]) s_num_iterations = std::string(options[NUM_ITERATIONS].last()->arg);
+    if (options[NUM_WAIT_ITERS]) s_num_wait_iters = std::string(options[NUM_WAIT_ITERS].last()->arg);
+    if (options[OUT_DIR]) out_dir = std::string(options[OUT_DIR].last()->arg);
+    if (options[FILE_SUFFIX]) file_suffix = std::string(options[FILE_SUFFIX].last()->arg);
+
+    int num_datapoints = (s_num_datapoints.empty()) ? 10000 : std::stoi(s_num_datapoints);
+    int num_iterations = (s_num_iterations.empty()) ? 3000 : std::stoi(s_num_iterations);
+    int num_wait_iters = (s_num_wait_iters.empty()) ? 1000 : std::stoi(s_num_wait_iters);
+
+    int depth = 1;
+    int num_succeeds = 2;
+    int num_fails = 2;
+    int propose_count = 4;
+
     seed_rng();
-    generate_datapoints(10, 1, 2, 2, 4, 3000, 1000, "deeprole_output", "");
-    // test();
+    generate_datapoints(num_datapoints, depth, num_succeeds, num_fails, propose_count, num_iterations, num_wait_iters, out_dir, file_suffix);
     return 0;
 }
