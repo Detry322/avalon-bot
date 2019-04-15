@@ -1,6 +1,6 @@
 TARGET := deeprole
 
-CC := clang++
+CC := g++
 
 EXTRA_CFLAGS ?=
 CFLAGS := -Wall -std=c++17
