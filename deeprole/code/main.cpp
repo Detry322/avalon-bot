@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    auto lookahead = create_avalon_lookahead(2, 2, 3, 3, 2);
+    auto lookahead = create_avalon_lookahead(2, 2, 3, 4, 2);
     cfr_plus(lookahead.get());
     return 0;
 }
