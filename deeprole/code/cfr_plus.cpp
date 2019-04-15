@@ -442,22 +442,27 @@ void calculate_counterfactual_values(LookaheadNode* node, const AssignmentProbs&
     #endif
 }
 
-void cfr_plus(LookaheadNode* root) {
-    AssignmentProbs starting_probs = AssignmentProbs::Constant(1.0/NUM_ASSIGNMENTS);
-    ViewpointVector value_weights[NUM_PLAYERS];
+void cfr_get_values(
+    LookaheadNode* root,
+    const int iterations,
+    const int wait_iterations,
+    const AssignmentProbs& starting_probs,
+    ViewpointVector* values
+) {
     for (int i = 0; i < NUM_PLAYERS; i++) {
-        value_weights[i].setZero();
+        values[i].setZero();
     }
-    for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
-        for (int p = 0; p < NUM_PLAYERS; p++) {
-            value_weights[p](ASSIGNMENT_TO_VIEWPOINT[i][p]) += starting_probs(i);
-        }
-    }
-
-    for (int i = 0; i < 10000; i++) { 
+    long long total_size = 0;
+    for (int iter = 0; iter < iterations; iter++) {
         calculate_strategy(root);
         calculate_counterfactual_values(root, starting_probs);
-        cout << i << " " << root->counterfactual_values[0].transpose() << endl;
+        int weight = (iter < wait_iterations) ? 0 : (iter - wait_iterations);
+        total_size += weight;
+        for (int player = 0; player < NUM_PLAYERS; player++) {
+            values[player] += root->counterfactual_values[player] * weight;
+        }
+    }
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        values[i] /= total_size;
     }
 }
-

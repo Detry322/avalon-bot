@@ -1,3 +1,4 @@
 .cflags
 *.o
 deeprole
+deeprole_output/
