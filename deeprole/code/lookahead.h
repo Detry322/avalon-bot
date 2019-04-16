@@ -60,6 +60,8 @@ struct LookaheadNode {
 
     static std::unique_ptr<LookaheadNode> RootProposal(int num_succeeds, int num_fails, int proposer, int propose_count);
     static std::unique_ptr<LookaheadNode> CopyParent(const LookaheadNode& parent);
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 void add_lookahead_children(const int depth, LookaheadNode* node);

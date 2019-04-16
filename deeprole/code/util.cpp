@@ -124,7 +124,7 @@ std::map<std::pair<int, int>, double> generate_evil_probs(const int num_succeeds
 
     std::uniform_real_distribution<> get_split(0.0, 1.0);
 
-    for (int i = 0; i < evil_possibilities.size(); i++) {
+    for (size_t i = 0; i < evil_possibilities.size(); i++) {
         uint32_t evil = evil_possibilities[i];
         double prob = evil_probs[i];
         int player_1 = __builtin_ctz(evil);

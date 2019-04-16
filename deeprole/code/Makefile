@@ -1,6 +1,6 @@
 TARGET := deeprole
 
-CC := g++
+CC := clang++
 
 EXTRA_CFLAGS ?=
 CFLAGS := -Wall -std=c++17
@@ -13,7 +13,13 @@ endif
 
 CFLAGS += $(EXTRA_CFLAGS)
 
-LDFLAGS := 
+LDFLAGS :=
+
+ifeq ($(OPENMIND),1)
+  CC := clang++-8
+  CFLAGS += -target x86_64-unknown-linux-gnu -march=corei7-avx -static -mavx
+  LDFLAGS += -target x86_64-unknown-linux-gnu -march=corei7-avx -static -mavx
+endif
 
 # You shouldn't need to touch this.  This keeps track of whether or
 # not you've changed CFLAGS.

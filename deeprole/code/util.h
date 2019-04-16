@@ -23,6 +23,8 @@ struct Initialization {
     ViewpointVector solution_values[NUM_PLAYERS];
 
     std::string Stringify() const;
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 void seed_rng();
