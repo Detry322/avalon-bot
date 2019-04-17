@@ -3,6 +3,10 @@
 
 #include <memory>
 
+#ifdef OPENMIND
+#include <experimental/string_view>
+#endif
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-std-move"
 #include <fdeep/fdeep.hpp>

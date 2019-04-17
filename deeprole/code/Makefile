@@ -16,9 +16,9 @@ CFLAGS += $(EXTRA_CFLAGS)
 LDFLAGS :=
 
 ifeq ($(OPENMIND),1)
-  CC := clang++-8
-  CFLAGS += -target x86_64-unknown-linux-gnu -march=corei7-avx -static -mavx
-  LDFLAGS += -target x86_64-unknown-linux-gnu -march=corei7-avx -static -mavx
+  CC := g++-5
+  CFLAGS += -march=corei7-avx -static -mavx -DOPENMIND
+  LDFLAGS += -march=corei7-avx -static -mavx -DOPENMIND
 endif
 
 # You shouldn't need to touch this.  This keeps track of whether or

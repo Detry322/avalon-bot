@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
 
     int num_datapoints = (s_num_datapoints.empty()) ? 10000 : std::stoi(s_num_datapoints);
     int num_iterations = (s_num_iterations.empty()) ? 3000 : std::stoi(s_num_iterations);
-    int num_wait_iters = (s_num_wait_iters.empty()) ? 3000 : std::stoi(s_num_wait_iters);
+    int num_wait_iters = (s_num_wait_iters.empty()) ? 1000 : std::stoi(s_num_wait_iters);
     int num_succeeds = (s_num_succeeds.empty()) ? 2 : std::stoi(s_num_succeeds);
     int num_fails = (s_num_fails.empty()) ? 2 : std::stoi(s_num_fails);
     int propose_count = (s_propose_count.empty()) ? 4 : std::stoi(s_propose_count);
