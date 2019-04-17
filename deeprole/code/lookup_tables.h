@@ -1,20 +1,7 @@
 #ifndef LOOKUP_TABLES_H_
 #define LOOKUP_TABLES_H_
 
-#define NUM_PLAYERS 5
-#define NUM_EVIL 2
-#define NUM_VIEWPOINTS (1 + 6 + 4 + 4)
-#define NUM_GOOD_VIEWPOINTS (1 + 6)
-#define NUM_ASSIGNMENTS 60
-#define NUM_PROPOSAL_OPTIONS 10
-#define TREMBLE_VALUE 1e-15
-
-#define EVIL_WIN_PAYOFF 1.5
-#define EVIL_LOSE_PAYOFF -1.5
-#define GOOD_WIN_PAYOFF 1.0
-#define GOOD_LOSE_PAYOFF -1.0
-
-#define CFR_PLUS
+#include "game_constants.h"
 
 extern const int PROPOSAL_TO_INDEX_LOOKUP[32];
 extern const int INDEX_TO_PROPOSAL_2[10];

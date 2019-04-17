@@ -5,8 +5,8 @@ import random
 from data import load_data, MATRIX
 
 class CFVMaskAndAdjustLayer(tf.keras.layers.Layer):
-    def __init__(self):
-        super(CFVMaskAndAdjustLayer, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(CFVMaskAndAdjustLayer, self).__init__(*args, **kwargs)
 
     def call(self, inps):
         inp, cfvs = inps
@@ -47,7 +47,7 @@ def train():
         x=X,
         y=Y,
         batch_size=4096,
-        epochs=2,
+        epochs=20000,
         validation_split=0.1,
         callbacks=[tf.keras.callbacks.ModelCheckpoint('models/2_2_4.h5', save_best_only=True)]
     )

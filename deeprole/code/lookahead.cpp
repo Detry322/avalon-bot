@@ -30,6 +30,26 @@ std::unique_ptr<LookaheadNode> LookaheadNode::CopyParent(const LookaheadNode& pa
     return result;
 }
 
+std::string LookaheadNode::typeAsString() const {
+    switch(type) {
+    case PROPOSE:
+        return "PROPOSE";
+    case VOTE:
+        return "VOTE";
+    case MISSION:
+        return "MISSION";
+    case TERMINAL_MERLIN:
+        return "TERMINAL_MERLIN";
+    case TERMINAL_PROPOSE_NN:
+        return "TERMINAL_PROPOSE_NN";
+    case TERMINAL_NO_CONSENSUS:
+        return "TERMINAL_NO_CONSENSUS";
+    case TERMINAL_TOO_MANY_FAILS:
+        return "TERMINAL_TOO_MANY_FAILS";
+    }
+    return "?????";
+}
+
 void add_lookahead_children(const int depth, LookaheadNode* node) {
     switch (node->type) {
     case PROPOSE: {
@@ -95,7 +115,7 @@ void add_lookahead_children(const int depth, LookaheadNode* node) {
     }
 }
 
-void allocate_lookahead_vectors(LookaheadNode* node) {
+void populate_lookahead_fields(const std::string& model_search_dir, LookaheadNode* node) {
     for (int i = 0; i < NUM_PLAYERS; i++) {
         node->reach_probs[i] = ViewpointVector::Constant(1.0);
         node->counterfactual_values[i].setZero();
@@ -135,15 +155,18 @@ void allocate_lookahead_vectors(LookaheadNode* node) {
         // Intentional missing break.
     }
     case TERMINAL_NO_CONSENSUS:
-    case TERMINAL_TOO_MANY_FAILS:
+    case TERMINAL_TOO_MANY_FAILS: {
+        node->full_reach_probs = std::make_unique<AssignmentProbs>();
+    } break;
     case TERMINAL_PROPOSE_NN: {
         node->full_reach_probs = std::make_unique<AssignmentProbs>();
+        node->nn_model = load_model(model_search_dir, node->num_succeeds, node->num_fails, node->propose_count);
     } break;
     default: break;
     }
 
     for (auto& child : node->children) {
-        allocate_lookahead_vectors(child.get());
+        populate_lookahead_fields(model_search_dir, child.get());
     }
 }
 
@@ -152,11 +175,12 @@ std::unique_ptr<LookaheadNode> create_avalon_lookahead(
     const int num_fails,
     const int proposer,
     const int propose_count,
-    const int depth) {
+    const int depth,
+    const std::string& model_search_dir) {
 
     auto root_node = LookaheadNode::RootProposal(num_succeeds, num_fails, proposer, propose_count);
     add_lookahead_children(depth, root_node.get());
-    allocate_lookahead_vectors(root_node.get());
+    populate_lookahead_fields(model_search_dir, root_node.get());
     return root_node;
 }
 

@@ -40,6 +40,7 @@ void prepare_initialization(
 void run_initialization_with_cfr(
     const int iterations,
     const int wait_iterations,
+    const std::string& model_search_dir,
     Initialization* init
 );
 

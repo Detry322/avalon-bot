@@ -186,6 +186,7 @@ void prepare_initialization(
 void run_initialization_with_cfr(
     const int iterations,
     const int wait_iterations,
+    const std::string& model_search_dir,
     Initialization* init
 ) {
     init->iterations = iterations;
@@ -196,7 +197,8 @@ void run_initialization_with_cfr(
         init->num_fails,
         init->proposer,
         init->propose_count,
-        init->depth
+        init->depth,
+        model_search_dir
     );
 
     AssignmentProbs& starting_probs = init->starting_probs;

@@ -6,10 +6,11 @@
 #include "lookahead.h"
 #include "cfr_plus.h"
 #include "util.h"
+#include "nn.h"
 
 using namespace std;
 
-enum optionIndex { UNKNOWN, HELP, NUM_DATAPOINTS, NUM_ITERATIONS, NUM_WAIT_ITERS, OUT_DIR, FILE_SUFFIX};
+enum optionIndex { UNKNOWN, HELP, NUM_DATAPOINTS, NUM_ITERATIONS, NUM_WAIT_ITERS, MODEL_SEARCH_DIR, OUT_DIR, FILE_SUFFIX, TEST_MODE, NUM_SUCCEEDS, NUM_FAILS, PROPOSE_COUNT, DEPTH};
 
 const option::Descriptor usage[] = {
     { UNKNOWN,           0,   "",              "",        option::Arg::None,       "USAGE: deeprole [options]\n\nOptions:"},
@@ -17,8 +18,14 @@ const option::Descriptor usage[] = {
     { NUM_DATAPOINTS,    0,   "n",  "ndatapoints",    option::Arg::Optional,       "  \t-n<num>, --ndatapoints=<num>  \tNumber of datapoints to generate (10000 default)" },
     { NUM_ITERATIONS,    0,   "i",   "iterations",    option::Arg::Optional,       "  \t-i<num>, --iterations=<num>  \tNum of iterations to run for (default: 4000)"},
     { NUM_WAIT_ITERS,    0,   "w",       "witers",    option::Arg::Optional,       "  \t-w<num>, --witers=<num>  \tNum of iterations to ignore (default: 1000)"},
-    { OUT_DIR,           0,   "o",          "out",    option::Arg::Optional,       "  \t-o<directory>, --out=<num>  \tThe output directory to write to (default: .)"},
-    { FILE_SUFFIX,       0,   "x",       "suffix",    option::Arg::Optional,       "  \t-x<text>, --suffix=<suffix>  \tCode to append to every filename (default: random)"},
+    { MODEL_SEARCH_DIR,  0,   "m",     "modeldir",    option::Arg::Optional,       "  \t-m<directory>, --modeldir=<directory>  \tWhere to search for models (default: 'models')"},
+    { OUT_DIR,           0,   "o",          "out",    option::Arg::Optional,       "  \t-o<directory>, --out=<directory>  \tThe output directory to write to (default: .)"},
+    { FILE_SUFFIX,       0,   "x",       "suffix",    option::Arg::Optional,       "  \t-x<text>, --suffix=<suffix>  \tCode to append to every filename (default: <random hex chars>)"},
+    { TEST_MODE,         0,   "t",         "test",    option::Arg::Optional,       "  \t-t, --test  \tRun single test"},
+    { NUM_SUCCEEDS,    0,   "s",       "succeeds",    option::Arg::Optional,       "  \t-s<num>, --succeeds=<num>  \tThe number of succeeds in the game (2 default)" },
+    { NUM_FAILS,       0,   "f",          "fails",    option::Arg::Optional,       "  \t-f<num>, --fails=<num>  \tThe number of fails in the game (2 default)" },
+    { PROPOSE_COUNT,   0,   "p",  "propose_count",    option::Arg::Optional,       "  \t-p<num>, --propose_count=<num>  \tThe proposal round (4 default)" },
+    { DEPTH,           0,   "d",          "depth",    option::Arg::Optional,       "  \t-d<num>, --depth=<num>  \tThe depth to do CFR at (1 default)" },
     { 0, 0, 0, 0, 0, 0 }
 };
 
@@ -37,8 +44,8 @@ std::string random_string(std::string::size_type length)
     return s;
 }
 
-void print_lookahead_information(const int depth, const int num_succeeds, const int num_fails, const int propose_count) {
-    auto lookahead = create_avalon_lookahead(num_succeeds, num_fails, 0, propose_count, depth);
+void print_lookahead_information(const int depth, const int num_succeeds, const int num_fails, const int propose_count, const std::string& model_search_dir) {
+    auto lookahead = create_avalon_lookahead(num_succeeds, num_fails, 0, propose_count, depth, model_search_dir);
     cout << "                PROPOSE: " << count_lookahead_type(lookahead.get(), PROPOSE) << endl;
     cout << "                   VOTE: " << count_lookahead_type(lookahead.get(), VOTE) << endl;
     cout << "                MISSION: " << count_lookahead_type(lookahead.get(), MISSION) << endl;
@@ -57,6 +64,7 @@ void generate_datapoints(
     const int propose_count,
     const int iterations,
     const int wait_iterations,
+    const std::string model_search_dir,
     const std::string output_dir,
     const std::string filename_suffix
 ) {
@@ -83,7 +91,9 @@ void generate_datapoints(
     cout << "                  Fails: " << num_fails << endl;
     cout << "              Propose #: " << propose_count << endl;
     cout << "------------------ Sanity checks -------------------" << endl;
-    print_lookahead_information(depth, num_succeeds, num_fails, propose_count);
+    print_lookahead_information(depth, num_succeeds, num_fails, propose_count, model_search_dir);
+    cout << "------------------ Loaded Models -------------------" << endl;
+    print_loaded_models(model_search_dir);
     cout << "------------------ Administration ------------------" << endl;
     cout << " Output directory: " << "'" << output_dir << "'" << endl;
     cout << " Writing to: " << filepath << endl;
@@ -101,7 +111,7 @@ void generate_datapoints(
 
         Initialization init;
         prepare_initialization(depth, num_succeeds, num_fails, propose_count, &init);
-        run_initialization_with_cfr(iterations, wait_iterations, &init);
+        run_initialization_with_cfr(iterations, wait_iterations, model_search_dir, &init);
 
         fs << init.Stringify() << endl << flush;
     }
@@ -109,7 +119,7 @@ void generate_datapoints(
 }
 
 void test() {
-    auto lookahead = create_avalon_lookahead(2, 2, 3, 4, 2);
+    auto lookahead = create_avalon_lookahead(2, 2, 3, 4, 2, "models");
     AssignmentProbs starting_probs = AssignmentProbs::Constant(1.0/NUM_ASSIGNMENTS);
     ViewpointVector values[NUM_PLAYERS];
     cfr_get_values(lookahead.get(), 3000, 1000, starting_probs, values);
@@ -134,24 +144,49 @@ int main(int argc, char* argv[]) {
     std::string s_num_datapoints;
     std::string s_num_iterations;
     std::string s_num_wait_iters;
+    std::string model_search_dir = "models";
     std::string out_dir = "deeprole_output";
     std::string file_suffix;
+    std::string s_num_succeeds;
+    std::string s_num_fails;
+    std::string s_propose_count;
+    std::string s_depth;
     if (options[NUM_DATAPOINTS]) s_num_datapoints = std::string(options[NUM_DATAPOINTS].last()->arg);
     if (options[NUM_ITERATIONS]) s_num_iterations = std::string(options[NUM_ITERATIONS].last()->arg);
     if (options[NUM_WAIT_ITERS]) s_num_wait_iters = std::string(options[NUM_WAIT_ITERS].last()->arg);
+    if (options[MODEL_SEARCH_DIR]) model_search_dir = std::string(options[MODEL_SEARCH_DIR].last()->arg);
     if (options[OUT_DIR]) out_dir = std::string(options[OUT_DIR].last()->arg);
     if (options[FILE_SUFFIX]) file_suffix = std::string(options[FILE_SUFFIX].last()->arg);
+    if (options[NUM_SUCCEEDS]) s_num_succeeds = std::string(options[NUM_SUCCEEDS].last()->arg);
+    if (options[NUM_FAILS]) s_num_fails = std::string(options[NUM_FAILS].last()->arg);
+    if (options[PROPOSE_COUNT]) s_propose_count = std::string(options[PROPOSE_COUNT].last()->arg);
+    if (options[DEPTH]) s_depth = std::string(options[DEPTH].last()->arg);
 
     int num_datapoints = (s_num_datapoints.empty()) ? 10000 : std::stoi(s_num_datapoints);
     int num_iterations = (s_num_iterations.empty()) ? 3000 : std::stoi(s_num_iterations);
-    int num_wait_iters = (s_num_wait_iters.empty()) ? 1000 : std::stoi(s_num_wait_iters);
+    int num_wait_iters = (s_num_wait_iters.empty()) ? 3000 : std::stoi(s_num_wait_iters);
+    int num_succeeds = (s_num_succeeds.empty()) ? 2 : std::stoi(s_num_succeeds);
+    int num_fails = (s_num_fails.empty()) ? 2 : std::stoi(s_num_fails);
+    int propose_count = (s_propose_count.empty()) ? 4 : std::stoi(s_propose_count);
+    int depth = (s_depth.empty()) ? 1 : std::stoi(s_depth);
 
-    int depth = 1;
-    int num_succeeds = 2;
-    int num_fails = 2;
-    int propose_count = 4;
+    if (options[TEST_MODE]) {
+        test();
+        return 0;
+    }
 
     seed_rng();
-    generate_datapoints(num_datapoints, depth, num_succeeds, num_fails, propose_count, num_iterations, num_wait_iters, out_dir, file_suffix);
+    generate_datapoints(
+        num_datapoints,
+        depth,
+        num_succeeds,
+        num_fails,
+        propose_count,
+        num_iterations,
+        num_wait_iters,
+        model_search_dir,
+        out_dir,
+        file_suffix
+    );
     return 0;
 }
