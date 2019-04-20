@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import random
+import sys
 
 from data import load_data, MATRIX
 
@@ -27,8 +28,8 @@ def loss(y_true, y_pred):
 
 def create_model():
     inp = tf.keras.layers.Input(shape=(65,))
-    x = tf.keras.layers.Dense(96, activation='relu')(inp)
-    x = tf.keras.layers.Dense(96, activation='relu')(x)
+    x = tf.keras.layers.Dense(128, activation='relu')(inp)
+    x = tf.keras.layers.Dense(128, activation='relu')(x)
     x = tf.keras.layers.Dense(5*15)(x)
     out = CFVMaskAndAdjustLayer()([inp, x])
 
@@ -36,20 +37,27 @@ def create_model():
     model.compile(optimizer='adam', loss=loss, metrics=['mse'])
     return model
 
-def train():
+def train(num_succeeds, num_fails, propose_count):
     model = create_model()
 
     print "Loading data..."
-    _, X, Y = load_data(2, 2, 4)
+    _, X, Y = load_data(num_succeeds, num_fails, propose_count)
+
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        'models/{}_{}_{}.h5'.format(num_succeeds, num_fails, propose_count),
+        save_best_only=True
+    )
+
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir='logs/{}_{}_{}'.format(num_succeeds, num_fails, propose_count))
 
     print "Fitting..."
     model.fit(
         x=X,
         y=Y,
         batch_size=4096,
-        epochs=20000,
+        epochs=3000,
         validation_split=0.1,
-        callbacks=[tf.keras.callbacks.ModelCheckpoint('models/2_2_4.h5', save_best_only=True)]
+        callbacks=[checkpoint_callback, tensorboard_callback]
     )
     return X, Y, model
 
@@ -63,6 +71,7 @@ def compare(a, b):
     for i in range(len(a)):
         print "{: <20}{: >20}".format('#' * int(a[i]/increment), '#' * int(b[i]/increment))
 
+
 def random_compare(X, Y, model):
     index = int(len(X) * random.random())
     a = Y[index]
@@ -70,6 +79,8 @@ def random_compare(X, Y, model):
     compare(a, b)
 
 if __name__ == "__main__":
-    X, Y, model = train()
-    random_compare(X, Y, model)
-    import IPython; IPython.embed()
+    if len(sys.argv) != 4:
+        print "Usage:"
+        print "python train.py <num_succeeds> <num_fails> <propose_count>"
+    _, num_succeeds, num_fails, propose_count = sys.argv
+    train(num_succeeds, num_fails, propose_count)

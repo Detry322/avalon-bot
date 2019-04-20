@@ -8,6 +8,7 @@
 #endif
 
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wreturn-std-move"
 #include <fdeep/fdeep.hpp>
 #pragma GCC diagnostic pop
