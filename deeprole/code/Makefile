@@ -16,9 +16,9 @@ CFLAGS += $(EXTRA_CFLAGS)
 LDFLAGS :=
 
 ifeq ($(OPENMIND),1)
-  CC := g++-5
-  CFLAGS += -march=corei7-avx -static -mavx -DOPENMIND
-  LDFLAGS += -march=corei7-avx -static -mavx -DOPENMIND
+  CC := clang++-8
+  CFLAGS += -march=corei7-avx -static -mavx -DOPENMIND -I/usr/include/c++/5/ -I/usr/include/x86_64-linux-gnu/c++/5/ -nostdinc++
+  LDFLAGS += -march=corei7-avx -static -mavx -DOPENMIND -I/usr/include/c++/5/ -I/usr/include/x86_64-linux-gnu/c++/5/ -nostdinc++
 endif
 
 # You shouldn't need to touch this.  This keeps track of whether or
