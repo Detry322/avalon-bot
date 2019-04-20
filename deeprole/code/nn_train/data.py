@@ -6,6 +6,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def load_data(num_succeeds, num_fails, propose_count):
     folder = os.path.join(BASE_DIR, 'data', '{}_{}_{}'.format(num_succeeds, num_fails, propose_count))
+    print "Loading data from: " + folder
     cache_filename = os.path.join(folder, 'combined.npy')
 
     if os.path.isfile(cache_filename):

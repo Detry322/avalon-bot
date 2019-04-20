@@ -5,7 +5,20 @@ function train_section() {
     NUM_FAILS="$2"
     PROPOSE_COUNT="$3"
 
-    echo $NUM_SUCCEEDS, $NUM_FAILS, $PROPOSE_COUNT
+    echo "$(date) ======== Starting training process for: Succeeds=$NUM_SUCCEEDS, Fails=$NUM_FAILS, Propose=$PROPOSE_COUNT"
+    echo "$(date) ==== Generating datapoints..."
+
+    mkdir datapoint_output/${NUM_SUCCEEDS}_${NUM_FAILS}_${PROPOSE_COUNT}
+    sbatch --wait --array=0-60 sbatch_generate_deeprole_data.sh $NUM_SUCCEEDS $NUM_FAILS $PROPOSE_COUNT
+
+    DATAPOINT_COUNT=$(cat datapoint_output/${NUM_SUCCEEDS}_${NUM_FAILS}_${PROPOSE_COUNT}/* | wc -l)
+    echo "$(date) ($NUM_SUCCEEDS, $NUM_FAILS, $PROPOSE_COUNT) Datapoints: $DATAPOINT_COUNT"
+
+    # something like 
+    echo "$(date) ==== Training neural network... (Takes 30-45 minutes)"
+    sbatch --wait sbatch_train_neural_network.sh $NUM_SUCCEEDS $NUM_FAILS $PROPOSE_COUNT
+
+    echo "$(date) ==== Done with Succeeds=$NUM_SUCCEEDS, Fails=$NUM_FAILS, Propose=$PROPOSE_COUNT"
 }
 
 ITEMS="2 2
@@ -20,7 +33,7 @@ ITEMS="2 2
 
 IFS=$'\n'
 for item in $ITEMS; do
-    for i in $(seq 4 0); do
+    for i in $(seq 4 -1 0); do
         IFS=' ' read ns nf <<< "$item"
         train_section $ns $nf $i
     done
