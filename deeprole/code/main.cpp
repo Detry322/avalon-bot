@@ -182,7 +182,7 @@ void play_mode(
     json_deserialize_starting_reach_probs(std::cin, &starting_probs);
 
     ViewpointVector _dummy_values[NUM_PLAYERS];
-    cfr_get_values(lookahead.get(), 10, 1, starting_probs, true, _dummy_values);
+    cfr_get_values(lookahead.get(), iterations, wait_iterations, starting_probs, true, _dummy_values);
     calculate_cumulative_strategy(lookahead.get());
     json_serialize_lookahead(lookahead.get(), starting_probs, std::cout);
 }
