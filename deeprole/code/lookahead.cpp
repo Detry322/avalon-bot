@@ -128,29 +128,37 @@ void populate_lookahead_fields(const std::string& model_search_dir, LookaheadNod
         node->propose_regrets->setZero();
         node->propose_strategy = std::make_unique<ProposeData>();
         node->propose_strategy->setZero();
+        node->propose_cum = std::make_unique<ProposeData>();
+        node->propose_cum->setZero();
     } break;
     case VOTE: {
         node->vote_regrets = std::make_unique<std::array<VoteData, NUM_PLAYERS>>();
         node->vote_strategy = std::make_unique<std::array<VoteData, NUM_PLAYERS>>();
+        node->vote_cum = std::make_unique<std::array<VoteData, NUM_PLAYERS>>();
         for (int i = 0; i < NUM_PLAYERS; i++) {
             node->vote_regrets->at(i).setZero();
             node->vote_strategy->at(i).setZero();
+            node->vote_cum->at(i).setZero();
         }
     } break;
     case MISSION: {
         node->mission_regrets = std::make_unique<std::array<MissionData, NUM_PLAYERS>>();
         node->mission_strategy = std::make_unique<std::array<MissionData, NUM_PLAYERS>>();
+        node->mission_cum = std::make_unique<std::array<MissionData, NUM_PLAYERS>>();
         for (int i = 0; i < NUM_PLAYERS; i++) {
             node->mission_regrets->at(i).setZero();
             node->mission_strategy->at(i).setZero();
+            node->mission_cum->at(i).setZero();
         }
     } break;
     case TERMINAL_MERLIN: {
         node->merlin_regrets = std::make_unique<std::array<MerlinData, NUM_PLAYERS>>();
         node->merlin_strategy = std::make_unique<std::array<MerlinData, NUM_PLAYERS>>();
+        node->merlin_cum = std::make_unique<std::array<MerlinData, NUM_PLAYERS>>();
         for (int i = 0; i < NUM_PLAYERS; i++) {
             node->merlin_regrets->at(i).setZero();
             node->merlin_strategy->at(i).setZero();
+            node->merlin_cum->at(i).setZero();
         }
         // Intentional missing break.
     }

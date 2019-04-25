@@ -36,15 +36,19 @@ struct LookaheadNode {
 
     std::unique_ptr<ProposeData> propose_regrets;
     std::unique_ptr<ProposeData> propose_strategy;
+    std::unique_ptr<ProposeData> propose_cum;
 
     std::unique_ptr<std::array<VoteData, NUM_PLAYERS>> vote_regrets;
     std::unique_ptr<std::array<VoteData, NUM_PLAYERS>> vote_strategy;
+    std::unique_ptr<std::array<VoteData, NUM_PLAYERS>> vote_cum;
 
     std::unique_ptr<std::array<MissionData, NUM_PLAYERS>> mission_regrets;
     std::unique_ptr<std::array<MissionData, NUM_PLAYERS>> mission_strategy;
+    std::unique_ptr<std::array<MissionData, NUM_PLAYERS>> mission_cum;
 
     std::unique_ptr<std::array<MerlinData, NUM_PLAYERS>> merlin_regrets;
     std::unique_ptr<std::array<MerlinData, NUM_PLAYERS>> merlin_strategy;
+    std::unique_ptr<std::array<MerlinData, NUM_PLAYERS>> merlin_cum;
 
     std::vector<std::pair<uint32_t, int>> fails;
     std::vector<std::unique_ptr<LookaheadNode>> children;

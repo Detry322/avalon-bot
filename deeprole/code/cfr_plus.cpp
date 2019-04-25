@@ -179,7 +179,7 @@ static void populate_full_reach_probs(LookaheadNode* node) {
     }
 }
 
-void calculate_strategy(LookaheadNode* node) {
+void calculate_strategy(LookaheadNode* node, const double cum_strat_weight) {
     switch (node->type) {
     case PROPOSE: {
         // Initialize the node's memory
@@ -196,6 +196,10 @@ void calculate_strategy(LookaheadNode* node) {
         ProposeData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
         tmp_holder = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 1.0/NUM_PROPOSAL_OPTIONS; });
         player_strategy = (1.0 - TREMBLE_VALUE) * tmp_holder + TREMBLE_VALUE * ProposeData::Constant(1.0/NUM_PROPOSAL_OPTIONS);
+
+        if (cum_strat_weight != 0) {
+            *(node->propose_cum) += (player_strategy.colwise() * node->reach_probs[node->proposer]) * cum_strat_weight;
+        }
     } break;
     case VOTE: {
         for (int i = 0; i < NUM_PLAYERS; i++) {
@@ -213,6 +217,10 @@ void calculate_strategy(LookaheadNode* node) {
             VoteData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
             tmp_holder = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.5; });
             player_strategy = (1.0 - TREMBLE_VALUE) * tmp_holder + TREMBLE_VALUE * VoteData::Constant(0.5);
+
+            if (cum_strat_weight != 0) {
+                node->vote_cum->at(i) += (player_strategy.colwise() * node->reach_probs[i]) * cum_strat_weight;
+            }
         }
     } break;
     case MISSION: {
@@ -232,6 +240,10 @@ void calculate_strategy(LookaheadNode* node) {
             MissionData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
             tmp_holder = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.5; });
             player_strategy = (1.0 - TREMBLE_VALUE) * tmp_holder + TREMBLE_VALUE * MissionData::Constant(0.5);
+
+            if (cum_strat_weight != 0) {
+                node->mission_cum->at(i) += (player_strategy.colwise() * node->reach_probs[i]) * cum_strat_weight;
+            }
         }
     } break;
     case TERMINAL_MERLIN: {
@@ -250,6 +262,10 @@ void calculate_strategy(LookaheadNode* node) {
             MerlinData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
             tmp_holder = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 1.0/NUM_PLAYERS; });
             player_strategy = (1.0 - TREMBLE_VALUE) * tmp_holder + TREMBLE_VALUE * MerlinData::Constant(1.0/NUM_PLAYERS);
+
+            if (cum_strat_weight != 0) {
+                node->merlin_cum->at(i) += (player_strategy.colwise() * node->reach_probs[i]) * cum_strat_weight;
+            }
         }
         // Intentional missing break.
     }
@@ -264,38 +280,8 @@ void calculate_strategy(LookaheadNode* node) {
     fill_reach_probabilities(node);
 
     for (auto& child : node->children) {
-        calculate_strategy(child.get());
+        calculate_strategy(child.get(), cum_strat_weight);
     }
-}
-
-void verbose_calculate_strategy(LookaheadNode* node, int player) {
-    auto& player_regrets = node->mission_regrets->at(player);
-    std::cout << "REGRETS:" << std::endl;
-    std::cout << player_regrets << std::endl;
-    auto& player_strategy = node->mission_strategy->at(player);
-
-    #ifdef CFR_PLUS
-    // These are already maxed
-    player_strategy = player_regrets;
-    #else
-    // These aren't so we have to max them.
-    player_strategy = player_regrets.max(0.0);
-    #endif
-
-    auto sums = player_strategy.rowwise().sum();
-    std::cout << "SUMS" << std::endl;
-    std::cout << sums << std::endl;
-
-    player_strategy.colwise() /= sums;
-
-    std::cout << "STRATEGY AFTER SUM AND NORMALIZE:" << std::endl;
-    std::cout << player_strategy << std::endl;
-
-    player_strategy = player_strategy.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.5; });
-    player_strategy = (1.0 - TREMBLE_VALUE) * player_strategy + TREMBLE_VALUE * MissionData::Constant(0.5);
-
-    std::cout << "FINAL STRATEGY:" << std::endl;
-    std::cout << player_strategy << std::endl;
 }
 
 static void calculate_propose_cfvs(LookaheadNode* node) {
@@ -523,6 +509,7 @@ void cfr_get_values(
     const int iterations,
     const int wait_iterations,
     const AssignmentProbs& starting_probs,
+    const bool save_strategy,
     ViewpointVector* values
 ) {
     ViewpointVector last_values[NUM_PLAYERS];
@@ -530,12 +517,18 @@ void cfr_get_values(
         values[i].setZero();
         last_values[i].setZero();
     }
+
     long long total_size = 0;
     for (int iter = 0; iter < iterations; iter++) {
-        calculate_strategy(root);
+        int weight = (iter < wait_iterations) ? 0 : (iter - wait_iterations);
+        if (!save_strategy) {
+            weight = 0;
+        }
+
+        calculate_strategy(root, (double) weight);
         calculate_counterfactual_values(root, starting_probs);
 
-        bool equals_previous_iteration = true;
+        bool equals_previous_iteration = !save_strategy; // Save strategy disables checking for early finish
         for (int i = 0; i < NUM_PLAYERS; i++) {
             if (!last_values[i].isApprox(root->counterfactual_values[i])) {
                 equals_previous_iteration = false;
@@ -548,7 +541,6 @@ void cfr_get_values(
             return;
         }
 
-        int weight = (iter < wait_iterations) ? 0 : (iter - wait_iterations);
         total_size += weight;
         for (int player = 0; player < NUM_PLAYERS; player++) {
             last_values[player] = root->counterfactual_values[player];
@@ -557,5 +549,67 @@ void cfr_get_values(
     }
     for (int i = 0; i < NUM_PLAYERS; i++) {
         values[i] /= total_size;
+    }
+}
+
+void calculate_cumulative_strategy(LookaheadNode* node) {
+    switch (node->type) {
+    case PROPOSE: {
+        // Initialize the node's memory
+        auto& player_cumulative = *(node->propose_cum);
+        auto& player_strategy = *(node->propose_strategy);
+
+        player_strategy = player_cumulative;
+
+        ProposeData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
+        player_strategy = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 1.0/NUM_PROPOSAL_OPTIONS; });
+    } break;
+    case VOTE: {
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            auto& player_cumulative = node->vote_cum->at(i);
+            auto& player_strategy = node->vote_strategy->at(i);
+
+            player_strategy = player_cumulative;
+
+            VoteData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
+            player_strategy = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.5; });
+        }
+    } break;
+    case MISSION: {
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            if (((1 << i) & node->proposal) == 0) continue;
+            auto& player_cumulative = node->mission_cum->at(i);
+            auto& player_strategy = node->mission_strategy->at(i);
+
+            player_strategy = player_cumulative;
+
+            MissionData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
+            player_strategy = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.5; });
+        }
+    } break;
+    case TERMINAL_MERLIN: {
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            auto& player_cumulative = node->merlin_cum->at(i);
+            auto& player_strategy = node->merlin_strategy->at(i);
+
+            player_strategy = player_cumulative;
+
+            MerlinData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
+            player_strategy = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 1.0/NUM_PLAYERS; });
+        }
+        // Intentional missing break.
+    }
+    case TERMINAL_NO_CONSENSUS:
+    case TERMINAL_TOO_MANY_FAILS:
+    case TERMINAL_PROPOSE_NN: {
+        populate_full_reach_probs(node);
+    } break;
+    default: break;
+    }
+
+    fill_reach_probabilities(node);
+
+    for (auto& child : node->children) {
+        calculate_cumulative_strategy(child.get());
     }
 }

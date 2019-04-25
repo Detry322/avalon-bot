@@ -203,5 +203,5 @@ void run_initialization_with_cfr(
 
     AssignmentProbs& starting_probs = init->starting_probs;
     ViewpointVector* out_values = init->solution_values;
-    cfr_get_values(lookahead.get(), iterations, wait_iterations, starting_probs, out_values);
+    cfr_get_values(lookahead.get(), iterations, wait_iterations, starting_probs, true, out_values);
 }

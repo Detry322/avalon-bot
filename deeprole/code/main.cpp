@@ -7,10 +7,27 @@
 #include "cfr_plus.h"
 #include "util.h"
 #include "nn.h"
+#include "serialization.h"
 
 using namespace std;
 
-enum optionIndex { UNKNOWN, HELP, NUM_DATAPOINTS, NUM_ITERATIONS, NUM_WAIT_ITERS, MODEL_SEARCH_DIR, OUT_DIR, FILE_SUFFIX, TEST_MODE, NUM_SUCCEEDS, NUM_FAILS, PROPOSE_COUNT, DEPTH};
+enum optionIndex { 
+    UNKNOWN,
+    HELP,
+    NUM_DATAPOINTS,
+    NUM_ITERATIONS,
+    NUM_WAIT_ITERS,
+    MODEL_SEARCH_DIR,
+    OUT_DIR,
+    FILE_SUFFIX,
+    TEST_MODE,
+    NUM_SUCCEEDS,
+    NUM_FAILS,
+    PROPOSE_COUNT,
+    DEPTH,
+    PLAY_MODE,
+    PROPOSER
+};
 
 const option::Descriptor usage[] = {
     { UNKNOWN,           0,   "",              "",        option::Arg::None,       "USAGE: deeprole [options]\n\nOptions:"},
@@ -26,6 +43,8 @@ const option::Descriptor usage[] = {
     { NUM_FAILS,       0,   "f",          "fails",    option::Arg::Optional,       "  \t-f<num>, --fails=<num>  \tThe number of fails in the game (2 default)" },
     { PROPOSE_COUNT,   0,   "p",  "propose_count",    option::Arg::Optional,       "  \t-p<num>, --propose_count=<num>  \tThe proposal round (4 default)" },
     { DEPTH,           0,   "d",          "depth",    option::Arg::Optional,       "  \t-d<num>, --depth=<num>  \tThe depth to do CFR at (1 default)" },
+    { PLAY_MODE,       0,   "l",           "play",    option::Arg::Optional,       "  \t-l, --play  \tRun in play mode. Read a belief from stdin, output data to stdout." },
+    { PROPOSER,        0,   "r",       "proposer",    option::Arg::Optional,       "  \t-r, --proposer=<num>  \tUse a specific proposer for play mode." },
     { 0, 0, 0, 0, 0, 0 }
 };
 
@@ -122,8 +141,50 @@ void test() {
     auto lookahead = create_avalon_lookahead(2, 2, 3, 4, 2, "models");
     AssignmentProbs starting_probs = AssignmentProbs::Constant(1.0/NUM_ASSIGNMENTS);
     ViewpointVector values[NUM_PLAYERS];
-    cfr_get_values(lookahead.get(), 3000, 1000, starting_probs, values);
+    cfr_get_values(lookahead.get(), 3000, 1000, starting_probs, false, values);
     cout << values[0].transpose() << endl;
+}
+
+void play_mode(
+    const int depth,
+    const int num_succeeds,
+    const int num_fails,
+    const int propose_count,
+    const int proposer,
+    const int iterations,
+    const int wait_iterations,
+    const std::string model_search_dir
+) {
+    cerr << "~.~.~.~.~.~.~.~. DEEPROLE PLAY MODE .~.~.~.~.~.~.~.~" << endl;
+    cerr << "           # Iterations: " << iterations << endl;
+    cerr << "           # Wait iters: " << wait_iterations << endl;
+    cerr << "------------------ Game settings -------------------" << endl;
+    cerr << "                  Depth: " << depth << endl;
+    cerr << "                  Round: " << (num_succeeds + num_fails) << endl;
+    cerr << "               Succeeds: " << num_succeeds << endl;
+    cerr << "                  Fails: " << num_fails << endl;
+    cerr << "              Propose #: " << propose_count << endl;
+    cerr << "------------------ Sanity checks -------------------" << endl;
+    print_lookahead_information(depth, num_succeeds, num_fails, propose_count, model_search_dir);
+    cerr << "------------------ Loaded Models -------------------" << endl;
+    print_loaded_models(model_search_dir);
+
+    auto lookahead = create_avalon_lookahead(
+        num_succeeds,
+        num_fails,
+        proposer,
+        propose_count,
+        depth,
+        model_search_dir
+    );
+
+    AssignmentProbs starting_probs;
+    json_deserialize_starting_reach_probs(std::cin, &starting_probs);
+
+    ViewpointVector _dummy_values[NUM_PLAYERS];
+    cfr_get_values(lookahead.get(), 10, 1, starting_probs, true, _dummy_values);
+    calculate_cumulative_strategy(lookahead.get());
+    json_serialize_lookahead(lookahead.get(), starting_probs, std::cout);
 }
 
 int main(int argc, char* argv[]) {
@@ -172,6 +233,30 @@ int main(int argc, char* argv[]) {
 
     if (options[TEST_MODE]) {
         test();
+        return 0;
+    }
+
+    if (options[PLAY_MODE]) {
+        std::string s_proposer;
+        if (options[PROPOSER]) {
+            s_proposer = std::string(options[PROPOSER].last()->arg);
+        }
+        int proposer = (s_proposer.empty()) ? -1 : std::stoi(s_proposer);
+        if (proposer < 0 || proposer >= NUM_PLAYERS) {
+            std::cerr << "You must pass a valid proposer" << std::endl;
+            return 1;
+        }
+
+        play_mode(
+            depth,
+            num_succeeds,
+            num_fails,
+            propose_count,
+            proposer,
+            num_iterations,
+            num_wait_iters,
+            model_search_dir
+        );
         return 0;
     }
 
