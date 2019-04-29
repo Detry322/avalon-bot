@@ -562,7 +562,8 @@ void calculate_cumulative_strategy(LookaheadNode* node) {
         player_strategy = player_cumulative;
 
         ProposeData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
-        player_strategy = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 1.0/NUM_PROPOSAL_OPTIONS; });
+        tmp_holder = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 1.0/NUM_PROPOSAL_OPTIONS; });
+        player_strategy = tmp_holder; // (1.0 - TREMBLE_VALUE) * tmp_holder + TREMBLE_VALUE * ProposeData::Constant(1.0/NUM_PROPOSAL_OPTIONS);
     } break;
     case VOTE: {
         for (int i = 0; i < NUM_PLAYERS; i++) {
@@ -572,7 +573,8 @@ void calculate_cumulative_strategy(LookaheadNode* node) {
             player_strategy = player_cumulative;
 
             VoteData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
-            player_strategy = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.5; });
+            tmp_holder = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.5; });
+            player_strategy = tmp_holder; // (1.0 - TREMBLE_VALUE) * tmp_holder + TREMBLE_VALUE * VoteData::Constant(0.5);
         }
     } break;
     case MISSION: {
@@ -584,7 +586,8 @@ void calculate_cumulative_strategy(LookaheadNode* node) {
             player_strategy = player_cumulative;
 
             MissionData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
-            player_strategy = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.5; });
+            tmp_holder = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 0.5; });
+            player_strategy = tmp_holder; // (1.0 - TREMBLE_VALUE) * tmp_holder + TREMBLE_VALUE * MissionData::Constant(0.5);
         }
     } break;
     case TERMINAL_MERLIN: {
@@ -595,7 +598,8 @@ void calculate_cumulative_strategy(LookaheadNode* node) {
             player_strategy = player_cumulative;
 
             MerlinData tmp_holder = player_strategy.colwise() / player_strategy.rowwise().sum();
-            player_strategy = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 1.0/NUM_PLAYERS; });
+            tmp_holder = tmp_holder.unaryExpr([](double v) { return std::isfinite(v) ? v : 1.0/NUM_PLAYERS; });
+            player_strategy = tmp_holder; // (1.0 - TREMBLE_VALUE) * tmp_holder + TREMBLE_VALUE * MerlinData::Constant(1.0/NUM_PLAYERS);
         }
         // Intentional missing break.
     }

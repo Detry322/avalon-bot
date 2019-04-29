@@ -9,7 +9,8 @@ from battlefield.bots import (
     SingleMCTSPlayoutBot, SingleMCTSHeuristicBot, SingleMCTSBaseOpponentBot,
     CFRBot,
     LearningBot,
-    ObserveBeaterBot
+    ObserveBeaterBot,
+    Deeprole
 )
 from battlefield.tournament import (
     run_simple_tournament,
@@ -34,23 +35,23 @@ from collections import defaultdict
 
 TOURNAMENT_CONFIG = [
     {
-        'bot': RandomBot,
+        'bot': Deeprole,
         'role': 'merlin'
     },
     {
-        'bot': RandomBot,
+        'bot': Deeprole,
         'role': 'minion'
     },
     {
-        'bot': ObserveBot,
+        'bot': Deeprole,
         'role': 'servant'
     },
     {
-        'bot': RandomBot,
+        'bot': Deeprole,
         'role': 'servant'
     },
     {
-        'bot': RandomBot,
+        'bot': Deeprole,
         'role': 'assassin'
     }
 ]
@@ -128,9 +129,12 @@ if __name__ == "__main__":
     # bots = [ ObserveBeaterBot, ObserveBot, ObserveBot, ObserveBot, ObserveBot ]
     # run_learning_tournament(bots, winrate_track=0)
     # grid_search()
-    predict_evil_using_voting()
+    # predict_evil_using_voting()
     # tournament()
-    # run_and_print_game(TOURNAMENT_CONFIG)
+    run_and_print_game(TOURNAMENT_CONFIG)
+    # print_tournament_statistics(
+    #     run_simple_tournament(TOURNAMENT_CONFIG, num_games=100, granularity=1)
+    # )
     # determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)
     # test_calculate()
     # df, _ = predict_evil_over_human_data(HumanLikeBot, 0.01)

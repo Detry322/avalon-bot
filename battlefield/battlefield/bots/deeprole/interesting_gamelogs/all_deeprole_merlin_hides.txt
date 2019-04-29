@@ -1,0 +1,467 @@
+       Role |                      Bot | Evil 
+----------------------------------------------
+     merlin |               Deeprole_1 |     
+     minion |               Deeprole_2 |  Yes
+    servant |               Deeprole_3 |     
+    servant |               Deeprole_4 |     
+   assassin |               Deeprole_5 |  Yes
+=============== Round 1 ================
+[0.001      0.001      0.001      0.001      0.33385337 0.001
+ 0.001      0.001      0.35558039 0.30356624]
+[0.001      0.001      0.001      0.001      0.33385337 0.001
+ 0.001      0.001      0.35558039 0.30356624]
+Proposal #1. Deeprole_1 proposes (0.36):
+ - Deeprole_3
+ - Deeprole_5
+              Deeprole_1 votes DOWN (0.99)
+              Deeprole_2 votes DOWN (0.24)
+              Deeprole_3 votes DOWN (0.99)
+              Deeprole_4 votes DOWN (0.99)
+              Deeprole_5 votes UP   (0.36)
+===== Actual belief for player 0 ====
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0408888634901 0.505001459009
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0400789490987 0.494998540991
+===== Actual belief for player 1 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0400789490987 0.385298412344
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0319707956914 0.307350793828
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.0319707956914 0.307350793828
+===== Actual belief for player 2 ====
+('assassin', 'merlin', 'servant', 'servant', 'minion'): 0.0682935840023 0.242836235673
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0408888634901 0.145391369277
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0400789490987 0.142511500473
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0326168607235 0.115978035027
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0319707956914 0.113680776761
+===== Actual belief for player 3 ====
+('servant', 'minion', 'assassin', 'servant', 'merlin'): 0.216891579826 0.359352729654
+('servant', 'assassin', 'minion', 'servant', 'merlin'): 0.104790953014 0.173620917138
+('assassin', 'merlin', 'servant', 'servant', 'minion'): 0.0682935840023 0.113150938588
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0408888634901 0.0677459434775
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0400789490987 0.06640405207
+===== Actual belief for player 4 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0400789490987 0.385298412344
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0319707956914 0.307350793828
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.0319707956914 0.307350793828
+[0.09139763 0.1718648  0.14855632 0.05780119 0.08572753 0.09823101
+ 0.00305932 0.10244053 0.13173088 0.10919079]
+[0.09139763 0.1718648  0.14855632 0.05780119 0.08572753 0.09823101
+ 0.00305932 0.10244053 0.13173088 0.10919079]
+Proposal #2. Deeprole_2 proposes (0.13):
+ - Deeprole_3
+ - Deeprole_5
+              Deeprole_1 votes DOWN (0.99)
+              Deeprole_2 votes DOWN (0.37)
+              Deeprole_3 votes UP   (0.86)
+              Deeprole_4 votes DOWN (0.99)
+              Deeprole_5 votes UP   (0.02)
+===== Actual belief for player 0 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0985632529892 0.595376803766
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.066984434401 0.404623196234
+===== Actual belief for player 1 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0985632529892 0.374633382694
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.0860215574038 0.326963102956
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0785077423327 0.29840351435
+===== Actual belief for player 2 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0985632529892 0.307499846919
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0785077423327 0.244930215036
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.066984434401 0.208979540545
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0533545368763 0.166456680602
+('servant', 'minion', 'servant', 'assassin', 'merlin'): 0.00699260792611 0.0218156950144
+===== Actual belief for player 3 ====
+('servant', 'minion', 'assassin', 'servant', 'merlin'): 0.134599283232 0.235608925276
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0985632529892 0.172529760567
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.0860215574038 0.150576185874
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.066984434401 0.117252709082
+('minion', 'merlin', 'assassin', 'servant', 'servant'): 0.0620976709065 0.108698688084
+===== Actual belief for player 4 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0985632529892 0.374633382694
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.0860215574038 0.326963102956
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0785077423327 0.29840351435
+[0.04143631 0.21381499 0.06547812 0.30424044 0.03143273 0.23748344
+ 0.00435587 0.01580603 0.00203834 0.08391372]
+[0.04143631 0.21381499 0.06547812 0.30424044 0.03143273 0.23748344
+ 0.00435587 0.01580603 0.00203834 0.08391372]
+Proposal #3. Deeprole_3 proposes (0.21):
+ - Deeprole_1
+ - Deeprole_3
+              Deeprole_1 votes DOWN (0.92)
+              Deeprole_2 votes UP   (0.94)
+              Deeprole_3 votes UP   (0.99)
+              Deeprole_4 votes UP   (0.73)
+              Deeprole_5 votes UP   (0.40)
+--- Mission results ---
+              Deeprole_1: SUCCEED
+              Deeprole_3: SUCCEED
+===== Actual belief for player 0 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0883335614504 0.53611414205
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.076432771914 0.46388585795
+===== Actual belief for player 1 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0883335614504 0.409397276566
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0659365609842 0.305594476774
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.0614947751521 0.285008246661
+===== Actual belief for player 2 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0883335614504 0.299859117848
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.076432771914 0.25946042687
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0659365609842 0.223829750392
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0570532201323 0.193674159384
+('merlin', 'minion', 'servant', 'assassin', 'servant'): 0.00369615896663 0.0125470653392
+===== Actual belief for player 3 ====
+('servant', 'minion', 'assassin', 'servant', 'merlin'): 0.342870518024 0.441851999162
+('servant', 'assassin', 'minion', 'servant', 'merlin'): 0.103741981553 0.133690706948
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0883335614504 0.113834111328
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.076432771914 0.0984977456398
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.0614947751521 0.0792473773935
+===== Actual belief for player 4 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0883335614504 0.409397276566
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0659365609842 0.305594476774
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.0614947751521 0.285008246661
+=============== Round 2 ================
+[0.00969703 0.26137929 0.07949986 0.22642821 0.28322644 0.001
+ 0.001      0.08582292 0.05094626 0.001     ]
+[0.00969703 0.26137929 0.07949986 0.22642821 0.28322644 0.001
+ 0.001      0.08582292 0.05094626 0.001     ]
+Proposal #1. Deeprole_4 proposes (0.26):
+ - Deeprole_1
+ - Deeprole_2
+ - Deeprole_4
+              Deeprole_1 votes UP   (0.99)
+              Deeprole_2 votes DOWN (0.61)
+              Deeprole_3 votes DOWN (0.99)
+              Deeprole_4 votes DOWN (0.99)
+              Deeprole_5 votes DOWN (0.98)
+===== Actual belief for player 0 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.149229712791 0.544742677711
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.12471561754 0.455257322289
+===== Actual belief for player 1 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.149229712791 0.556150214251
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0616761391139 0.22985501574
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.057420418529 0.21399477001
+===== Actual belief for player 2 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.149229712791 0.374807480143
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.12471561754 0.31323752804
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0616761391139 0.154906672766
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0515445458765 0.129460018342
+('merlin', 'minion', 'servant', 'assassin', 'servant'): 0.00708532342989 0.0177955996235
+===== Actual belief for player 3 ====
+('servant', 'minion', 'assassin', 'servant', 'merlin'): 0.196915378574 0.267093391627
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.149229712791 0.202413190932
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.12471561754 0.169162599279
+('servant', 'assassin', 'minion', 'servant', 'merlin'): 0.0928326989593 0.125917033999
+('minion', 'merlin', 'assassin', 'servant', 'servant'): 0.0650089744252 0.088177305354
+===== Actual belief for player 4 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.149229712791 0.556150214251
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.0616761391139 0.22985501574
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.057420418529 0.21399477001
+[0.20393651 0.04834344 0.05149608 0.01183391 0.001      0.00125878
+ 0.001      0.60790077 0.03397557 0.03925494]
+[0.20393651 0.04834344 0.05149608 0.01183391 0.001      0.00125878
+ 0.001      0.60790077 0.03397557 0.03925494]
+Proposal #2. Deeprole_5 proposes (0.61):
+ - Deeprole_2
+ - Deeprole_3
+ - Deeprole_5
+              Deeprole_1 votes DOWN (0.45)
+              Deeprole_2 votes UP   (0.90)
+              Deeprole_3 votes DOWN (0.68)
+              Deeprole_4 votes UP   (0.99)
+              Deeprole_5 votes UP   (0.95)
+--- Mission results ---
+              Deeprole_2: SUCCEED
+              Deeprole_3: SUCCEED
+              Deeprole_5: FAIL
+===== Actual belief for player 0 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.306796167205 0.806100961852
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0737965646284 0.193899038148
+===== Actual belief for player 1 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.306796167205 0.545894163009
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.131827582162 0.234565862675
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.123382932503 0.219539974317
+===== Actual belief for player 2 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.306796167205 0.542832326546
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.131827582162 0.233250218801
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0737965646284 0.130572559734
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0317097269351 0.0561058666513
+('merlin', 'minion', 'servant', 'assassin', 'servant'): 0.0209981721388 0.0371532889058
+===== Actual belief for player 3 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.306796167205 0.471234947399
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.123382932503 0.189514589566
+('minion', 'merlin', 'assassin', 'servant', 'servant'): 0.11586640316 0.177969297648
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0737965646284 0.113350569428
+('servant', 'assassin', 'merlin', 'servant', 'minion'): 0.0296784560103 0.0455857248294
+===== Actual belief for player 4 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.306796167205 0.545894163009
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.131827582162 0.234565862675
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.123382932503 0.219539974317
+=============== Round 3 ================
+[0.001      0.001      0.00446665 0.78623385 0.001      0.0010001
+ 0.00174426 0.001      0.00191389 0.20064126]
+[0.001      0.001      0.00446665 0.78623385 0.001      0.0010001
+ 0.00174426 0.001      0.00191389 0.20064126]
+Proposal #1. Deeprole_1 proposes (0.20):
+ - Deeprole_4
+ - Deeprole_5
+              Deeprole_1 votes UP   (0.97)
+              Deeprole_2 votes UP   (0.98)
+              Deeprole_3 votes DOWN (0.36)
+              Deeprole_4 votes DOWN (0.99)
+              Deeprole_5 votes DOWN (0.62)
+===== Actual belief for player 0 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.129494198063 0.846046710881
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0235637789938 0.153953289119
+===== Actual belief for player 1 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.318829919757 0.437819726788
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.27989779693 0.384357832772
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.129494198063 0.17782244044
+===== Actual belief for player 2 ====
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.27989779693 0.578434292148
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.129494198063 0.267611555415
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0509323964037 0.1052564364
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0235637789938 0.0486966956227
+('assassin', 'minion', 'servant', 'merlin', 'servant'): 3.42890009027e-07 7.08613436158e-07
+===== Actual belief for player 3 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.318829919757 0.483390721596
+('minion', 'merlin', 'assassin', 'servant', 'servant'): 0.129631770349 0.196539882639
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.129494198063 0.196331303825
+('servant', 'assassin', 'merlin', 'servant', 'minion'): 0.0580167905447 0.0879615635429
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0235637789938 0.0357259824926
+===== Actual belief for player 4 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.318829919757 0.437819726788
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.27989779693 0.384357832772
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.129494198063 0.17782244044
+[0.001      0.01013299 0.001      0.09434573 0.001      0.77770779
+ 0.001      0.001      0.001      0.11181349]
+[0.001      0.01013299 0.001      0.09434573 0.001      0.77770779
+ 0.001      0.001      0.001      0.11181349]
+Proposal #2. Deeprole_2 proposes (0.78):
+ - Deeprole_2
+ - Deeprole_4
+              Deeprole_1 votes UP   (0.47)
+              Deeprole_2 votes UP   (0.99)
+              Deeprole_3 votes DOWN (0.99)
+              Deeprole_4 votes DOWN (0.99)
+              Deeprole_5 votes UP   (0.99)
+--- Mission results ---
+              Deeprole_2: FAIL
+              Deeprole_4: SUCCEED
+===== Actual belief for player 0 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0857771071222 0.936284708087
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00583723452119 0.0637152919126
+===== Actual belief for player 1 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.447444916214 0.483186345663
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.392807696315 0.424184762086
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0857771071222 0.0926288922504
+===== Actual belief for player 2 ====
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.392807696315 0.768473591069
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0857771071222 0.167810972545
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0267310325802 0.0522955451041
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00583723452119 0.0114197369769
+('merlin', 'minion', 'servant', 'assassin', 'servant'): 7.79123266395e-08 1.52424624066e-07
+===== Actual belief for player 3 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.447444916214 0.785668608669
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0857771071222 0.150616037788
+('servant', 'assassin', 'merlin', 'servant', 'minion'): 0.030449160608 0.0534656865753
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00583723452119 0.0102496011432
+('merlin', 'assassin', 'minion', 'servant', 'servant'): 3.53023613378e-08 6.19874226076e-08
+===== Actual belief for player 4 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.447444916214 0.483186345663
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.392807696315 0.424184762086
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0857771071222 0.0926288922504
+=============== Round 4 ================
+[0.00642124 0.00850783 0.00727285 0.6166561  0.00648883 0.00654818
+ 0.00671996 0.16991887 0.16518801 0.00627812]
+[0.00642124 0.00850783 0.00727285 0.6166561  0.00648883 0.00654818
+ 0.00671996 0.16991887 0.16518801 0.00627812]
+Proposal #1. Deeprole_3 proposes (0.17):
+ - Deeprole_2
+ - Deeprole_4
+ - Deeprole_5
+              Deeprole_1 votes DOWN (0.99)
+              Deeprole_2 votes UP   (0.99)
+              Deeprole_3 votes DOWN (1.00)
+              Deeprole_4 votes DOWN (0.99)
+              Deeprole_5 votes UP   (0.98)
+===== Actual belief for player 0 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0810677278785 0.935372217106
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00560122208165 0.0646277828937
+===== Actual belief for player 1 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.500171647724 0.534753437057
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.354091962287 0.378573825064
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0810677278785 0.0866727378786
+===== Actual belief for player 2 ====
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.354091962287 0.761117794619
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0810677278785 0.174254422097
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0244653177041 0.0525880015331
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00560122208165 0.0120397813337
+('merlin', 'minion', 'servant', 'assassin', 'servant'): 1.84504623604e-10 3.96591188649e-10
+===== Actual belief for player 3 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.500171647724 0.804912197458
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0810677278785 0.130460019648
+('servant', 'assassin', 'merlin', 'servant', 'minion'): 0.0345584186354 0.0556138933725
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00560122208165 0.00901388952114
+('assassin', 'minion', 'merlin', 'servant', 'servant'): 1.28292474613e-13 2.06457479403e-13
+===== Actual belief for player 4 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.500171647724 0.534753437057
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.354091962287 0.378573825064
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0810677278785 0.0866727378786
+[0.001 0.001 0.001 0.991 0.001 0.001 0.001 0.001 0.001 0.001]
+[0.001 0.001 0.001 0.991 0.001 0.001 0.001 0.001 0.001 0.001]
+Proposal #2. Deeprole_4 proposes (0.99):
+ - Deeprole_1
+ - Deeprole_3
+ - Deeprole_4
+              Deeprole_1 votes DOWN (0.87)
+              Deeprole_2 votes DOWN (0.99)
+              Deeprole_3 votes UP   (0.99)
+              Deeprole_4 votes UP   (0.99)
+              Deeprole_5 votes DOWN (0.99)
+===== Actual belief for player 0 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0814489044552 0.936223508651
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00554838166569 0.0637764913492
+===== Actual belief for player 1 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.500470716338 0.534563402919
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.354303685188 0.378439292127
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0814489044552 0.0869973049537
+===== Actual belief for player 2 ====
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.354303685188 0.761228842143
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0814489044552 0.174994666508
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0241355250158 0.0518556778558
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00554838166569 0.0119208134934
+('servant', 'minion', 'servant', 'assassin', 'merlin'): 3.57226376366e-17 7.67508304972e-17
+===== Actual belief for player 3 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.500470716338 0.805184141047
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0814489044552 0.131039367604
+('servant', 'assassin', 'merlin', 'servant', 'minion'): 0.0340925708617 0.0548499572287
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00554838166569 0.00892653412048
+('assassin', 'minion', 'merlin', 'servant', 'servant'): 7.39101821329e-16 1.18910666644e-15
+===== Actual belief for player 4 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.500470716338 0.534563402919
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.354303685188 0.378439292127
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0814489044552 0.0869973049537
+[0.33289759 0.001      0.00197644 0.001      0.32813609 0.001
+ 0.001      0.00197642 0.00197672 0.32903674]
+[0.33289759 0.001      0.00197644 0.001      0.32813609 0.001
+ 0.001      0.00197642 0.00197672 0.32903674]
+Proposal #3. Deeprole_5 proposes (0.33):
+ - Deeprole_1
+ - Deeprole_2
+ - Deeprole_3
+              Deeprole_1 votes DOWN (0.99)
+              Deeprole_2 votes UP   (0.99)
+              Deeprole_3 votes DOWN (0.99)
+              Deeprole_4 votes DOWN (0.99)
+              Deeprole_5 votes UP   (0.99)
+===== Actual belief for player 0 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0814185595733 0.935874593336
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00557873702288 0.0641254066639
+===== Actual belief for player 1 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.500284259259 0.534563402919
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.354171684598 0.378439292127
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0814185595733 0.0869973049537
+===== Actual belief for player 2 ====
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.354171684598 0.760945144501
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0814185595733 0.174929448835
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0242675711739 0.052139375497
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00557873702288 0.0119860311669
+('servant', 'minion', 'servant', 'assassin', 'merlin'): 2.04728555073e-17 4.39863508853e-17
+===== Actual belief for player 3 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.500284259259 0.804884061979
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0814185595733 0.130990531357
+('servant', 'assassin', 'merlin', 'servant', 'minion'): 0.0342790923067 0.0551500362967
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00557873702288 0.00897537036713
+('assassin', 'minion', 'merlin', 'servant', 'servant'): 4.58508325384e-16 7.37672706179e-16
+===== Actual belief for player 4 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.500284259259 0.534563402919
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.354171684598 0.378439292127
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0814185595733 0.0869973049537
+[0.001 0.001 0.001 0.991 0.001 0.001 0.001 0.001 0.001 0.001]
+[0.001 0.001 0.001 0.991 0.001 0.001 0.001 0.001 0.001 0.001]
+Proposal #4. Deeprole_1 proposes (0.99):
+ - Deeprole_1
+ - Deeprole_3
+ - Deeprole_4
+              Deeprole_1 votes UP   (0.50)
+              Deeprole_2 votes DOWN (0.99)
+              Deeprole_3 votes UP   (0.99)
+              Deeprole_4 votes UP   (0.99)
+              Deeprole_5 votes DOWN (0.99)
+--- Mission results ---
+              Deeprole_1: SUCCEED
+              Deeprole_3: SUCCEED
+              Deeprole_4: SUCCEED
+===== Actual belief for player 0 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0431276145309 0.935874593336
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0029550709464 0.0641254066639
+===== Actual belief for player 1 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.52270367385 0.558518927186
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.370043304955 0.395398387337
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0431276145309 0.0460826854773
+===== Actual belief for player 2 ====
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.370043304955 0.83818611429
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0431276145309 0.0976884790463
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0253550823822 0.0574318672839
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0029550709464 0.00669353937998
+('servant', 'minion', 'servant', 'assassin', 'merlin'): 2.1175061176e-17 4.79636896799e-17
+===== Actual belief for player 3 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.52270367385 0.864542308361
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0431276145309 0.0713322849752
+('servant', 'assassin', 'merlin', 'servant', 'minion'): 0.0358152533352 0.0592377734116
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.0029550709464 0.00488763325222
+('assassin', 'minion', 'merlin', 'servant', 'servant'): 1.22358988725e-23 2.02379527547e-23
+===== Actual belief for player 4 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.52270367385 0.558518927186
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.370043304955 0.395398387337
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0431276145309 0.0460826854773
+=============== Round 5 ================
+[0.89563899 0.01352997 0.01537947 0.001      0.01056736 0.01530216
+ 0.01099531 0.01306459 0.01401652 0.01050563]
+[0.89563899 0.01352997 0.01537947 0.001      0.01056736 0.01530216
+ 0.01099531 0.01306459 0.01401652 0.01050563]
+Proposal #1. Deeprole_2 proposes (0.90):
+ - Deeprole_1
+ - Deeprole_2
+ - Deeprole_3
+              Deeprole_1 votes DOWN (0.99)
+              Deeprole_2 votes UP   (0.98)
+              Deeprole_3 votes DOWN (0.99)
+              Deeprole_4 votes DOWN (0.99)
+              Deeprole_5 votes UP   (0.96)
+===== Actual belief for player 0 ====
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0431637431141 0.936658588079
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00291894236326 0.0633414119213
+===== Actual belief for player 1 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.523141549753 0.558518927186
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.370353295212 0.395398387337
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0431637431141 0.0460826854773
+===== Actual belief for player 2 ====
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.370353295212 0.838888274079
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0431637431141 0.0977703139999
+('servant', 'assassin', 'servant', 'merlin', 'minion'): 0.0250450921253 0.056729707495
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00291894236326 0.00661170442631
+('servant', 'minion', 'servant', 'assassin', 'merlin'): 2.55599724497e-24 5.78959643428e-24
+===== Actual belief for player 3 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.523141549753 0.865266547088
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0431637431141 0.0713920409904
+('servant', 'assassin', 'merlin', 'servant', 'minion'): 0.0353773774327 0.0585135346843
+('merlin', 'assassin', 'servant', 'servant', 'minion'): 0.00291894236326 0.00482787723705
+('assassin', 'minion', 'merlin', 'servant', 'servant'): 1.82913160875e-33 3.02535019827e-33
+===== Actual belief for player 4 ====
+('servant', 'minion', 'merlin', 'servant', 'assassin'): 0.523141549753 0.558518927186
+('servant', 'minion', 'servant', 'merlin', 'assassin'): 0.370353295212 0.395398387337
+('merlin', 'minion', 'servant', 'servant', 'assassin'): 0.0431637431141 0.0460826854773
+[0.001 0.001 0.001 0.991 0.001 0.001 0.001 0.001 0.001 0.001]
+[0.001 0.001 0.001 0.991 0.001 0.001 0.001 0.001 0.001 0.001]
+Proposal #2. Deeprole_3 proposes (0.99):
+ - Deeprole_1
+ - Deeprole_3
+ - Deeprole_4
+              Deeprole_1 votes UP   (0.99)
+              Deeprole_2 votes DOWN (0.99)
+              Deeprole_3 votes UP   (0.99)
+              Deeprole_4 votes UP   (0.99)
+              Deeprole_5 votes DOWN (0.99)
+--- Mission results ---
+              Deeprole_1: SUCCEED
+              Deeprole_3: SUCCEED
+              Deeprole_4: SUCCEED
+===== Final chance: pick merlin! =====
+Deeprole_5 picked Deeprole_3 (WRONG)
+('good', 'assassin failed')

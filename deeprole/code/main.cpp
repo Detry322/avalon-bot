@@ -26,7 +26,8 @@ enum optionIndex {
     PROPOSE_COUNT,
     DEPTH,
     PLAY_MODE,
-    PROPOSER
+    PROPOSER,
+    NN_TEST,
 };
 
 const option::Descriptor usage[] = {
@@ -38,13 +39,14 @@ const option::Descriptor usage[] = {
     { MODEL_SEARCH_DIR,  0,   "m",     "modeldir",    option::Arg::Optional,       "  \t-m<directory>, --modeldir=<directory>  \tWhere to search for models (default: 'models')"},
     { OUT_DIR,           0,   "o",          "out",    option::Arg::Optional,       "  \t-o<directory>, --out=<directory>  \tThe output directory to write to (default: .)"},
     { FILE_SUFFIX,       0,   "x",       "suffix",    option::Arg::Optional,       "  \t-x<text>, --suffix=<suffix>  \tCode to append to every filename (default: <random hex chars>)"},
-    { TEST_MODE,         0,   "t",         "test",    option::Arg::Optional,       "  \t-t, --test  \tRun single test"},
+    { TEST_MODE,         0,   "t",         "test",    option::Arg::Optional,       "  \t-t, --test  \tRun single test" },
     { NUM_SUCCEEDS,    0,   "s",       "succeeds",    option::Arg::Optional,       "  \t-s<num>, --succeeds=<num>  \tThe number of succeeds in the game (2 default)" },
     { NUM_FAILS,       0,   "f",          "fails",    option::Arg::Optional,       "  \t-f<num>, --fails=<num>  \tThe number of fails in the game (2 default)" },
     { PROPOSE_COUNT,   0,   "p",  "propose_count",    option::Arg::Optional,       "  \t-p<num>, --propose_count=<num>  \tThe proposal round (4 default)" },
     { DEPTH,           0,   "d",          "depth",    option::Arg::Optional,       "  \t-d<num>, --depth=<num>  \tThe depth to do CFR at (1 default)" },
     { PLAY_MODE,       0,   "l",           "play",    option::Arg::Optional,       "  \t-l, --play  \tRun in play mode. Read a belief from stdin, output data to stdout." },
     { PROPOSER,        0,   "r",       "proposer",    option::Arg::Optional,       "  \t-r, --proposer=<num>  \tUse a specific proposer for play mode." },
+    { NN_TEST,         0,   "u",        "nn-test",    option::Arg::Optional,       "  \t-u, --nn-test  \tRun neural net test" },
     { 0, 0, 0, 0, 0, 0 }
 };
 
@@ -65,14 +67,14 @@ std::string random_string(std::string::size_type length)
 
 void print_lookahead_information(const int depth, const int num_succeeds, const int num_fails, const int propose_count, const std::string& model_search_dir) {
     auto lookahead = create_avalon_lookahead(num_succeeds, num_fails, 0, propose_count, depth, model_search_dir);
-    cout << "                PROPOSE: " << count_lookahead_type(lookahead.get(), PROPOSE) << endl;
-    cout << "                   VOTE: " << count_lookahead_type(lookahead.get(), VOTE) << endl;
-    cout << "                MISSION: " << count_lookahead_type(lookahead.get(), MISSION) << endl;
-    cout << "        TERMINAL_MERLIN: " << count_lookahead_type(lookahead.get(), TERMINAL_MERLIN) << endl;
-    cout << "  TERMINAL_NO_CONSENSUS: " << count_lookahead_type(lookahead.get(), TERMINAL_NO_CONSENSUS) << endl;
-    cout << "TERMINAL_TOO_MANY_FAILS: " << count_lookahead_type(lookahead.get(), TERMINAL_TOO_MANY_FAILS) << endl;
-    cout << "    TERMINAL_PROPOSE_NN: " << count_lookahead_type(lookahead.get(), TERMINAL_PROPOSE_NN) << endl;
-    cout << "                  Total: " << count_lookahead(lookahead.get()) << endl;
+    cerr << "                PROPOSE: " << count_lookahead_type(lookahead.get(), PROPOSE) << endl;
+    cerr << "                   VOTE: " << count_lookahead_type(lookahead.get(), VOTE) << endl;
+    cerr << "                MISSION: " << count_lookahead_type(lookahead.get(), MISSION) << endl;
+    cerr << "        TERMINAL_MERLIN: " << count_lookahead_type(lookahead.get(), TERMINAL_MERLIN) << endl;
+    cerr << "  TERMINAL_NO_CONSENSUS: " << count_lookahead_type(lookahead.get(), TERMINAL_NO_CONSENSUS) << endl;
+    cerr << "TERMINAL_TOO_MANY_FAILS: " << count_lookahead_type(lookahead.get(), TERMINAL_TOO_MANY_FAILS) << endl;
+    cerr << "    TERMINAL_PROPOSE_NN: " << count_lookahead_type(lookahead.get(), TERMINAL_PROPOSE_NN) << endl;
+    cerr << "                  Total: " << count_lookahead(lookahead.get()) << endl;
 }
 
 void generate_datapoints(
@@ -99,24 +101,24 @@ void generate_datapoints(
     );
     const std::string filepath = ((output_dir.empty()) ? "" : (output_dir + "/")) + base_filename;
 
-    cout << "=========== DEEPROLE DATAPOINT GENERATOR =========" << endl;
-    cout << "           # Datapoints: " << num_datapoints << endl;
-    cout << "           # Iterations: " << iterations << endl;
-    cout << "           # Wait iters: " << wait_iterations << endl;
-    cout << "------------------ Game settings -------------------" << endl;
-    cout << "                  Depth: " << depth << endl;
-    cout << "                  Round: " << (num_succeeds + num_fails) << endl;
-    cout << "               Succeeds: " << num_succeeds << endl;
-    cout << "                  Fails: " << num_fails << endl;
-    cout << "              Propose #: " << propose_count << endl;
-    cout << "------------------ Sanity checks -------------------" << endl;
+    cerr << "=========== DEEPROLE DATAPOINT GENERATOR =========" << endl;
+    cerr << "           # Datapoints: " << num_datapoints << endl;
+    cerr << "           # Iterations: " << iterations << endl;
+    cerr << "           # Wait iters: " << wait_iterations << endl;
+    cerr << "------------------ Game settings -------------------" << endl;
+    cerr << "                  Depth: " << depth << endl;
+    cerr << "                  Round: " << (num_succeeds + num_fails) << endl;
+    cerr << "               Succeeds: " << num_succeeds << endl;
+    cerr << "                  Fails: " << num_fails << endl;
+    cerr << "              Propose #: " << propose_count << endl;
+    cerr << "------------------ Sanity checks -------------------" << endl;
     print_lookahead_information(depth, num_succeeds, num_fails, propose_count, model_search_dir);
-    cout << "------------------ Loaded Models -------------------" << endl;
+    cerr << "------------------ Loaded Models -------------------" << endl;
     print_loaded_models(model_search_dir);
-    cout << "------------------ Administration ------------------" << endl;
-    cout << " Output directory: " << "'" << output_dir << "'" << endl;
-    cout << " Writing to: " << filepath << endl;
-    cout << "====================================================" << endl;
+    cerr << "------------------ Administration ------------------" << endl;
+    cerr << " Output directory: " << "'" << output_dir << "'" << endl;
+    cerr << " Writing to: " << filepath << endl;
+    cerr << "====================================================" << endl;
 
     const int status_interval = max(1, min(100, num_datapoints/10));
 
@@ -125,7 +127,7 @@ void generate_datapoints(
 
     for (int i = 0; i < num_datapoints; i++) {
         if (i % status_interval == 0) {
-            cout << i << "/" << num_datapoints << endl;
+            cerr << i << "/" << num_datapoints << endl;
         }
 
         Initialization init;
@@ -187,6 +189,30 @@ void play_mode(
     json_serialize_lookahead(lookahead.get(), starting_probs, std::cout);
 }
 
+void nn_test_mode(
+    const int num_succeeds,
+    const int num_fails,
+    const int propose_count,
+    const int proposer,
+    const std::string model_search_dir
+) {
+    auto model = load_model(model_search_dir, num_succeeds, num_fails, propose_count);
+
+    AssignmentProbs starting_probs;
+    json_deserialize_starting_reach_probs(std::cin, &starting_probs);
+
+    ViewpointVector results[NUM_PLAYERS];
+    model->predict(proposer, starting_probs, results);
+
+    nlohmann::json json;
+
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        json.push_back(eigen_to_single_vector(results[i]));
+    }
+
+    std::cout << std::setprecision(17) << std::setw(2) << json << std::endl;
+}
+
 int main(int argc, char* argv[]) {
     argc -= (argc > 0); argv += (argc > 0); // skip program name argv[0] if present
     
@@ -236,7 +262,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    if (options[PLAY_MODE]) {
+    if (options[PLAY_MODE] || options[NN_TEST]) {
         std::string s_proposer;
         if (options[PROPOSER]) {
             s_proposer = std::string(options[PROPOSER].last()->arg);
@@ -247,16 +273,21 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
-        play_mode(
-            depth,
-            num_succeeds,
-            num_fails,
-            propose_count,
-            proposer,
-            num_iterations,
-            num_wait_iters,
-            model_search_dir
-        );
+        if (options[PLAY_MODE]) {
+            play_mode(
+                depth,
+                num_succeeds,
+                num_fails,
+                propose_count,
+                proposer,
+                num_iterations,
+                num_wait_iters,
+                model_search_dir
+            );            
+        } else {
+            nn_test_mode(num_succeeds, num_fails, propose_count, proposer, model_search_dir);
+        }
+
         return 0;
     }
 

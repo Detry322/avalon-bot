@@ -86,7 +86,7 @@ std::shared_ptr<Model> load_model(const std::string& search_dir, const int num_s
     auto model = fdeep::load_model(
         model_filename,
         true,
-        fdeep::cout_logger,
+        fdeep::cerr_logger,
         static_cast<fdeep::internal::float_type>(0.0001),
         fdeep::internal::custom_creator
     );
@@ -119,11 +119,11 @@ void Model::predict(const int proposer, const AssignmentProbs& input_probs, View
 
 void print_loaded_models(const std::string& search_dir) {
     if (model_cache.size() == 0) {
-        std::cout << "No models loaded." << std::endl;
+        std::cerr << "No models loaded." << std::endl;
         return;
     }
     for (const auto& pair : model_cache) {
         const auto& tuple = pair.first;
-        std::cout << get_model_filename(search_dir, std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple)) << std::endl;
+        std::cerr << get_model_filename(search_dir, std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple)) << std::endl;
     }
 }

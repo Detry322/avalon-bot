@@ -10,3 +10,4 @@ from battlefield.bots.single_mcts_bot import *
 from battlefield.bots.cfr_bot import *
 from battlefield.bots.learning_bot import *
 from battlefield.bots.observe_beater_bot import *
+from battlefield.bots.deeprole import *

@@ -5,32 +5,6 @@
 using json = nlohmann::json;
 using namespace std;
 
-template <typename Derived>
-std::vector<std::vector<double>> eigen_to_double_vector(const Eigen::ArrayBase<Derived>& array) {
-    std::vector<std::vector<double>> result;
-
-    for (int i = 0; i < array.rows(); i++) {
-        std::vector<double> row;
-        for (int j = 0; j < array.cols(); j++) {
-            row.push_back(array(i, j));
-        }
-        result.push_back(row);
-    }
-
-    return result;
-}
-
-template <typename Derived>
-std::vector<double> eigen_to_single_vector(const Eigen::ArrayBase<Derived>& array) {
-    std::vector<double> result;
-
-    for (int i = 0; i < array.rows(); i++) {
-        result.push_back(array(i));
-    }
-
-    return result;
-}
-
 void json_deserialize_starting_reach_probs(std::istream& in_stream, AssignmentProbs* starting_reach_probs) {
     cerr << "Deserializing. Enter a json array of numbers:" << endl;
     json j;
@@ -119,9 +93,16 @@ void json_serialize_nn_propose(const LookaheadNode* node, const AssignmentProbs&
 
     if (sum == 0.0) {
         json_node["new_belief"] = "impossible";
+        json_node["nn_output"] = "n/a";
     } else {
         new_belief /= sum;
+        ViewpointVector nn_output[NUM_PLAYERS];
+        node->nn_model->predict(node->proposer, new_belief, nn_output);
+        
         json_node["new_belief"] = eigen_to_single_vector(new_belief);
+        for (int i = 0; i < NUM_PLAYERS; i++) {
+            json_node["nn_output"].push_back(eigen_to_single_vector(nn_output[i]));
+        }
     }
 }
 
@@ -168,5 +149,4 @@ void json_serialize_lookahead(const LookaheadNode* root, const AssignmentProbs& 
     json result;
     json_serialize_node(root, starting_reach_probs, result);
     out_stream << std::setprecision(17) << std::setw(2) << result << std::endl;
-
 }

@@ -150,6 +150,11 @@ inline void cout_logger(const std::string& str)
     std::cout << str << std::flush;
 }
 
+inline void cerr_logger(const std::string& str)
+{
+    std::cerr << str << std::flush;
+}
+
 // Load and construct an fdeep::model from an istream
 // providing the exported json content.
 // Throws an exception if a problem occurs.
