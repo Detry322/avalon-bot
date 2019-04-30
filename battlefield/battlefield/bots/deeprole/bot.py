@@ -67,8 +67,9 @@ class Deeprole(Bot):
 
         if self.node['type'] == 'TERMINAL_PROPOSE_NN':
             # print_top_k_belief(self.node['new_belief'])
+            print "Player {} perspective {}".format(self.player, self.perspective)
             print_top_k_viewpoint_belief(self.node['new_belief'], self.player, self.perspective)
-            print "Player {} NN value: {}".format(self.player, self.node['nn_output'][self.player][self.perspective])
+            print self.node['new_belief']
             self.node = run_deeprole_on_node(self.node)
 
         if self.node['type'].startswith("TERMINAL_") and self.node['type'] != "TERMINAL_MERLIN":

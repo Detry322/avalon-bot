@@ -14,11 +14,13 @@ using string_view = experimental::string_view;
 
 #endif
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpragmas"
-#pragma GCC diagnostic ignored "-Wreturn-std-move"
-#include <fdeep/fdeep.hpp>
-#pragma GCC diagnostic pop
+// #pragma GCC diagnostic push
+// #pragma GCC diagnostic ignored "-Wpragmas"
+// #pragma GCC diagnostic ignored "-Wreturn-std-move"
+// #include <fdeep/fdeep.hpp>
+// #pragma GCC diagnostic pop
+
+#include "./fdeep_replace.h"
 
 #include "eigen_types.h"
 
@@ -26,9 +28,9 @@ struct Model {
     int num_succeeds;
     int num_fails;
     int propose_count;
-    fdeep::model model;
+    jdeep::model model;
 
-    Model(int num_succeeds, int num_fails, int propose_count, fdeep::model model) :
+    Model(int num_succeeds, int num_fails, int propose_count, jdeep::model model) :
         num_succeeds(num_succeeds),
         num_fails(num_fails),
         propose_count(propose_count),

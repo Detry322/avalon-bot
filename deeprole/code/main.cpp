@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <nlohmann/json.hpp>
+#include <iomanip>
 #include "optionparser.h"
 #include "lookahead.h"
 #include "cfr_plus.h"

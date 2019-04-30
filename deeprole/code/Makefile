@@ -7,6 +7,8 @@ CFLAGS := -Wall -std=c++17 -Ilibs/
 
 ifeq ($(DEBUG),1)
   CFLAGS += -O0 -g
+else ifeq ($(PROFILE), 1)
+  CFLAGS += -O1 -g -DNDEBUG
 else
   CFLAGS += -O3 -DNDEBUG
 endif
@@ -35,7 +37,7 @@ all: $(TARGET)
 %.o: %.cpp .cflags
 	$(CC) $(CFLAGS) -c $<
 
-$(TARGET): main.o lookahead.o lookup_tables.o cfr_plus.o util.o nn.o serialization.o
+$(TARGET): main.o lookahead.o lookup_tables.o cfr_plus.o util.o nn.o serialization.o fdeep_replace.o
 	$(CC) -o $(TARGET) $^ $(LDFLAGS)
 
 clean::

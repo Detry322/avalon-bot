@@ -17,63 +17,103 @@ static std::string get_model_filename(const std::string& search_dir, const int n
 }
 
 
-namespace fdeep { namespace internal {
+// namespace fdeep { namespace internal {
 
-class cfv_mask_and_adjust_layer : public layer {
-public:
-    explicit cfv_mask_and_adjust_layer(const std::string& name) : layer(name) {}
-protected:
-    tensor5s apply_impl(const tensor5s& input) const override
-    {
-        const fdeep::tensor5& inp = input[0];
-        const fdeep::tensor5& cfvs = input[1];
+// class cfv_mask_and_adjust_layer : public layer {
+// public:
+//     explicit cfv_mask_and_adjust_layer(const std::string& name) : layer(name) {}
+// protected:
+//     tensor5s apply_impl(const tensor5s& input) const override
+//     {
+//         const fdeep::tensor5& inp = input[0];
+//         const fdeep::tensor5& cfvs = input[1];
 
-        const fdeep::float_type* inp_data = inp.as_vector()->data();
-        const fdeep::float_type* cfvs_data = cfvs.as_vector()->data();
-        bool mask[NUM_PLAYERS * NUM_VIEWPOINTS] = {0};
-        for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
-            if (inp_data[i] > 0.0) {
-                for (int player = 0; player < NUM_PLAYERS; player++) {
-                    mask[NUM_VIEWPOINTS * player + ASSIGNMENT_TO_VIEWPOINT[i][player]] = true;
-                }
-            }   
-        }
-        int num_left = 0;
-        for (int i = 0; i < NUM_PLAYERS * NUM_VIEWPOINTS; i++) {
-            num_left += (int) (mask[i]);
-        }
+//         const fdeep::float_type* inp_data = inp.as_vector()->data();
+//         const fdeep::float_type* cfvs_data = cfvs.as_vector()->data();
+//         bool mask[NUM_PLAYERS * NUM_VIEWPOINTS] = {0};
+//         for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
+//             if (inp_data[i] > 0.0) {
+//                 for (int player = 0; player < NUM_PLAYERS; player++) {
+//                     mask[NUM_VIEWPOINTS * player + ASSIGNMENT_TO_VIEWPOINT[i][player]] = true;
+//                 }
+//             }   
+//         }
+//         int num_left = 0;
+//         for (int i = 0; i < NUM_PLAYERS * NUM_VIEWPOINTS; i++) {
+//             num_left += (int) (mask[i]);
+//         }
 
-        fdeep::float_type masked_sum = 0.0;
-        for (int i = 0; i < NUM_PLAYERS * NUM_VIEWPOINTS; i++) {
-            if (mask[i]) {
-                masked_sum += cfvs_data[i];
-            }
-        }
-        fdeep::tensor5 result(cfvs.shape(), 0.0);
-        fdeep::float_type* result_data = const_cast<fdeep::float_type*>(result.as_vector()->data());
+//         fdeep::float_type masked_sum = 0.0;
+//         for (int i = 0; i < NUM_PLAYERS * NUM_VIEWPOINTS; i++) {
+//             if (mask[i]) {
+//                 masked_sum += cfvs_data[i];
+//             }
+//         }
+//         fdeep::tensor5 result(cfvs.shape(), 0.0);
+//         fdeep::float_type* result_data = const_cast<fdeep::float_type*>(result.as_vector()->data());
 
-        fdeep::float_type subtract_amount = masked_sum / num_left;
-        for (int i = 0; i < NUM_PLAYERS * NUM_VIEWPOINTS; i++) {
-            if (mask[i]) {
-                result_data[i] = cfvs_data[i] - subtract_amount;
-            }
-        }
+//         fdeep::float_type subtract_amount = masked_sum / num_left;
+//         for (int i = 0; i < NUM_PLAYERS * NUM_VIEWPOINTS; i++) {
+//             if (mask[i]) {
+//                 result_data[i] = cfvs_data[i] - subtract_amount;
+//             }
+//         }
 
-        return { result };
-    }
-};
+//         return { result };
+//     }
+// };
 
-inline layer_ptr create_cfv_mask_and_adjust_layer(
-    const get_param_f&,
-    const get_global_param_f&,
-    const nlohmann::json&,
-    const std::string& name) {
-    return std::make_shared<cfv_mask_and_adjust_layer>(name);
-}
+// inline layer_ptr create_cfv_mask_and_adjust_layer(
+//     const get_param_f&,
+//     const get_global_param_f&,
+//     const nlohmann::json&,
+//     const std::string& name) {
+//     return std::make_shared<cfv_mask_and_adjust_layer>(name);
+// }
 
-const layer_creators custom_creator = { { "CFVMaskAndAdjustLayer", create_cfv_mask_and_adjust_layer } };
+// class cfv_from_win_probs_layer : public layer {
+// public:
+//     explicit cfv_from_win_probs_layer(const std::string& name) : layer(name) {}
+// protected:
+//     tensor5s apply_impl(const tensor5s& input) const override
+//     {
+//         const fdeep::tensor5& inp = input[0];
+//         const fdeep::tensor5& win_probs = input[1];
 
-} } // namespace fdeep, namespace internal
+//         const fdeep::float_type* inp_data = inp.as_vector()->data();
+//         const fdeep::float_type* win_probs_data = win_probs.as_vector()->data();
+
+//         fdeep::tensor5 result(shape5(1, 1, 1, 1, NUM_PLAYERS*NUM_VIEWPOINTS), 0.0);
+//         fdeep::float_type* result_data = const_cast<fdeep::float_type*>(result.as_vector()->data());
+
+//         for (int assignment = 0; assignment < NUM_ASSIGNMENTS; assignment++) {
+//             fdeep::float_type good_expected_payoff = 2 * GOOD_WIN_PAYOFF * win_probs_data[assignment] - GOOD_WIN_PAYOFF;
+//             fdeep::float_type bad_expected_payoff = good_expected_payoff * EVIL_LOSE_PAYOFF;
+//             for (int player = 0; player < NUM_PLAYERS; player++) {
+//                 int viewpoint = ASSIGNMENT_TO_VIEWPOINT[assignment][player];
+//                 fdeep::float_type payoff = (viewpoint < NUM_GOOD_VIEWPOINTS) ? good_expected_payoff : bad_expected_payoff;
+//                 result_data[NUM_VIEWPOINTS*player + viewpoint] += inp_data[NUM_PLAYERS + assignment] * payoff;
+//             }
+//         }
+
+//         return { result };
+//     }
+// };
+
+// inline layer_ptr create_cfv_from_win_probs_layer(
+//     const get_param_f&,
+//     const get_global_param_f&,
+//     const nlohmann::json&,
+//     const std::string& name) {
+//     return std::make_shared<cfv_from_win_probs_layer>(name);
+// }
+
+// const layer_creators custom_creator = {
+//     { "CFVMaskAndAdjustLayer", create_cfv_mask_and_adjust_layer },
+//     { "CFVFromWinProbsLayer", create_cfv_from_win_probs_layer }
+// };
+
+// } } // namespace fdeep, namespace internal
 
 
 std::shared_ptr<Model> load_model(const std::string& search_dir, const int num_succeeds, const int num_fails, const int propose_count) {
@@ -83,13 +123,14 @@ std::shared_ptr<Model> load_model(const std::string& search_dir, const int num_s
     }
 
     auto model_filename = get_model_filename(search_dir, num_succeeds, num_fails, propose_count);
-    auto model = fdeep::load_model(
-        model_filename,
-        true,
-        fdeep::cerr_logger,
-        static_cast<fdeep::internal::float_type>(0.0001),
-        fdeep::internal::custom_creator
-    );
+    // auto model = fdeep::load_model(
+    //     model_filename,
+    //     true,
+    //     fdeep::cerr_logger,
+    //     static_cast<fdeep::internal::float_type>(0.0001),
+    //     fdeep::internal::custom_creator
+    // );
+    auto model = jdeep::model::load_model(model_filename);
     auto model_ptr = std::make_shared<Model>(num_succeeds, num_fails, propose_count, std::move(model));
 
     model_cache[cache_key] = model_ptr;
@@ -98,21 +139,32 @@ std::shared_ptr<Model> load_model(const std::string& search_dir, const int num_s
 }
 
 void Model::predict(const int proposer, const AssignmentProbs& input_probs, ViewpointVector* output_values) {
-    fdeep::tensor5 input_tensor(fdeep::shape5(1, 1, 1, 1, NUM_ASSIGNMENTS + NUM_PLAYERS), 0.0);
-    fdeep::float_type* input_data = const_cast<fdeep::float_type*>(input_tensor.as_vector()->data());
-    input_data[proposer] = 1.0;
-    for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
-        input_data[i + NUM_PLAYERS] = (fdeep::float_type) input_probs(i);
-    }
+    // fdeep::tensor5 input_tensor(fdeep::shape5(1, 1, 1, 1, NUM_PLAYERS + NUM_ASSIGNMENTS), 0.0);
+    // fdeep::float_type* input_data = const_cast<fdeep::float_type*>(input_tensor.as_vector()->data());
+    // input_data[proposer] = 1.0;
+    // for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
+    //     input_data[i + NUM_PLAYERS] = (fdeep::float_type) input_probs(i);
+    // }
 
-    const auto result = this->model.predict({ input_tensor });
+    // const auto result = this->model.predict({ input_tensor });
 
-    const fdeep::float_type* output_data = result.front().as_vector()->data();
+    // const fdeep::float_type* output_data = result.front().as_vector()->data();
+
+    // for (int player = 0; player < NUM_PLAYERS; player++) {
+    //     for (int viewpoint = 0; viewpoint < NUM_VIEWPOINTS; viewpoint++) {
+    //         output_values[player](viewpoint) = (double) output_data[NUM_VIEWPOINTS*player + viewpoint];
+    //     }
+    // }
+
+    EigenVector input_tensor(65);
+    input_tensor.setZero();
+    input_tensor(proposer) = 1.0;
+    input_tensor.bottomRows<60>() = input_probs.cast<float>();
+
+    EigenVector result = this->model.predict(input_tensor);
 
     for (int player = 0; player < NUM_PLAYERS; player++) {
-        for (int viewpoint = 0; viewpoint < NUM_VIEWPOINTS; viewpoint++) {
-            output_values[player](viewpoint) = (double) output_data[NUM_VIEWPOINTS*player + viewpoint];
-        }
+        output_values[player] = result.block<NUM_VIEWPOINTS, 1>(NUM_VIEWPOINTS*player, 0).cast<double>();
     }
 }
 
