@@ -141,12 +141,29 @@ void generate_datapoints(
     fs.close();
 }
 
-void test() {
-    auto lookahead = create_avalon_lookahead(2, 2, 3, 4, 2, "models");
-    AssignmentProbs starting_probs = AssignmentProbs::Constant(1.0/NUM_ASSIGNMENTS);
-    ViewpointVector values[NUM_PLAYERS];
-    cfr_get_values(lookahead.get(), 3000, 1000, starting_probs, false, values);
-    cout << values[0].transpose() << endl;
+void test(
+    const int depth,
+    const int num_succeeds,
+    const int num_fails,
+    const int propose_count,
+    const int proposer,
+    const int iterations,
+    const int wait_iterations,
+    const std::string model_search_dir
+) {
+    auto lookahead = create_avalon_lookahead(
+        num_succeeds,
+        num_fails,
+        proposer,
+        propose_count,
+        depth,
+        model_search_dir
+    );
+
+    Initialization init;
+    prepare_initialization(depth, num_succeeds, num_fails, propose_count, &init);
+    run_initialization_with_cfr(iterations, wait_iterations, model_search_dir, &init);
+    cout << init.solution_values[0].transpose() << endl;
 }
 
 void play_mode(
@@ -240,6 +257,7 @@ int main(int argc, char* argv[]) {
     std::string s_num_fails;
     std::string s_propose_count;
     std::string s_depth;
+    std::string s_proposer;
     if (options[NUM_DATAPOINTS]) s_num_datapoints = std::string(options[NUM_DATAPOINTS].last()->arg);
     if (options[NUM_ITERATIONS]) s_num_iterations = std::string(options[NUM_ITERATIONS].last()->arg);
     if (options[NUM_WAIT_ITERS]) s_num_wait_iters = std::string(options[NUM_WAIT_ITERS].last()->arg);
@@ -250,6 +268,7 @@ int main(int argc, char* argv[]) {
     if (options[NUM_FAILS]) s_num_fails = std::string(options[NUM_FAILS].last()->arg);
     if (options[PROPOSE_COUNT]) s_propose_count = std::string(options[PROPOSE_COUNT].last()->arg);
     if (options[DEPTH]) s_depth = std::string(options[DEPTH].last()->arg);
+    if (options[PROPOSER]) s_proposer = std::string(options[PROPOSER].last()->arg);
 
     int num_datapoints = (s_num_datapoints.empty()) ? 10000 : std::stoi(s_num_datapoints);
     int num_iterations = (s_num_iterations.empty()) ? 3000 : std::stoi(s_num_iterations);
@@ -258,18 +277,26 @@ int main(int argc, char* argv[]) {
     int num_fails = (s_num_fails.empty()) ? 2 : std::stoi(s_num_fails);
     int propose_count = (s_propose_count.empty()) ? 4 : std::stoi(s_propose_count);
     int depth = (s_depth.empty()) ? 1 : std::stoi(s_depth);
+    int proposer = (s_proposer.empty()) ? -1 : std::stoi(s_proposer);
 
     if (options[TEST_MODE]) {
-        test();
+        if (proposer < 0 || proposer >= NUM_PLAYERS) {
+            proposer = 0;
+        }
+        test(
+            depth,
+            num_succeeds,
+            num_fails,
+            propose_count,
+            proposer,
+            num_iterations,
+            num_wait_iters,
+            model_search_dir
+        );
         return 0;
     }
 
     if (options[PLAY_MODE] || options[NN_TEST]) {
-        std::string s_proposer;
-        if (options[PROPOSER]) {
-            s_proposer = std::string(options[PROPOSER].last()->arg);
-        }
-        int proposer = (s_proposer.empty()) ? -1 : std::stoi(s_proposer);
         if (proposer < 0 || proposer >= NUM_PLAYERS) {
             std::cerr << "You must pass a valid proposer" << std::endl;
             return 1;

@@ -521,11 +521,8 @@ void cfr_get_values(
     long long total_size = 0;
     for (int iter = 0; iter < iterations; iter++) {
         int weight = (iter < wait_iterations) ? 0 : (iter - wait_iterations);
-        if (!save_strategy) {
-            weight = 0;
-        }
 
-        calculate_strategy(root, (double) weight);
+        calculate_strategy(root, (save_strategy) ? weight : 0.0);
         calculate_counterfactual_values(root, starting_probs);
 
         bool equals_previous_iteration = !save_strategy; // Save strategy disables checking for early finish
@@ -547,6 +544,7 @@ void cfr_get_values(
             values[player] += root->counterfactual_values[player] * weight;
         }
     }
+
     for (int i = 0; i < NUM_PLAYERS; i++) {
         values[i] /= total_size;
     }
