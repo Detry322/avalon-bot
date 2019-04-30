@@ -50,22 +50,53 @@ static EigenVector calculate_dense_layer(
     const DenseBiases& biases,
     const activation_type activation
 ) {
-    EigenVector result = (input.matrix().transpose() * weights + biases.transpose()).array();
+    EigenVector result = (input.matrix().transpose() * weights + biases.transpose()).transpose().array();
 
     switch (activation) {
     case RELU:
         result = result.max(0.0);
         break;
     case SIGMOID:
-        result = 1.0 / (1.0 + (-result).exp());
+        result = (1.0 / (1.0 + (-result).exp()));
         break;
     default: break;
     }
     return result;
 }
 
-static EigenVector calculate_cfv_mask_and_adjust_layer(const EigenVector& input_1, const EigenVector& input_2) {
-    return input_1;
+static EigenVector calculate_cfv_mask_and_adjust_layer(const EigenVector& inp, const EigenVector& cfvs) {
+    EigenVector result(NUM_PLAYERS * NUM_VIEWPOINTS);
+    result.setZero();
+
+    bool mask[NUM_PLAYERS * NUM_VIEWPOINTS] = {0};
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
+        if (inp(i) > 0.0) {
+            for (int player = 0; player < NUM_PLAYERS; player++) {
+                mask[NUM_VIEWPOINTS * player + ASSIGNMENT_TO_VIEWPOINT[i][player]] = true;
+            }
+        }   
+    }
+
+    int num_left = 0;
+    for (int i = 0; i < NUM_PLAYERS * NUM_VIEWPOINTS; i++) {
+        num_left += (int) (mask[i]);
+    }
+
+    float masked_sum = 0.0;
+    for (int i = 0; i < NUM_PLAYERS * NUM_VIEWPOINTS; i++) {
+        if (mask[i]) {
+            masked_sum += cfvs(i);
+        }
+    }
+
+    float subtract_amount = masked_sum / num_left;
+    for (int i = 0; i < NUM_PLAYERS * NUM_VIEWPOINTS; i++) {
+        if (mask[i]) {
+            result(i) = cfvs(i) - subtract_amount;
+        }
+    }
+
+    return result;
 };
 
 static EigenVector calculate_cfv_from_win_layer(const EigenVector& input_probs, const EigenVector& win_probs) {
@@ -173,7 +204,12 @@ void run_test(const nlohmann::json& test_case, const model& test_model) {
     }
 
     for (int i = 0; i < output_size; i++) {
-        if (abs(result(i) - output_vec(i)) > 1e-6) {
+        if (abs(result(i) - output_vec(i)) > 0.0001) {
+            std::cerr << std::setprecision(16);
+            std::cerr << "Result:" << std::endl;
+            std::cerr << result.transpose().leftCols(6) << std::endl;
+            std::cerr << "Expected:" << std::endl;
+            std::cerr << output_vec.transpose().leftCols(6) << std::endl;
             throw std::domain_error("results don't match");
         }
     }

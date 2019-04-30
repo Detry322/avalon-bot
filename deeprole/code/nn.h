@@ -14,12 +14,6 @@ using string_view = experimental::string_view;
 
 #endif
 
-// #pragma GCC diagnostic push
-// #pragma GCC diagnostic ignored "-Wpragmas"
-// #pragma GCC diagnostic ignored "-Wreturn-std-move"
-// #include <fdeep/fdeep.hpp>
-// #pragma GCC diagnostic pop
-
 #include "./fdeep_replace.h"
 
 #include "eigen_types.h"
