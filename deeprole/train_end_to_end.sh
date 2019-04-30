@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export HDF5_USE_FILE_LOCKING=FALSE
+
 function train_section() {
     NUM_SUCCEEDS="$1"
     NUM_FAILS="$2"
