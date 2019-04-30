@@ -1,6 +1,6 @@
 #include "./fdeep_replace.h"
 
-#include <nlohmann/json.hpp>
+#include "json.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -15,34 +15,6 @@
 #include "./lookup_tables.h"
 
 namespace jdeep {
-
-// enum layer_type {
-//     INPUT,
-//     DENSE,
-//     CFV_MASK,
-//     CFV_FROM_WIN
-// };
-
-// enum activation_type {
-    // NA,
-    // LINEAR,
-    // RELU,
-    // SIGMOID
-// }
-
-// typedef int layer_id;
-
-// class model {
-// public:
-//     EigenVector predict(const EigenVector& input);
-
-// private:
-//     std::map<layer_id, DenseWeights> layer_weights;
-//     std::map<layer_id, DenseBiases> layer_biases;
-//     std::vector<layer_id> ordered_layers;
-//     std::map<layer_id, std::pair<layer_type, activation_type>> layer_info;
-//     std::map<layer_id, std::vector<layer_id>> predecessors;
-// };
 
 static EigenVector calculate_dense_layer(
     const EigenVector& input,
@@ -204,7 +176,7 @@ void run_test(const nlohmann::json& test_case, const model& test_model) {
     }
 
     for (int i = 0; i < output_size; i++) {
-        if (abs(result(i) - output_vec(i)) > 0.0001) {
+        if (std::abs(result(i) - output_vec(i)) > 0.0001) {
             std::cerr << std::setprecision(16);
             std::cerr << "Result:" << std::endl;
             std::cerr << result.transpose().leftCols(6) << std::endl;

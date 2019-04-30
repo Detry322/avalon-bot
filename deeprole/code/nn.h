@@ -3,17 +3,6 @@
 
 #include <memory>
 
-#ifdef OPENMIND
-#include <experimental/string_view>
-
-namespace std {
-
-using string_view = experimental::string_view;
-
-} // namespace std;
-
-#endif
-
 #include "./fdeep_replace.h"
 
 #include "eigen_types.h"
