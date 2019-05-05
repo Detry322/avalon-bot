@@ -16,8 +16,8 @@ def actually_run_deeprole_on_node(node):
         '--fails={}'.format(node['fails']),
         '--propose_count={}'.format(node['propose_count']),
         '--depth=1',
-        '--iterations=500',
-        '--witers=250',
+        '--iterations=100',
+        '--witers=50',
         '--modeldir=deeprole_models'
     ]
     process = subprocess.Popen(

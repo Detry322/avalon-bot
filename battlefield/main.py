@@ -96,11 +96,6 @@ def parallel_human_compare():
         pool.terminate()
 
 
-def human_compare():
-    stats = compute_human_statistics(CFRBot(1000000), verbose=False, num_players=5)
-    print_human_statistics(stats)
-
-
 STRING_TO_BOT = {
     "RandomBot": RandomBot,
     "RandomBotUV": RandomBotUV,
@@ -109,8 +104,27 @@ STRING_TO_BOT = {
     "SimpleStatsBot": SimpleStatsBot,
     "CFRBot_3000000": CFRBot(3000000),
     "CFRBot_6000000": CFRBot(6000000),
-    "CFRBot_10000000": CFRBot(10000000)
+    "CFRBot_10000000": CFRBot(10000000),
+    "Deeprole": Deeprole
 }
+
+def human_compare():
+    assert len(sys.argv) == 4, "Need 3 arguments to collect human stats"
+    bot = STRING_TO_BOT[sys.argv[1]]
+    min_game_id = int(sys.argv[2])
+    max_game_id = int(sys.argv[3])
+    stats = compute_human_statistics(
+        bot,
+        verbose=True,
+        num_players=5,
+        max_num_players=None,
+        min_game_id=min_game_id,
+        max_game_id=max_game_id,
+        roles=set(['servant', 'merlin', 'minion', 'assassin'])
+    )
+    with gzip.open('human/{}-{}-{}.msg.gz'.format(bot.__name__, min_game_id, max_game_id), 'w') as f:
+        stats.to_msgpack(f)
+
 
 def predict_roles(bot, tremble):
     bot = STRING_TO_BOT[bot]
@@ -132,9 +146,10 @@ if __name__ == "__main__":
     # predict_evil_using_voting()
     # tournament()
     # run_and_print_game(TOURNAMENT_CONFIG)
-    print_tournament_statistics(
-        run_simple_tournament(TOURNAMENT_CONFIG, num_games=100, granularity=1)
-    )
+    # print_tournament_statistics(
+    #     run_simple_tournament(TOURNAMENT_CONFIG, num_games=1000, granularity=1)
+    # )
+    human_compare()
     # determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)
     # test_calculate()
     # df, _ = predict_evil_over_human_data(HumanLikeBot, 0.01)
