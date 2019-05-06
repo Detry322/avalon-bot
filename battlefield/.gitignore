@@ -5,3 +5,5 @@ human/
 tournaments/
 predict_roles/
 *.pkl
+*.msg
+*.msg.gz

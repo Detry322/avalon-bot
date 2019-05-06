@@ -282,6 +282,11 @@ class _CFRBotCreator:
         self.cls = IterCFRBot
         return self.cls(*args, **kwargs)
 
+    def create_and_reset(self, game, player, role, hidden_states):
+        bot = self()
+        bot.reset(game, player, role, hidden_states)
+        return bot
+
 
 def CFRBot(iteration='latest'):
     return _CFRBotCreator(iteration)

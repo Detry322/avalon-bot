@@ -16,6 +16,7 @@ from battlefield.tournament import (
     run_simple_tournament,
     run_large_tournament,
     run_all_combos_parallel,
+    run_all_combos_simple,
     print_tournament_statistics,
     check_config,
     run_learning_tournament,
@@ -139,6 +140,14 @@ def predict_roles(bot, tremble):
         pickle.dump(particles, f)
 
 
+def benchmark_performance():
+    games_per_matching = int(sys.argv[1])
+    bot_names = sys.argv[2:]
+    bot_classes = [ STRING_TO_BOT[name] for name in bot_names ]
+    roles = ['merlin', 'servant', 'assassin', 'minion', 'servant']
+    run_all_combos_simple(bot_classes, roles, games_per_matching=games_per_matching)
+
+
 if __name__ == "__main__":
     # bots = [ ObserveBeaterBot, ObserveBot, ObserveBot, ObserveBot, ObserveBot ]
     # run_learning_tournament(bots, winrate_track=0)
@@ -149,7 +158,8 @@ if __name__ == "__main__":
     # print_tournament_statistics(
     #     run_simple_tournament(TOURNAMENT_CONFIG, num_games=1000, granularity=1)
     # )
-    human_compare()
+    benchmark_performance()
+    # human_compare()
     # determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)
     # test_calculate()
     # df, _ = predict_evil_over_human_data(HumanLikeBot, 0.01)

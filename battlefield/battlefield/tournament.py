@@ -3,6 +3,7 @@ import pandas as pd
 import multiprocessing
 import gzip
 import random
+import os
 from collections import defaultdict
 
 from battlefield.avalon_types import GOOD_ROLES, EVIL_ROLES, possible_hidden_states, starting_hidden_states
@@ -51,9 +52,10 @@ def run_large_tournament(bots_classes, roles, games_per_matching=50):
             seen_bot_orders.add(bot_order_str)
 
             for _ in range(games_per_matching):
-                bots = [ bot_cls() for _ in hidden_state ]
-                for player, (bot, role) in enumerate(zip(bots, hidden_state)):
-                    bot.reset(start_state, player, role, beliefs[player])
+                bots = [
+                    bot_cls.create_and_reset(start_state, player, role, beliefs[player])
+                    for player, (bot_cls, role) in enumerate(zip(bots_classes, hidden_state))
+                ]
                 values, game_end = run_game(start_state, hidden_state, bots)
                 game_stat = {
                     'winner': game_end[0],
@@ -151,6 +153,22 @@ def print_tournament_statistics(tournament_statistics):
         print "{}: {} - {}".format(count, game_end[0], game_end[1])
 
 
+
+def run_all_combos_simple(bots, roles, games_per_matching=50):
+    results = []
+    for combination in itertools.combinations_with_replacement(bots, r=len(roles)):
+        combo_name = '-'.join(map(lambda c: c.__name__, combination))
+        results.append(
+            (combo_name, run_large_tournament(combination, roles, games_per_matching=games_per_matching))
+        )
+
+    job_id = os.urandom(10).encode('hex')
+
+    for combo_name, dataframe in results:
+        filename = 'tournaments/{}_{}.msg.gz'.format(combo_name, job_id)
+        print "Writing {}".format(filename)
+        with gzip.open(filename, 'w') as f:
+            dataframe.to_msgpack(f)
 
 
 def run_all_combos_parallel(bots, roles):
