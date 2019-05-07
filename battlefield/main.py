@@ -106,7 +106,9 @@ STRING_TO_BOT = {
     "CFRBot_3000000": CFRBot(3000000),
     "CFRBot_6000000": CFRBot(6000000),
     "CFRBot_10000000": CFRBot(10000000),
-    "Deeprole": Deeprole
+    "Deeprole": Deeprole,
+    "ISMCTSBot": ISMCTSBot,
+    "MOISMCTSBot": MOISMCTSBot,
 }
 
 def human_compare():

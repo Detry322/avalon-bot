@@ -8,11 +8,16 @@ from battlefield.bots.ismcts.moismcts import search_moismcts
 from battlefield.bots.ismcts.mtmoismcts import search_mtmoismcts
 
 class ISMCTSBot(Bot):
-    def __init__(self, game, player, role, hidden_states):
+    def __init__(self):
+        pass
+
+
+    def reset(self, game, player, role, hidden_states):
         self.game = game
         self.player = player
         self.role = role
         self.hidden_states = hidden_states
+        self.is_evil = role in EVIL_ROLES
 
 
     def handle_transition(self, old_state, new_state, observation, move=None):
@@ -26,7 +31,7 @@ class ISMCTSBot(Bot):
         if len(legal_actions) == 1:
             return legal_actions[0]
 
-        action, _ = search_ismcts(self.player, state, self.hidden_states, 500)
+        action, _ = search_ismcts(self.player, state, self.hidden_states, 10000)
         return action
 
 
@@ -58,16 +63,12 @@ class MOISMCTSBot(Bot):
         if len(legal_actions) == 1:
             return legal_actions[0]
 
-        print state
         actions, roots = search_mtmoismcts(self.player, state, self.hidden_states, 10000)
         root = roots[self.player][self.is_evil]
         while '_no_move' in root.children:
             root = root.children['_no_move']
-        print "MOVES: "
         for move in root.children:
             child = root.children[move]
-            print move, child.total_reward / child.visit_count, child.visit_count, "CHOSEN" if move == actions[self.is_evil] else ""
-        # import IPython; IPython.embed()
         return actions[self.role in EVIL_ROLES]
 
 
