@@ -36,7 +36,7 @@ def actually_run_deeprole_on_node(node):
 def run_deeprole_on_node(node):
     global deeprole_cache
 
-    if len(deeprole_cache) > 10000:
+    if len(deeprole_cache) > 100:
         deeprole_cache = {}
 
     cache_key = (node['proposer'], node['succeeds'], node['fails'], node['propose_count'], tuple(node['new_belief']))

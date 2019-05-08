@@ -27,6 +27,7 @@ from battlefield.compare_to_human import compute_human_statistics, print_human_s
 from battlefield.predict_roles import predict_evil_over_human_data, predict_evil_using_voting, grid_search
 from battlefield.determine_reachable_states import determine_reachable
 from battlefield.subgame import calculate_subgame_ll, test_calculate
+from battlefield.predict_merlin import get_merlin_prediction
 import multiprocessing
 import pandas as pd
 import sys
@@ -142,6 +143,18 @@ def predict_roles(bot, tremble):
         pickle.dump(particles, f)
 
 
+def predict_merlin():
+    assert len(sys.argv) == 4, "Need 3 arguments to collect human stats"
+    bot = STRING_TO_BOT[sys.argv[1]]
+    min_game_id = int(sys.argv[2])
+    max_game_id = int(sys.argv[3])
+
+    result = get_merlin_prediction(bot, num_players=5, min_game_id=min_game_id, max_game_id=max_game_id)
+
+    with gzip.open('merlin/{}-{}-{}.msg.gz'.format(bot.__name__, min_game_id, max_game_id), 'w') as f:
+        result.to_msgpack(f)
+
+
 def benchmark_performance():
     games_per_matching = int(sys.argv[1])
     bot_names = sys.argv[2:]
@@ -160,7 +173,8 @@ if __name__ == "__main__":
     # print_tournament_statistics(
     #     run_simple_tournament(TOURNAMENT_CONFIG, num_games=1000, granularity=1)
     # )
-    benchmark_performance()
+    # benchmark_performance()
+    predict_merlin()
     # human_compare()
     # determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)
     # test_calculate()
