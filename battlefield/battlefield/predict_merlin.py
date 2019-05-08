@@ -93,6 +93,8 @@ def get_bot_merlin_prediction(bot_class, game):
         'bot_human_prob': move_probs[find_merlin['merlin_guess']],
         'correct_guess': hidden_state.index('merlin'),
         'bot_correct_prob': move_probs[hidden_state.index('merlin')],
+        'top_pick': np.argmax(move_probs),
+        'top_pick_prob': np.max(move_probs),
         'game': game['id'],
         'merlin': game['players'][hidden_state.index('merlin')]['player_id'],
         'assassin': game['players'][hidden_state.index('assassin')]['player_id']

@@ -54,7 +54,7 @@ def run_large_tournament(bots_classes, roles, games_per_matching=50):
             for _ in range(games_per_matching):
                 bots = [
                     bot_cls.create_and_reset(start_state, player, role, beliefs[player])
-                    for player, (bot_cls, role) in enumerate(zip(bots_classes, hidden_state))
+                    for player, (bot_cls, role) in enumerate(zip(bot_order, hidden_state))
                 ]
                 values, game_end = run_game(start_state, hidden_state, bots)
                 game_stat = {
@@ -66,6 +66,63 @@ def run_large_tournament(bots_classes, roles, games_per_matching=50):
                     game_stat['bot_{}_role'.format(player)] = role
                     game_stat['bot_{}_payoff'.format(player)] = values[player]
                 result.append(game_stat)
+
+    df = pd.DataFrame(result, columns=sorted(result[0].keys()))
+    df['winner'] = df['winner'].astype('category')
+    df['win_type'] = df['win_type'].astype('category')
+    for player in range(len(roles)):
+        df['bot_{}'.format(player)] = df['bot_{}'.format(player)].astype('category')
+        df['bot_{}_role'.format(player)] = df['bot_{}_role'.format(player)].astype('category')
+
+    return df
+
+
+def large_tournament_parallel_helper(bot_order, hidden_state, beliefs, start_state):
+    bots = [
+        bot_cls.create_and_reset(start_state, player, role, beliefs[player])
+        for player, (bot_cls, role) in enumerate(zip(bot_order, hidden_state))
+    ]
+    values, game_end = run_game(start_state, hidden_state, bots)
+    game_stat = {
+        'winner': game_end[0],
+        'win_type': game_end[1],
+    }
+    for player, (bot_cls, role) in enumerate(zip(bot_order, hidden_state)):
+        game_stat['bot_{}'.format(player)] = bot_cls.__name__
+        game_stat['bot_{}_role'.format(player)] = role
+        game_stat['bot_{}_payoff'.format(player)] = values[player]
+
+    return game_stat
+
+
+def run_large_tournament_parallel(pool, bots_classes, roles, games_per_matching=50):
+    print "Running {}".format(' '.join(map(lambda c: c.__name__, bots_classes)))
+
+    start_state = AvalonState.start_state(len(roles))
+    async_results = []
+    all_hidden_states = possible_hidden_states(set(roles), num_players=len(roles))
+
+    seen_hidden_states = set([])
+    for hidden_state in itertools.permutations(roles):
+        if hidden_state in seen_hidden_states:
+            continue
+        seen_hidden_states.add(hidden_state)
+
+        beliefs = [
+            starting_hidden_states(player, hidden_state, all_hidden_states) for player in range(len(hidden_state))
+        ]
+        seen_bot_orders = set([])
+        for bot_order in itertools.permutations(bots_classes):
+            bot_order_str = tuple([bot_cls.__name__ for bot_cls in bot_order])
+            if bot_order_str in seen_bot_orders:
+                continue
+            seen_bot_orders.add(bot_order_str)
+
+            for _ in range(games_per_matching):
+                async_result = pool.apply_async(large_tournament_parallel_helper, (bot_order, hidden_state, beliefs, start_state))
+                async_results.append(async_result)
+                
+    result = [ async_result.get() for async_result in async_results ]
 
     df = pd.DataFrame(result, columns=sorted(result[0].keys()))
     df['winner'] = df['winner'].astype('category')
@@ -161,6 +218,27 @@ def run_all_combos_simple(bots, roles, games_per_matching=50):
         results.append(
             (combo_name, run_large_tournament(combination, roles, games_per_matching=games_per_matching))
         )
+
+    job_id = os.urandom(10).encode('hex')
+
+    for combo_name, dataframe in results:
+        filename = 'tournaments/{}_{}.msg.gz'.format(combo_name, job_id)
+        print "Writing {}".format(filename)
+        with gzip.open(filename, 'w') as f:
+            dataframe.to_msgpack(f)
+
+
+def run_all_combos(bots, roles, games_per_matching=50, parallelization=16):
+    pool = multiprocessing.Pool(parallelization)
+    results = []
+    for combination in itertools.combinations_with_replacement(bots, r=len(roles)):
+        combo_name = '-'.join(map(lambda c: c.__name__, combination))
+        results.append(
+            (combo_name, run_large_tournament_parallel(pool, combination, roles, games_per_matching=games_per_matching))
+        )
+
+    pool.close()
+    pool.join()
 
     job_id = os.urandom(10).encode('hex')
 

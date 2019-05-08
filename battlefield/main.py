@@ -17,6 +17,7 @@ from battlefield.tournament import (
     run_large_tournament,
     run_all_combos_parallel,
     run_all_combos_simple,
+    run_all_combos,
     print_tournament_statistics,
     check_config,
     run_learning_tournament,
@@ -155,12 +156,23 @@ def predict_merlin():
         result.to_msgpack(f)
 
 
-def benchmark_performance():
+def benchmark_performance_simple():
     games_per_matching = int(sys.argv[1])
     bot_names = sys.argv[2:]
     bot_classes = [ STRING_TO_BOT[name] for name in bot_names ]
     roles = ['merlin', 'servant', 'assassin', 'minion', 'servant']
     run_all_combos_simple(bot_classes, roles, games_per_matching=games_per_matching)
+
+
+def benchmark_performance():
+    print "Launching..."
+    games_per_matching = int(sys.argv[1])
+    bot_names = sys.argv[2:]
+    bot_classes = [ STRING_TO_BOT[name] for name in bot_names ]
+    roles = ['merlin', 'servant', 'assassin', 'minion', 'servant']
+    run_all_combos(bot_classes, roles, games_per_matching=games_per_matching, parallelization=20)
+
+
 
 
 if __name__ == "__main__":
@@ -173,8 +185,8 @@ if __name__ == "__main__":
     # print_tournament_statistics(
     #     run_simple_tournament(TOURNAMENT_CONFIG, num_games=1000, granularity=1)
     # )
-    # benchmark_performance()
-    predict_merlin()
+    benchmark_performance()
+    # predict_merlin()
     # human_compare()
     # determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)
     # test_calculate()
