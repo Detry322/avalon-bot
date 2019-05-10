@@ -10,7 +10,16 @@ from battlefield.bots import (
     CFRBot,
     LearningBot,
     ObserveBeaterBot,
-    Deeprole
+    Deeprole,
+    Deeprole_3_1,
+    Deeprole_10_5,
+    Deeprole_30_15,
+    Deeprole_100_50,
+    Deeprole_300_150,
+    Deeprole_100_0,
+    Deeprole_100_25,
+    Deeprole_100_75,
+    Deeprole_100_100
 )
 from battlefield.tournament import (
     run_simple_tournament,
@@ -31,6 +40,7 @@ from battlefield.subgame import calculate_subgame_ll, test_calculate
 from battlefield.predict_merlin import get_merlin_prediction
 import multiprocessing
 import pandas as pd
+import random
 import sys
 import gzip
 import cPickle as pickle
@@ -108,9 +118,18 @@ STRING_TO_BOT = {
     "CFRBot_3000000": CFRBot(3000000),
     "CFRBot_6000000": CFRBot(6000000),
     "CFRBot_10000000": CFRBot(10000000),
-    "Deeprole": Deeprole,
     "ISMCTSBot": ISMCTSBot,
     "MOISMCTSBot": MOISMCTSBot,
+    "Deeprole": Deeprole,
+    "Deeprole_3_1": Deeprole_3_1,
+    "Deeprole_10_5": Deeprole_10_5,
+    "Deeprole_30_15": Deeprole_30_15,
+    "Deeprole_100_50": Deeprole_100_50,
+    "Deeprole_300_150": Deeprole_300_150,
+    "Deeprole_100_0": Deeprole_100_0,
+    "Deeprole_100_25": Deeprole_100_25,
+    "Deeprole_100_75": Deeprole_100_75,
+    "Deeprole_100_100": Deeprole_100_100
 }
 
 def human_compare():
@@ -170,7 +189,7 @@ def benchmark_performance():
     bot_names = sys.argv[2:]
     bot_classes = [ STRING_TO_BOT[name] for name in bot_names ]
     roles = ['merlin', 'servant', 'assassin', 'minion', 'servant']
-    run_all_combos(bot_classes, roles, games_per_matching=games_per_matching, parallelization=20)
+    run_all_combos(bot_classes, roles, games_per_matching=games_per_matching, parallelization=40)
 
 
 
@@ -181,7 +200,9 @@ if __name__ == "__main__":
     # grid_search()
     # predict_evil_using_voting()
     # tournament()
-    # run_and_print_game(TOURNAMENT_CONFIG)
+    # roles = ['merlin', 'assassin', 'servant', 'servant', 'minion']
+    # random.shuffle(roles)
+    # run_and_print_game([ {'bot': Deeprole, 'role': r } for r in roles ])
     # print_tournament_statistics(
     #     run_simple_tournament(TOURNAMENT_CONFIG, num_games=1000, granularity=1)
     # )

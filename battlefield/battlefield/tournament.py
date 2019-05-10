@@ -415,12 +415,18 @@ def run_and_print_game(config):
         elif state.status == 'run':
             print "--- Mission results ---"
             for player, move in zip(moving_players, moves):
-                print "{: >24}: {}".format(bot_names[player], 'FAIL' if move.fail else 'SUCCEED')
+                legal_actions = state.legal_actions(player, hidden_state)
+                move_probs = bots[player].get_move_probabilities(state, legal_actions)
+                move_prob = move_probs[legal_actions.index(move)]
+                print "{: >24}: {} ({:0.2f})".format(bot_names[player], 'FAIL' if move.fail else 'SUCCEED', move_prob)
         elif state.status == 'merlin':
             print "===== Final chance: pick merlin! ====="
             assassin = hidden_state.index('assassin')
+            legal_actions = state.legal_actions(assassin, hidden_state)
+            move_probs = bots[assassin].get_move_probabilities(state, legal_actions)
+            move_prob = move_probs[legal_actions.index(moves[0])]
             assassin_pick = moves[assassin].merlin
-            print '{} picked {} ({})'.format(bot_names[assassin], bot_names[assassin_pick], 'CORRECT' if assassin_pick == hidden_state.index('merlin') else 'WRONG')
+            print '{} picked {} - {}! ({:0.2f})'.format(bot_names[assassin], bot_names[assassin_pick], 'CORRECT' if assassin_pick == hidden_state.index('merlin') else 'WRONG', move_prob)
 
         new_state, _, observation = state.transition(moves, hidden_state)
         for player, bot in enumerate(bots):

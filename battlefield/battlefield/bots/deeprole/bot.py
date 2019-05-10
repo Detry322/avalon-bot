@@ -38,12 +38,15 @@ def print_move_probs(probs, legal_actions, cutoff=0.95):
 
 # Plays randomly, except always fails missions if bad.
 class Deeprole(Bot):
+    ITERATIONS = 100
+    WAIT_ITERATIONS = 50
+
     def __init__(self):
         pass
 
 
     def reset(self, game, player, role, hidden_states):
-        self.node = run_deeprole_on_node(START_NODE)
+        self.node = run_deeprole_on_node(START_NODE, self.ITERATIONS, self.WAIT_ITERATIONS)
         self.player = player
         self.perspective = get_deeprole_perspective(player, hidden_states[0])
         # print self.perspective
@@ -70,7 +73,7 @@ class Deeprole(Bot):
             # print "Player {} perspective {}".format(self.player, self.perspective)
             # print_top_k_viewpoint_belief(self.node['new_belief'], self.player, self.perspective)
             # print self.node['new_belief']
-            self.node = run_deeprole_on_node(self.node)
+            self.node = run_deeprole_on_node(self.node, self.ITERATIONS, self.WAIT_ITERATIONS)
 
         if self.node['type'].startswith("TERMINAL_") and self.node['type'] != "TERMINAL_MERLIN":
             return
@@ -127,4 +130,45 @@ class Deeprole(Bot):
             # print np.array(self.node['merlin_strat'][self.player][self.perspective])
             return np.array(self.node['merlin_strat'][self.player][self.perspective])
 
+
+# For examining the effect of more iterations
+class Deeprole_3_1(Deeprole):
+    ITERATIONS = 3
+    WAIT_ITERATIONS = 1
+
+class Deeprole_10_5(Deeprole):
+    ITERATIONS = 10
+    WAIT_ITERATIONS = 5
+
+class Deeprole_30_15(Deeprole):
+    ITERATIONS = 30
+    WAIT_ITERATIONS = 15
+
+class Deeprole_100_50(Deeprole):
+    ITERATIONS = 100
+    WAIT_ITERATIONS = 50
+
+class Deeprole_300_150(Deeprole):
+    ITERATIONS = 300
+    WAIT_ITERATIONS = 150
+
+
+# For examining the effect of "Wait iterations"
+class Deeprole_100_0(Deeprole):
+    ITERATIONS = 100
+    WAIT_ITERATIONS = 0
+
+class Deeprole_100_25(Deeprole):
+    ITERATIONS = 100
+    WAIT_ITERATIONS = 25
+
+# class Deeprole_100_50(Deeprole):
+
+class Deeprole_100_75(Deeprole):
+    ITERATIONS = 100
+    WAIT_ITERATIONS = 75
+
+class Deeprole_100_100(Deeprole):
+    ITERATIONS = 100
+    WAIT_ITERATIONS = 99
 

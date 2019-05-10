@@ -7,7 +7,7 @@ DEEPROLE_BINARY = os.path.join(DEEPROLE_BASE_DIR, 'code', 'deeprole')
 
 deeprole_cache = {}
 
-def actually_run_deeprole_on_node(node):
+def actually_run_deeprole_on_node(node, iterations, wait_iterations):
     command = [
         DEEPROLE_BINARY,
         '--play',
@@ -16,8 +16,8 @@ def actually_run_deeprole_on_node(node):
         '--fails={}'.format(node['fails']),
         '--propose_count={}'.format(node['propose_count']),
         '--depth=1',
-        '--iterations=100',
-        '--witers=50',
+        '--iterations={}'.format(iterations),
+        '--witers={}'.format(wait_iterations),
         '--modeldir=deeprole_models'
     ]
     process = subprocess.Popen(
@@ -33,16 +33,16 @@ def actually_run_deeprole_on_node(node):
     return result
 
 
-def run_deeprole_on_node(node):
+def run_deeprole_on_node(node, iterations, wait_iterations):
     global deeprole_cache
 
-    if len(deeprole_cache) > 100:
+    if len(deeprole_cache) > 250:
         deeprole_cache = {}
 
-    cache_key = (node['proposer'], node['succeeds'], node['fails'], node['propose_count'], tuple(node['new_belief']))
+    cache_key = (node['proposer'], node['succeeds'], node['fails'], node['propose_count'], tuple(node['new_belief']), iterations, wait_iterations)
     if cache_key in deeprole_cache:
         return deeprole_cache[cache_key]
 
-    result = actually_run_deeprole_on_node(node)
+    result = actually_run_deeprole_on_node(node, iterations, wait_iterations)
     deeprole_cache[cache_key] = result
     return result
