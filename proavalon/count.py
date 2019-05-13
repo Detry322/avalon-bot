@@ -93,8 +93,7 @@ def calculate_human_statistics():
             'bot_avg_payoff': sum(bot_payoffs) / len(bot_payoffs),
             'human_avg_payoff': sum(human_payoffs) / len(human_payoffs),
             'n_games': len(game_results[num_bots]),
-            'confidence': compute_prob(bot_payoffs),
-            'winrate': np.mean(np.array(bot_payoffs) > 0)
+            'confidence': compute_prob(bot_payoffs)
         }
     return result
 
@@ -102,16 +101,15 @@ def calculate_human_statistics():
 
 def print_statistics():
     all_statistics = calculate_human_statistics()
-    print " N_Bots | N_Humans | Bot_payoff | human_payoff | N_games | 'Winrate' | P(bot_payoff > 0.0) "
+    print " N_Bots | N_Humans | Bot_payoff | human_payoff | N_games | P(bot_payoff > 0.0) "
     print "==========================================================================================="
     for num_bots, stats in sorted(all_statistics.items()):
-        print " {: <6} | {: <8} | {:.08f} | {:.09f} | {: <7} | {: <9.4f} | {}".format(
+        print " {: <6} | {: <8} | {:.08f} | {:.09f} | {: <7} | {}".format(
             stats['n_bots'],
             stats['n_humans'],
             stats['bot_avg_payoff'],
             stats['human_avg_payoff'],
             stats['n_games'],
-            stats['winrate'],
             stats['confidence']
         )
 
