@@ -28,7 +28,7 @@ def analyze_game(game):
     total_bots = res_bots + spy_bots
     total_humans = 5 - total_bots
 
-    return (res_bots + spy_bots, bot_payoff/total_bots, human_payoff/total_humans)
+    return [(res_bots + spy_bots, res_payoff)] * res_bots + [(res_bots + spy_bots, spy_payoff)] * spy_bots
 
 
 def all_equal(l):
@@ -65,10 +65,9 @@ def load_games():
     for _, similar_games in games.items():
         filenames = similar_games.keys()
         game_results = [analyze_game(similar_games[filename]) for filename in filenames]
-        assert all_equal(game_results)
         result = game_results[0]
-        bot_count, _, _ = result
-        games_by_bot_count[bot_count].append(result)
+        bot_count, _ = result[0]
+        games_by_bot_count[bot_count].extend(result)
     return games_by_bot_count
 
 
@@ -86,13 +85,17 @@ def calculate_human_statistics():
     result = {}
     game_results = load_games()
     for num_bots in sorted(game_results.keys()):
-        _, bot_payoffs, human_payoffs = zip(*game_results[num_bots])
+        _, bot_payoffs = zip(*game_results[num_bots])
+
+        bot_avg = sum(bot_payoffs) / len(bot_payoffs)
+        human_avg = -bot_avg * (5.0 - num_bots) / num_bots
+
         result[num_bots] = {
             'n_bots': num_bots,
             'n_humans': 5 - num_bots,
-            'bot_avg_payoff': sum(bot_payoffs) / len(bot_payoffs),
-            'human_avg_payoff': sum(human_payoffs) / len(human_payoffs),
-            'n_games': len(game_results[num_bots]),
+            'bot_avg_payoff': bot_avg,
+            'human_avg_payoff': human_avg,
+            'n_games': len(game_results[num_bots]) / num_bots,
             'confidence': compute_prob(bot_payoffs)
         }
     return result
