@@ -1,13 +1,44 @@
 import subprocess
 import json
 import os
+import numpy as np
+
+from battlefield.bots.deeprole.lookup_tables import ASSIGNMENT_TO_VIEWPOINT
 
 DEEPROLE_BASE_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'deeprole')
 DEEPROLE_BINARY = os.path.join(DEEPROLE_BASE_DIR, 'code', 'deeprole')
 
+def marginalize_belief(belief):
+    player_beliefs = [ np.zeros(15) for _ in range(5) ]
+
+    for value, viewpoint in zip(belief, ASSIGNMENT_TO_VIEWPOINT):
+        for player in range(5):
+            player_beliefs[player][viewpoint[player]] += value
+
+    for player in range(5):
+        player_beliefs[player] /= np.sum(player_beliefs[player])
+
+    result = np.zeros(60)
+
+    for index, viewpoint in enumerate(ASSIGNMENT_TO_VIEWPOINT):
+        for player in range(5):
+            result[index] += np.log(player_beliefs[player][viewpoint[player]])
+
+    result -= np.max(result)
+    result = np.exp(result)
+    result /= np.sum(result)
+
+    nonzero = np.array([1.0 if b != 0 else 0.0 for b in belief])
+    nonzero /= np.sum(nonzero)
+
+    result = (1-1e-60) * result + 1e-60 * nonzero
+
+    return list(result / np.sum(result))
+
+
 deeprole_cache = {}
 
-def actually_run_deeprole_on_node(node, iterations, wait_iterations):
+def actually_run_deeprole_on_node(node, iterations, wait_iterations, margin):
     command = [
         DEEPROLE_BINARY,
         '--play',
@@ -28,21 +59,27 @@ def actually_run_deeprole_on_node(node, iterations, wait_iterations):
         cwd=DEEPROLE_BASE_DIR
     )
 
-    stdout, _ = process.communicate(input=str(node['new_belief']) + "\n")
+    belief = node['new_belief']
+    print margin, belief[:10]
+    if margin:
+        belief = marginalize_belief(belief)
+    print margin, belief[:10]
+
+    stdout, _ = process.communicate(input=str(belief) + "\n")
     result = json.loads(stdout)
     return result
 
 
-def run_deeprole_on_node(node, iterations, wait_iterations):
+def run_deeprole_on_node(node, iterations, wait_iterations, margin=False):
     global deeprole_cache
 
     if len(deeprole_cache) > 250:
         deeprole_cache = {}
 
-    cache_key = (node['proposer'], node['succeeds'], node['fails'], node['propose_count'], tuple(node['new_belief']), iterations, wait_iterations)
+    cache_key = (node['proposer'], node['succeeds'], node['fails'], node['propose_count'], tuple(node['new_belief']), iterations, wait_iterations, margin)
     if cache_key in deeprole_cache:
         return deeprole_cache[cache_key]
 
-    result = actually_run_deeprole_on_node(node, iterations, wait_iterations)
+    result = actually_run_deeprole_on_node(node, iterations, wait_iterations, margin)
     deeprole_cache[cache_key] = result
     return result

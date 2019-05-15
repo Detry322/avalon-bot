@@ -41,7 +41,7 @@ def all_equal(l):
 
 def load_games():
     games = defaultdict(lambda: {})
-    for game_file in glob.glob('results_dir/*.json'):
+    for game_file in glob.glob('results_dir/*/*/*.json'):
         with open(game_file) as f:
             g = json.load(f)
 
@@ -76,7 +76,7 @@ def compute_prob(data):
     values, counts = np.unique(data, return_counts=True)
     if 0 in list(counts):
         return float('nan')
-    better_counts = 10*np.ones(len(counts)) + counts
+    better_counts = 0.5*np.ones(len(counts)) + counts
     samples = np.random.dirichlet(better_counts, 1000000)
     return np.mean((np.dot(samples, values) > 0.0).astype(np.float))
 
@@ -102,7 +102,7 @@ def calculate_human_statistics():
 def print_statistics():
     all_statistics = calculate_human_statistics()
     print " N_Bots | N_Humans | Bot_payoff | human_payoff | N_games | P(bot_payoff > 0.0) "
-    print "==========================================================================================="
+    print "==============================================================================="
     for num_bots, stats in sorted(all_statistics.items()):
         print " {: <6} | {: <8} | {:.08f} | {:.09f} | {: <7} | {}".format(
             stats['n_bots'],
@@ -112,6 +112,8 @@ def print_statistics():
             stats['n_games'],
             stats['confidence']
         )
+
+    print "============================================== | {: <7} | =====================".format(sum(v['n_games'] for v in all_statistics.values()))
 
 
 if __name__ == '__main__':

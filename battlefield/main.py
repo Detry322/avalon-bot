@@ -19,7 +19,8 @@ from battlefield.bots import (
     Deeprole_100_0,
     Deeprole_100_25,
     Deeprole_100_75,
-    Deeprole_100_100
+    Deeprole_100_100,
+    Deeprole_Marginalized
 )
 from battlefield.tournament import (
     run_simple_tournament,
@@ -56,11 +57,11 @@ TOURNAMENT_CONFIG = [
         'role': 'minion'
     },
     {
-        'bot': Deeprole,
+        'bot': Deeprole_Marginalized,
         'role': 'servant'
     },
     {
-        'bot': Deeprole,
+        'bot': Deeprole_Marginalized,
         'role': 'servant'
     },
     {
@@ -129,7 +130,8 @@ STRING_TO_BOT = {
     "Deeprole_100_0": Deeprole_100_0,
     "Deeprole_100_25": Deeprole_100_25,
     "Deeprole_100_75": Deeprole_100_75,
-    "Deeprole_100_100": Deeprole_100_100
+    "Deeprole_100_100": Deeprole_100_100,
+    "Deeprole_Marginalized": Deeprole_Marginalized,
 }
 
 def human_compare():
@@ -203,10 +205,10 @@ if __name__ == "__main__":
     # roles = ['merlin', 'assassin', 'servant', 'servant', 'minion']
     # random.shuffle(roles)
     # run_and_print_game([ {'bot': Deeprole, 'role': r } for r in roles ])
-    # print_tournament_statistics(
-    #     run_simple_tournament(TOURNAMENT_CONFIG, num_games=1000, granularity=1)
-    # )
-    benchmark_performance()
+    print_tournament_statistics(
+        run_single_threaded_tournament(TOURNAMENT_CONFIG, num_games=100, granularity=1)
+    )
+    # benchmark_performance()
     # predict_merlin()
     # human_compare()
     # determine_reachable(RandomBot, set(['merlin', 'minion', 'assassin', 'servant']), 5)

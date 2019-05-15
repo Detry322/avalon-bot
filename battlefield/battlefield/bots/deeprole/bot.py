@@ -40,13 +40,14 @@ def print_move_probs(probs, legal_actions, cutoff=0.95):
 class Deeprole(Bot):
     ITERATIONS = 100
     WAIT_ITERATIONS = 50
+    MARGINALIZE=False
 
     def __init__(self):
         pass
 
 
     def reset(self, game, player, role, hidden_states):
-        self.node = run_deeprole_on_node(START_NODE, self.ITERATIONS, self.WAIT_ITERATIONS)
+        self.node = run_deeprole_on_node(START_NODE, self.ITERATIONS, self.WAIT_ITERATIONS, margin=self.MARGINALIZE)
         self.player = player
         self.perspective = get_deeprole_perspective(player, hidden_states[0])
         # print self.perspective
@@ -73,7 +74,7 @@ class Deeprole(Bot):
             # print "Player {} perspective {}".format(self.player, self.perspective)
             # print_top_k_viewpoint_belief(self.node['new_belief'], self.player, self.perspective)
             # print self.node['new_belief']
-            self.node = run_deeprole_on_node(self.node, self.ITERATIONS, self.WAIT_ITERATIONS)
+            self.node = run_deeprole_on_node(self.node, self.ITERATIONS, self.WAIT_ITERATIONS, margin=self.MARGINALIZE)
 
         if self.node['type'].startswith("TERMINAL_") and self.node['type'] != "TERMINAL_MERLIN":
             return
@@ -172,3 +173,6 @@ class Deeprole_100_100(Deeprole):
     ITERATIONS = 100
     WAIT_ITERATIONS = 99
 
+
+class Deeprole_Marginalized(Deeprole):
+    MARGINALIZE = True
