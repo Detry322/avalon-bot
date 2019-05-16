@@ -11,6 +11,8 @@ def to_tuple(lst):
 def compute_csv_data(game):
     roles = game['game_info']['roles']
     roles = roles[:1] + roles[1:][::-1]
+    if set(roles) != set(['Resistance', 'Merlin', 'Assassin', 'Spy']):
+        return []
     res_bots = 0
     spy_bots = 0
     results = []
