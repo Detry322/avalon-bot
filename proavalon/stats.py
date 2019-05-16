@@ -78,10 +78,14 @@ def get_dataframe():
         result = compute_csv_data(similar_games[filenames[0]])
         dataframe_data.extend(result)
 
-    return pd.DataFrame(dataframe_data, columns=[
+    df = pd.DataFrame(dataframe_data, columns=[
         'game', 'num_bots', 'is_bot', 'win', 'payoff', 'is_resistance',
         'role', 'resistance_win', 'res_bots', 'spy_bots', 'seat'
     ])
+
+    add_other_dataframes = pd.concat([ df, pd.read_csv('human_v_human_data.csv'), pd.read_csv('bot_v_bot_data.csv')])
+    add_other_dataframes.reset_index(drop=True, inplace=True)
+    return add_other_dataframes
 
 
 def compute_prob(data):
@@ -100,22 +104,24 @@ def calculate_aggregate_statistics(df):
     print " N_Bots | N_Humans | Bot_payoff | human_payoff | N_games | P(bot_payoff > 0.0) "
     print "-------------------------------------------------------------------------------"
     total_games = 0
-    for num_bots in range(1, 5):
+    for num_bots in range(6):
         df_by_game = df[df.num_bots == num_bots]
         bot_payoffs = df_by_game[df_by_game.is_bot].payoff
-        bot_avg = bot_payoffs.mean()
-        human_avg = -bot_avg * (5.0 - num_bots) / num_bots
+        bot_avg = bot_payoffs.mean() if len(bot_payoffs) > 0 else 0.0
+        human_avg = -bot_avg * (5.0 - num_bots) / num_bots if num_bots > 0 else df_by_game.payoff.mean()
+        if num_bots == 5:
+            human_avg = 0.0
 
         num_games = len(df_by_game.game.unique())
         total_games += num_games
 
-        print " {: <6} | {: <8} | {:.08f} | {:.09f} | {: <7} | {}".format(
+        print " {: <6} | {: <8} | {: >10.05f} | {: >12.05f} | {: <7} | {}".format(
             num_bots,
             5 - num_bots,
             bot_avg,
             human_avg,
             num_games,
-            compute_prob(bot_payoffs)
+            compute_prob(bot_payoffs) if num_bots not in [0, 5] else 'undefined'
         )
 
     print "---------------------------------------------- | {: <7} | ---------------------".format(total_games)
@@ -139,38 +145,10 @@ def confidence_b_gr_a(pos_a, neg_a, pos_b, neg_b):
     return total
 
 
-def compare_humans_and_bots(df, fields):
-    human_stats = df[df.is_bot == False].groupby(fields + ['win']).count().game
-    bot_stats = df[df.is_bot == True].groupby(fields + ['win']).count().game
-    
-    results = []
-    for idx in human_stats.index:
-        if not idx[-1]:
-            continue
-        idx = idx[:-1]
-        human_win = human_stats.loc[idx + (True,)]
-        human_loss = human_stats.loc[idx + (False,)]
-        bot_win = bot_stats.loc[idx + (True,)]
-        bot_loss = bot_stats.loc[idx + (False,)]
-        new_dict = {
-            'bot_winrate': bot_win / float(bot_win + bot_loss),
-            'bot_n': bot_win + bot_loss,
-            'human_winrate': human_win / float(human_win + human_loss),
-            'human_n': human_win + human_loss,
-            'bot_better_confidence': confidence_b_gr_a(human_win, human_loss, bot_win, bot_loss)
-        }
-        for k, v in zip(fields, idx):
-            new_dict[k] = v
-        results.append(new_dict)
-    
-    result = pd.DataFrame(results, columns=fields + ['bot_winrate', 'human_winrate', 'bot_better_confidence', 'bot_n', 'human_n'])
-    return result.groupby(fields).mean()
-
-
 def calculate_statistics_by_role(df):
     print "============================ Stats by role =================================="
     print ""
-    print compare_humans_and_bots(df, ['num_bots', 'is_resistance'])
+    # print compare_humans_and_bots(df, ['num_bots', 'is_resistance'])
 
 
 def main():
