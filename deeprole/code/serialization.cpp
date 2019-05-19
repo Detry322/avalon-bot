@@ -82,6 +82,15 @@ void json_serialize_merlin_node(const LookaheadNode* node, json& json_node) {
     }
 }
 
+void calc_nozero_belief(const LookaheadNode* node, const AssignmentProbs& starting_reach_probs, AssignmentProbs* nozero_belief) {
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++) {
+        for (int player = 0; player < NUM_PLAYERS; player++) {
+            int viewpoint = ASSIGNMENT_TO_VIEWPOINT[i][player];
+            (*nozero_belief)(i) *= node->reach_probs[player](viewpoint);
+        }
+    }
+}
+
 void json_serialize_nn_propose(const LookaheadNode* node, const AssignmentProbs& starting_reach_probs, json& json_node) {
     json_node["succeeds"] = node->num_succeeds;
     json_node["fails"] = node->num_fails;
@@ -89,6 +98,8 @@ void json_serialize_nn_propose(const LookaheadNode* node, const AssignmentProbs&
     json_node["propose_count"] = node->propose_count;
 
     AssignmentProbs new_belief = *(node->full_reach_probs) * starting_reach_probs;
+    AssignmentProbs nozero_belief = starting_reach_probs;
+    calc_nozero_belief(node, starting_reach_probs, &nozero_belief);
 
     double sum = new_belief.sum();
 
@@ -97,10 +108,12 @@ void json_serialize_nn_propose(const LookaheadNode* node, const AssignmentProbs&
         json_node["nn_output"] = "n/a";
     } else {
         new_belief /= sum;
+        nozero_belief /= nozero_belief.sum();
         ViewpointVector nn_output[NUM_PLAYERS];
         node->nn_model->predict(node->proposer, new_belief, nn_output);
         
         json_node["new_belief"] = eigen_to_single_vector(new_belief);
+        json_node["nozero_belief"] = eigen_to_single_vector(nozero_belief);
         for (int i = 0; i < NUM_PLAYERS; i++) {
             json_node["nn_output"].push_back(eigen_to_single_vector(nn_output[i]));
         }

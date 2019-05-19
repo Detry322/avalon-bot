@@ -15,6 +15,45 @@ def filter_bot_v_bot_games(all_games, acceptable_bots):
     return all_games[selector]
 
 
+def convert_to_by_player(games):
+    resistance_win = games['winner'] == 'good'
+    num_bots = pd.Series(np.zeros(len(games)), index=games.index).astype(int)
+    res_bots = pd.Series(np.zeros(len(games)), index=games.index).astype(int)
+    spy_bots = pd.Series(np.zeros(len(games)), index=games.index).astype(int)
+    for i in range(5):
+        is_bot = games['bot_{}'.format(i)] == 'Deeprole'
+        is_res = games['bot_{}_role'.format(i)].isin(['merlin', 'servant'])
+        num_bots += is_bot.astype(int)
+        res_bots += (is_bot & is_res).astype(int)
+        spy_bots += (is_bot & ~is_res).astype(int)
+
+    new_dfs = []
+    for i in range(5):
+        df = pd.DataFrame()
+        is_resistance = games['bot_{}_role'.format(i)].isin(['merlin', 'servant'])
+        df['num_bots'] = num_bots
+        df['is_bot'] = games['bot_{}'.format(i)] == 'Deeprole'
+        df['win'] = ~(is_resistance ^ resistance_win)
+        df['is_resistance'] = is_resistance
+        df['role'] = games['bot_{}_role'.format(i)].map({
+            'servant': 'Resistance',
+            'merlin': 'Merlin',
+            'minion': 'Spy',
+            'assassin': 'Assassin'
+        })
+        df['resistance_win'] = resistance_win
+        df['res_bots'] = res_bots
+        df['spy_bots'] = spy_bots
+        df['seat'] = i
+        df['game'] = games.index
+        new_dfs.append(df)
+
+    result = pd.concat(new_dfs)
+    result.sort_values('game', inplace=True)
+    result.reset_index(drop=True, inplace=True)
+    return result
+
+
 def _group_by_bot(unchunked_games, bots, chunksize=100000):
     results = []
     for i in range(0, len(unchunked_games), chunksize):
@@ -135,3 +174,71 @@ def compare_humans_and_bots(df, fields):
     
     result = pd.DataFrame(results, columns=['num_other_bots'] + fields + ['bot_winrate', 'human_winrate', 'bot_better_confidence', 'bot_n', 'human_n'])
     return result.groupby(['num_other_bots'] + fields).mean()
+
+
+
+def create_moawt(bot_games, human_games, bots):
+    result = []
+    for i, bot in enumerate(bots + ['Human']):
+        if bot != 'Human':
+            filtered_games = filter_bot_v_bot_games(bot_games, ['Deeprole', bot])
+            by_player = convert_to_by_player(filtered_games)
+            bot = "{}_{}".format(i, bot)
+        else:
+            by_player = human_games
+        h_v_bot_role = compare_humans_and_bots(by_player, ['is_resistance'])
+        h_v_bot_overall = compare_humans_and_bots(by_player, [])
+
+        only_other_overall = h_v_bot_overall.loc[0]
+        only_dr_overall = h_v_bot_overall.loc[4]
+        only_other_res = h_v_bot_role.loc[(0, True)]
+        only_dr_res = h_v_bot_role.loc[(4, True)]
+        only_other_spy = h_v_bot_role.loc[(0, False)]
+        only_dr_spy = h_v_bot_role.loc[(4, False)]
+        result.extend([
+            {
+                'Bot': bot,
+                'Role': '1_all',
+                '_4them_us_winrate': only_other_overall['bot_winrate'],
+                '_4them_us_n': only_other_overall['bot_n'],
+                '_4them_them_winrate': only_other_overall['human_winrate'],
+                '_4them_them_n': only_other_overall['human_n'],
+                '_4us_us_winrate': only_dr_overall['bot_winrate'],
+                '_4us_us_n': only_dr_overall['bot_n'],
+                '_4us_them_winrate': only_dr_overall['human_winrate'],
+                '_4us_them_n': only_dr_overall['human_n'],
+            },
+            {
+                'Bot': bot,
+                'Role': '2_res',
+                '_4them_us_winrate': only_other_res['bot_winrate'],
+                '_4them_us_n': only_other_res['bot_n'],
+                '_4them_them_winrate': only_other_res['human_winrate'],
+                '_4them_them_n': only_other_res['human_n'],
+                '_4us_us_winrate': only_dr_res['bot_winrate'],
+                '_4us_us_n': only_dr_res['bot_n'],
+                '_4us_them_winrate': only_dr_res['human_winrate'],
+                '_4us_them_n': only_dr_res['human_n'],
+            },
+            {
+                'Bot': bot,
+                'Role': '3_spy',
+                '_4them_us_winrate': only_other_spy['bot_winrate'],
+                '_4them_us_n': only_other_spy['bot_n'],
+                '_4them_them_winrate': only_other_spy['human_winrate'],
+                '_4them_them_n': only_other_spy['human_n'],
+                '_4us_us_winrate': only_dr_spy['bot_winrate'],
+                '_4us_us_n': only_dr_spy['bot_n'],
+                '_4us_them_winrate': only_dr_spy['human_winrate'],
+                '_4us_them_n': only_dr_spy['human_n'],
+            }
+        ])
+
+    df = pd.DataFrame(result)
+    df['_4them_us_se'] = np.sqrt(df['_4them_us_winrate'] * (1.0 - df['_4them_us_winrate']) / df['_4them_us_n'])
+    df['_4them_them_se'] = np.sqrt(df['_4them_them_winrate'] * (1.0 - df['_4them_them_winrate']) / df['_4them_them_n'])
+    df['_4us_us_se'] = np.sqrt(df['_4us_us_winrate'] * (1.0 - df['_4us_us_winrate']) / df['_4us_us_n'])
+    df['_4us_them_se'] = np.sqrt(df['_4us_them_winrate'] * (1.0 - df['_4us_them_winrate']) / df['_4us_them_n'])
+    return df
+
+

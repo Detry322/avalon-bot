@@ -38,7 +38,7 @@ def marginalize_belief(belief):
 
 deeprole_cache = {}
 
-def actually_run_deeprole_on_node(node, iterations, wait_iterations, margin):
+def actually_run_deeprole_on_node(node, iterations, wait_iterations, no_zero, nn_folder):
     command = [
         DEEPROLE_BINARY,
         '--play',
@@ -49,7 +49,7 @@ def actually_run_deeprole_on_node(node, iterations, wait_iterations, margin):
         '--depth=1',
         '--iterations={}'.format(iterations),
         '--witers={}'.format(wait_iterations),
-        '--modeldir=deeprole_models'
+        '--modeldir={}'.format(nn_folder)
     ]
     process = subprocess.Popen(
         command,
@@ -59,27 +59,37 @@ def actually_run_deeprole_on_node(node, iterations, wait_iterations, margin):
         cwd=DEEPROLE_BASE_DIR
     )
 
-    belief = node['new_belief']
-    print margin, belief[:10]
-    if margin:
-        belief = marginalize_belief(belief)
-    print margin, belief[:10]
+    if no_zero:
+        belief = node['nozero_belief']
+    else:
+        belief = node['new_belief']
 
     stdout, _ = process.communicate(input=str(belief) + "\n")
     result = json.loads(stdout)
     return result
 
 
-def run_deeprole_on_node(node, iterations, wait_iterations, margin=False):
+def run_deeprole_on_node(node, iterations, wait_iterations, no_zero=False, nn_folder='deeprole_models'):
     global deeprole_cache
 
     if len(deeprole_cache) > 250:
         deeprole_cache = {}
 
-    cache_key = (node['proposer'], node['succeeds'], node['fails'], node['propose_count'], tuple(node['new_belief']), iterations, wait_iterations, margin)
+    cache_key = (
+        node['proposer'],
+        node['succeeds'],
+        node['fails'],
+        node['propose_count'],
+        tuple(node['new_belief']),
+        iterations,
+        wait_iterations,
+        no_zero,
+        nn_folder
+    )
+    
     if cache_key in deeprole_cache:
         return deeprole_cache[cache_key]
 
-    result = actually_run_deeprole_on_node(node, iterations, wait_iterations, margin)
+    result = actually_run_deeprole_on_node(node, iterations, wait_iterations, no_zero, nn_folder)
     deeprole_cache[cache_key] = result
     return result

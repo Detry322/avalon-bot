@@ -12,7 +12,8 @@ START_NODE = {
     "fails": 0,
     "propose_count": 0,
     "proposer": 0,
-    "new_belief": list(np.ones(60)/60.0)
+    "new_belief": list(np.ones(60)/60.0),
+    "nozero_belief": list(np.ones(60)/60.0)
 }
 
 def assert_eq(a, b):
@@ -40,14 +41,15 @@ def print_move_probs(probs, legal_actions, cutoff=0.95):
 class Deeprole(Bot):
     ITERATIONS = 100
     WAIT_ITERATIONS = 50
-    MARGINALIZE=False
+    NO_ZERO=False
+    NN_FOLDER='deeprole_models'
 
     def __init__(self):
         pass
 
 
     def reset(self, game, player, role, hidden_states):
-        self.node = run_deeprole_on_node(START_NODE, self.ITERATIONS, self.WAIT_ITERATIONS, margin=self.MARGINALIZE)
+        self.node = run_deeprole_on_node(START_NODE, self.ITERATIONS, self.WAIT_ITERATIONS, no_zero=self.NO_ZERO, nn_folder=self.NN_FOLDER)
         self.player = player
         self.perspective = get_deeprole_perspective(player, hidden_states[0])
         # print self.perspective
@@ -74,7 +76,7 @@ class Deeprole(Bot):
             # print "Player {} perspective {}".format(self.player, self.perspective)
             # print_top_k_viewpoint_belief(self.node['new_belief'], self.player, self.perspective)
             # print self.node['new_belief']
-            self.node = run_deeprole_on_node(self.node, self.ITERATIONS, self.WAIT_ITERATIONS, margin=self.MARGINALIZE)
+            self.node = run_deeprole_on_node(self.node, self.ITERATIONS, self.WAIT_ITERATIONS, no_zero=self.NO_ZERO, nn_folder=self.NN_FOLDER)
 
         if self.node['type'].startswith("TERMINAL_") and self.node['type'] != "TERMINAL_MERLIN":
             return
@@ -169,10 +171,15 @@ class Deeprole_100_75(Deeprole):
     ITERATIONS = 100
     WAIT_ITERATIONS = 75
 
+
 class Deeprole_100_100(Deeprole):
     ITERATIONS = 100
     WAIT_ITERATIONS = 99
 
 
-class Deeprole_Marginalized(Deeprole):
-    MARGINALIZE = True
+class Deeprole_NoZeroing(Deeprole):
+    NO_ZERO = True
+
+
+class Deeprole_OldNNs(Deeprole):
+    NN_FOLDER = 'deeprole_models_old'

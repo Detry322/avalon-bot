@@ -60,12 +60,11 @@ def create_model_v1():
     inp = tf.keras.layers.Input(shape=(65,))
     x = tf.keras.layers.Dense(128, activation='relu')(inp)
     x = tf.keras.layers.Dense(128, activation='relu')(x)
-    x = tf.keras.layers.Dense(128, activation='relu')(x)
     x = tf.keras.layers.Dense(5*15)(x)
     out = CFVMaskAndAdjustLayer()([inp, x])
 
     model = tf.keras.models.Model(inputs=inp, outputs=out)
-    model.compile(optimizer='adam', loss=loss, metrics=['mse'])
+    model.compile(optimizer='adam', loss='mse', metrics=['mse'])
     return model
 
 
@@ -81,29 +80,44 @@ def create_model_v2():
     return model
 
 
+VAL_DATAPOINTS = 20000
 def train(num_succeeds, num_fails, propose_count):
-    model = create_model_v2()
-
     print "Loading data..."
     _, X, Y = load_data(num_succeeds, num_fails, propose_count)
+    idx = np.random.permutation(len(X))
+    X = X[idx]
+    Y = Y[idx]
 
-    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-        'models/{}_{}_{}.h5'.format(num_succeeds, num_fails, propose_count),
-        save_best_only=True
-    )
+    X_val, X_train = X[:VAL_DATAPOINTS], X[VAL_DATAPOINTS:]
+    Y_val, Y_train = Y[:VAL_DATAPOINTS], Y[VAL_DATAPOINTS:]
 
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir='logs/{}_{}_{}'.format(num_succeeds, num_fails, propose_count))
+    for num_datapoints in [20000, 40000, 60000, 80000, 100000]:
+        checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+            'models/{}.h5'.format(num_datapoints),
+            save_best_only=True
+        )
 
-    print "Fitting..."
-    model.fit(
-        x=X,
-        y=Y,
-        batch_size=4096,
-        epochs=3000,
-        validation_split=0.1,
-        callbacks=[checkpoint_callback, tensorboard_callback]
-    )
-    return X, Y, model
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(
+            log_dir='logs/{}'.format(num_datapoints)
+        )
+
+        early_stopping_callback = tf.keras.callbacks.EarlyStopping(
+            monitor='val_loss',
+            patience=int(100 * (100000.0/num_datapoints)),
+            verbose=True
+        )
+
+        print "Fitting..."
+        model = create_model_v1()
+        model.fit(
+            x=X_train[:num_datapoints],
+            y=Y_train[:num_datapoints],
+            batch_size=4000,
+            epochs=int(5000 * (100000.0/num_datapoints)),
+            validation_data=(X_val, Y_val),
+            callbacks=[checkpoint_callback, tensorboard_callback, early_stopping_callback]
+        )
+    return
 
 
 def compare(a, b):

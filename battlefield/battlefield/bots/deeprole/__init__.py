@@ -9,5 +9,6 @@ from battlefield.bots.deeprole.bot import (
     Deeprole_100_25,
     Deeprole_100_75,
     Deeprole_100_100,
-    Deeprole_Marginalized
+    Deeprole_NoZeroing,
+    Deeprole_OldNNs
 )
